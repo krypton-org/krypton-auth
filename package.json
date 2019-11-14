@@ -1,5 +1,5 @@
 {
-  "name": "rest-authentification",
+  "name": "graphql-authentification-service",
   "version": "0.0.1",
   "description": "A REST back-end to handle login, registration, access control and password recovery with JsonWebToken.",
   "main": "app.js",
@@ -42,7 +42,9 @@
     "user",
     "space",
     "userspace",
-    "REST",
+    "GraphQL",
+    "graph",
+    "ql",
     "authentification",
     "registration",
     "login",
