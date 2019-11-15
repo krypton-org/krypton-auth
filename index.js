@@ -3,7 +3,7 @@
  * MIT Licensed
  */
 
-module.exports = require('./lib/REST-authentification');
+module.exports = require('./lib/GraphQLAuthentificationService');
 
 
 
