@@ -15,7 +15,7 @@ test('Get service public key', async (done) => {
               value
             }}`
     }
-    const res = await request.postGraphQL(query);
+    const res = await request.getGraphQL(query);
     expect(res.data.publicKey.value).toBeTruthy();
     done();
 });

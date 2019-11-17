@@ -32,7 +32,7 @@ const AppTester = function (options) {
     });
 
     this.request.getGraphQL = (query) => new Promise((resolve, reject)=> {
-        request.get('/graphql')
+        this.request.get('/graphql')
         .set('Accept', 'application/json')
         .set("Content-Type", "application/json")
         .send(JSON.stringify(query))
