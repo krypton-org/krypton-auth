@@ -20,7 +20,25 @@ const AppTester = function (options) {
         }
     }
 
-    this.request = request(new GraphQLAuthentificationService(options))
+    this.request = request(new GraphQLAuthentificationService(options));
+
+    this.request.postGraphQL = (query) => new Promise((resolve, reject)=> {
+        this.request.post('/graphql')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify(query))
+        .then(res => resolve(JSON.parse(res.text)))
+        .catch(err => reject(err))
+    });
+
+    this.request.getGraphQL = (query) => new Promise((resolve, reject)=> {
+        request.get('/graphql')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify(query))
+        .then(res => resolve(JSON.parse(res.text)))
+        .catch(err => reject(err))
+    });
 
     this.close = async (done) => {
         const agenda = require('../../lib/service/agenda/agenda');
