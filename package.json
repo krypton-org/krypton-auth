@@ -29,7 +29,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "test-with-coverage": "jest --coverage --forceExit && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test-with-coverage": "jest --coverage --forceExit && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test": "jest --forceExit",
     "start": "node app.js"
   },
