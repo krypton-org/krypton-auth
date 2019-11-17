@@ -22,9 +22,8 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.4",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "supertest": "^3.3.0",
-    "supertest-session": "^3.3.0",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",
     "webpack-node-externals": "^1.7.2"
