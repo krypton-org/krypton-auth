@@ -80,11 +80,7 @@ test('Password to small', async (done) => {
               }
             }}`
     }
-    const res = await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message).toBe("The password must contain at least 8 characters!");
     done();
 });
@@ -108,11 +104,7 @@ test('Email invalid', async (done) => {
               }
             }}`
     }
-    const res = await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("This email address is not valid!")).toBeTruthy();
     done();
 });
@@ -136,11 +128,7 @@ test('Username contains unauthorized characters', async (done) => {
               }
             }}`
     }
-    const res = await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("A username may only contain letters, numbers, dashes, dots and underscores")).toBeTruthy();
     done();
 });
@@ -164,11 +152,7 @@ test('Username to small', async (done) => {
               }
             }}`
     }
-    const res = await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
     done();
 });
@@ -192,11 +176,7 @@ test('Register a correct user', async (done) => {
               }
             }}`
     }
-    const res =  await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     if (res.errors) { return done(res.errors); }
     expect(res.data.register.notifications[0].type).toBe("SUCCESS");
     done();
@@ -221,11 +201,7 @@ test('Username already exists', async (done) => {
               }
             }}`
     }
-    const res =  await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message).toBe("Username already exists");
     done();
 });
@@ -249,11 +225,7 @@ test('Email already exists', async (done) => {
               }
             }}`
     }
-    const res =  await request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => JSON.parse(res.text));
+    const res = await request.postGraphQL(query);
     expect(res.errors[0].message).toBe("Email already exists");
     done();
 });
