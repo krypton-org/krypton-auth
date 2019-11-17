@@ -3,13 +3,12 @@ const AppTester = require('../utils/AppTester');
 let appTester;
 let request;
 
-beforeAll(async (done) => {
-    appTester = new AppTester();
-    request = appTester.getRequestSender();
-    setTimeout(() => done(), 10000)
+beforeAll((done) => {
+    appTester = new AppTester({onReady: done});
 }, 15000);
 
 test('Get service public key', (done) => {
+    request = appTester.getRequestSender();
     const query = {
         query: `query{
             publicKey{
@@ -29,5 +28,5 @@ test('Get service public key', (done) => {
 
 
 afterAll(async (done) => {
-    await appTester.disconnectDB(done);
+    await appTester.close(done);
 }, 10000);

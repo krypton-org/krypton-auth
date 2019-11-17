@@ -1,5 +1,6 @@
 const db = require('../../lib/service/db/db');
 const request = require('supertest');
+const mongoose = require('mongoose');
 const GraphQLAuthentificationService = require("../../index");
 
 const AppTester = function (options) {
@@ -15,16 +16,20 @@ const AppTester = function (options) {
                     pass: 'JAXPXSY9MQP3uHtFjB'
                 }
             },
+            dbConfig: {
+                userDB: "test"
+            },
             graphiql: true
         }
     }
 
     this.request = request(new GraphQLAuthentificationService(options))
 
-    this.disconnectDB = async (done) => {
+    this.close = async (done) => {
         const agenda = require('../../lib/service/agenda/agenda');
         await agenda.stop();
-        await db.close(done)
+        mongoose.connection.db.dropDatabase()
+        .then(() => db.close(done));
     }
 
     this.getRequestSender = () => {
