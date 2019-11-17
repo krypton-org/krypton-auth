@@ -23,8 +23,10 @@ jobs:
       run: |
         npm ci
         npm run build --if-present
-        npm test
+        jest --coverage --forceExit && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v1.0.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
       env:
         CI: true
