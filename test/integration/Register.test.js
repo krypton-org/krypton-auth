@@ -19,45 +19,6 @@ beforeAll((done) => {
         dbConfig: {
             userDB: "RegisterTest"
         },
-        extendedSchema: {
-            firstName:{ 
-                type: String,
-                required: false,
-                maxlength: 256,
-                validate: {
-                    validator: v => v.length >= 2,
-                    message: () => "A minimum of 2 letters are required for your first name!",
-                },
-                isPublic: false
-            },
-            lastName:{ 
-                type: String,
-                required: false,
-                maxlength: 256,
-                validate: {
-                    validator: v => v.length >= 2,
-                    message: () => "A minimum of 2 letters are required for your last name!",
-                },
-                isPublic: false
-            },
-            gender:{ 
-                type: String,
-                required: true,
-                enum: ["M", "Mrs", "Other"],
-                isPublic: true
-            },
-            age:{ 
-                type: Number,
-                required: true,
-                isPublic: true
-            },
-            receiveNewsletter:{ 
-                type: Boolean,
-                required: true,
-                default: false,
-                isPublic: false
-            }
-        },
         onReady: done});
 }, 40000);
 
