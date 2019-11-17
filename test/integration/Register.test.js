@@ -16,6 +16,9 @@ let user = {
 
 beforeAll((done) => {
     appTester = new AppTester({
+        dbConfig: {
+            userDB: "RegisterTest"
+        },
         extendedSchema: {
             firstName:{ 
                 type: String,
@@ -58,7 +61,35 @@ beforeAll((done) => {
         onReady: done});
 }, 40000);
 
-test('Get service public key', (done) => {
+test('Password to small', async (done) => {
+    request = appTester.getRequestSender();
+    const query = {
+        query: `mutation{
+            register(fields: {
+                username:"${user.username}" 
+                email:"${user.email}" 
+                password:"1234"
+                age:${user.age}
+                receiveNewsletter:${user.receiveNewsletter},
+                gender:${user.gender}
+                firstName:"${user.firstName}" 
+                lastName:"${user.lastName}"}){
+              notifications{
+                  type
+                  message
+              }
+            }}`
+    }
+    const res = await request.post('/graphql')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify(query))
+        .then(res => JSON.parse(res.text));
+    expect(res.errors[0].message).toBe("The password must contain at least 8 characters!");
+    done();
+});
+
+test('Register a correct user', async (done) => {
     request = appTester.getRequestSender();
     const query = {
         query: `mutation{
@@ -77,17 +108,70 @@ test('Get service public key', (done) => {
               }
             }}`
     }
-    request.post('/graphql')
+    const res =  await request.post('/graphql')
         .set('Accept', 'application/json')
         .set("Content-Type", "application/json")
         .send(JSON.stringify(query))
-        .end((err, res) => {
-            if (err) { return done(err); }
-            res = JSON.parse(res.text)
-            if (res.errors) { return done(res.errors); }
-            expect(res.data.register.notifications[0].type).toBe("SUCCESS");
-            done();
-        });
+        .then(res => JSON.parse(res.text));
+    if (res.errors) { return done(res.errors); }
+    expect(res.data.register.notifications[0].type).toBe("SUCCESS");
+    done();
+});
+
+test('Username already exists!', async (done) => {
+    request = appTester.getRequestSender();
+    const query = {
+        query: `mutation{
+            register(fields: {
+                username:"${user.username}" 
+                email:"other.email@mail.com" 
+                password:"${user.password}"
+                age:${user.age}
+                receiveNewsletter:${user.receiveNewsletter},
+                gender:${user.gender}
+                firstName:"${user.firstName}" 
+                lastName:"${user.lastName}"}){
+              notifications{
+                  type
+                  message
+              }
+            }}`
+    }
+    const res =  await request.post('/graphql')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify(query))
+        .then(res => JSON.parse(res.text));
+    expect(res.errors[0].message).toBe("Username already exists");
+    done();
+});
+
+test('Email already exists!', async (done) => {
+    request = appTester.getRequestSender();
+    const query = {
+        query: `mutation{
+            register(fields: {
+                username:"other_username" 
+                email:"${user.email}" 
+                password:"${user.password}"
+                age:${user.age}
+                receiveNewsletter:${user.receiveNewsletter},
+                gender:${user.gender}
+                firstName:"${user.firstName}" 
+                lastName:"${user.lastName}"}){
+              notifications{
+                  type
+                  message
+              }
+            }}`
+    }
+    const res =  await request.post('/graphql')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send(JSON.stringify(query))
+        .then(res => JSON.parse(res.text));
+    expect(res.errors[0].message).toBe("Email already exists");
+    done();
 });
 
 

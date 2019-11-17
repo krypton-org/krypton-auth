@@ -16,9 +16,6 @@ const AppTester = function (options) {
                     pass: 'JAXPXSY9MQP3uHtFjB'
                 }
             },
-            dbConfig: {
-                userDB: "test"
-            },
             graphiql: true
         }
     }
