@@ -61,16 +61,17 @@ const AppTester = function (options) {
 
     this.request = request(new GraphQLAuthentificationService(options));
 
-    this.request.postGraphQL = (query) => new Promise((resolve, reject)=> {
-        this.request.post('/graphql')
+    this.request.postGraphQL = (query, bearerToken) => new Promise((resolve, reject)=> {
+        let request = this.request.post('/graphql')
         .set('Accept', 'application/json')
         .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
+        if (bearerToken) request = request.set("Authorization", "Bearer "+bearerToken)
+        request.send(JSON.stringify(query))
         .then(res => resolve(JSON.parse(res.text)))
         .catch(err => reject(err))
     });
 
-    this.request.getGraphQL = (query) => new Promise((resolve, reject)=> {
+    this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject)=> {
         this.request.get('/graphql')
         .set('Accept', 'application/json')
         .set("Content-Type", "application/json")
