@@ -71,6 +71,41 @@ const AppTester = function (options) {
         .catch(err => reject(err))
     });
 
+    this.register = (user) => new Promise((resolve, reject) => {
+        const registerQuery = {
+            query: `mutation{
+                register(fields: {
+                    username:"${user.username}" 
+                    email:"${user.email}" 
+                    password:"${user.password}"
+                    age:${user.age}
+                    receiveNewsletter:${user.receiveNewsletter},
+                    gender:${user.gender}
+                    firstName:"${user.firstName}" 
+                    lastName:"${user.lastName}"}){
+                notifications{
+                    type
+                    message
+                }
+                }}`
+        }
+        this.request.postGraphQL(registerQuery)
+        .then(res => resolve(res))
+        .catch(err => reject(err));
+    });
+
+    this.login = (login, password) => new Promise((resolve, reject) => {
+        let loginQuery = {
+            query:  `mutation{
+                login(login:"${login}" password:"${password}"){
+                token
+            }}`
+        }
+        this.request.postGraphQL(loginQuery)
+        .then(res => resolve(res))
+        .catch(err => reject(err));
+    }) 
+
     this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject)=> {
         this.request.get('/graphql')
         .set('Accept', 'application/json')
