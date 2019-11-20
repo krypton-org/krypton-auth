@@ -42,9 +42,9 @@ beforeAll((done) => {
         onReady: async () => {
             try{
                 request = appTester.getRequestSender();
-                await appTester.register(user1);
-                await appTester.register(user2);
-                let res = await appTester.login(user1.email, user1.password);
+                let res = await appTester.register(user1);
+                res = await appTester.register(user2);
+                res = await appTester.login(user1.email, user1.password);
                 token1 = res.data.login.token;
                 res = await appTester.login(user2.email, user2.password);
                 token2 = res.data.login.token;
@@ -229,6 +229,25 @@ test('Wrong gender', async (done) => {
     let res = await request.postGraphQL(query, token1);
     expect(res.errors[0].message.includes("found Mutant")).toBeTruthy();
     done();
+});
+
+test('Update email of a verified user', async (done) => {
+    const UserModel = require('../../lib/model/UserModel');
+    await UserModel.updateUser({username: user2.username}, {verified: true});
+    const newEmail = "yoyo@whatever.com";
+    const query = {
+        query: `mutation{
+            updateMe(fields:{email: "${newEmail}"}){
+              notifications{
+                type
+                message
+              }
+            }
+          }`
+    }
+    let res = await request.postGraphQL(query, token2);
+    expect(res.data.updateMe.notifications.filter(notif => notif.message.includes("You will receive a confirmation link at your email address in a few minutes")).length).toBe(1);
+    done();  
 });
 
 afterAll(async (done) => {
