@@ -141,7 +141,7 @@ test('Register a correct user', async (done) => {
     if (res.errors) { return done(res.errors); }
     expect(res.data.register.notifications[0].type).toBe("SUCCESS");
     done();
-});
+}, 10000);
 
 test('Username already exists', async (done) => {
     request = appTester.getRequestSender();

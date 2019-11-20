@@ -17,7 +17,7 @@ const AppTester = function (options) {
                 }
             },
             extendedSchema: {
-                firstName:{ 
+                firstName: {
                     type: String,
                     required: false,
                     maxlength: 256,
@@ -27,7 +27,7 @@ const AppTester = function (options) {
                     },
                     isPublic: false
                 },
-                lastName:{ 
+                lastName: {
                     type: String,
                     required: false,
                     maxlength: 256,
@@ -37,18 +37,18 @@ const AppTester = function (options) {
                     },
                     isPublic: false
                 },
-                gender:{ 
+                gender: {
                     type: String,
                     required: true,
                     enum: ["M", "Mrs", "Other"],
                     isPublic: true
                 },
-                age:{ 
+                age: {
                     type: Number,
                     required: true,
                     isPublic: true
                 },
-                receiveNewsletter:{ 
+                receiveNewsletter: {
                     type: Boolean,
                     required: true,
                     default: false,
@@ -61,14 +61,24 @@ const AppTester = function (options) {
 
     this.request = request(new GraphQLAuthentificationService(options));
 
-    this.request.postGraphQL = (query, bearerToken) => new Promise((resolve, reject)=> {
-        let request = this.request.post('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        if (bearerToken) request = request.set("Authorization", "Bearer "+bearerToken)
+    this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject) => {
+        let request = this.request.get('/graphql')
+            .set('Accept', 'application/json')
+            .set("Content-Type", "application/json");
+        if (bearerToken) request = request.set("Authorization", "Bearer " + bearerToken);
         request.send(JSON.stringify(query))
-        .then(res => resolve(JSON.parse(res.text)))
-        .catch(err => reject(err))
+            .then(res => resolve(JSON.parse(res.text)))
+            .catch(err => reject(err));
+    });
+
+    this.request.postGraphQL = (query, bearerToken) => new Promise((resolve, reject) => {
+        let request = this.request.post('/graphql')
+            .set('Accept', 'application/json')
+            .set("Content-Type", "application/json");
+        if (bearerToken) request = request.set("Authorization", "Bearer " + bearerToken);
+        request.send(JSON.stringify(query))
+            .then(res => resolve(JSON.parse(res.text)))
+            .catch(err => reject(err));
     });
 
     this.register = (user) => new Promise((resolve, reject) => {
@@ -90,36 +100,33 @@ const AppTester = function (options) {
                 }}`
         }
         this.request.postGraphQL(registerQuery)
-        .then(res => resolve(res))
-        .catch(err => reject(err));
+            .then(res => resolve(res))
+            .catch(err => reject(err));
     });
 
+    /**
+        Log user in and return token
+        @param String login
+        @param String password
+        @return String token
+    */
     this.login = (login, password) => new Promise((resolve, reject) => {
         let loginQuery = {
-            query:  `mutation{
+            query: `mutation{
                 login(login:"${login}" password:"${password}"){
                 token
             }}`
         }
         this.request.postGraphQL(loginQuery)
-        .then(res => resolve(res))
-        .catch(err => reject(err));
-    }) 
-
-    this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject)=> {
-        this.request.get('/graphql')
-        .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send(JSON.stringify(query))
-        .then(res => resolve(JSON.parse(res.text)))
-        .catch(err => reject(err))
-    });
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+    })
 
     this.close = async (done) => {
         const agenda = require('../../lib/service/agenda/agenda');
         await agenda.stop();
         mongoose.connection.db.dropDatabase()
-        .then(() => db.close(done));
+            .then(() => db.close(done));
     }
 
     this.getRequestSender = () => {
