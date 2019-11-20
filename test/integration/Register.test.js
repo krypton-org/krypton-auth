@@ -3,7 +3,7 @@ const AppTester = require('../utils/AppTester');
 let appTester;
 let request;
 
-let user = {
+let user1 = {
     username: "username", 
     email: "test@test.com", 
     password: "password", 
@@ -14,12 +14,31 @@ let user = {
     receiveNewsletter: true
 };
 
-beforeAll((done) => {
+let user2 = {
+    username: "username2",
+    email: "test2@test.com",
+    password: "password2",
+    firstName: "firstname2",
+    lastName: "lastname2",
+    age: 24,
+    gender: "Mrs",
+    receiveNewsletter: true
+};
+
+beforeAll(async (done) => {
     appTester = new AppTester({
         dbConfig: {
             userDB: "RegisterTest"
         },
-        onReady: done});
+        onReady: async () => {
+            try{
+                request = appTester.getRequestSender();
+                res = await appTester.register(user2);
+                done();
+            } catch (err) {
+                done(err);
+            }
+        }});
 }, 40000);
 
 test('Password to small', async (done) => {
@@ -27,14 +46,14 @@ test('Password to small', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user.username}" 
-                email:"${user.email}" 
+                username:"${user1.username}" 
+                email:"${user1.email}" 
                 password:"1234"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -51,14 +70,14 @@ test('Email invalid', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user.username}" 
+                username:"${user1.username}" 
                 email:"wrong.email.com" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -76,13 +95,13 @@ test('Username contains unauthorized characters', async (done) => {
         query: `mutation{
             register(fields: {
                 username:"Yo^^^^" 
-                email:"${user.email}" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                email:"${user1.email}" 
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -100,13 +119,13 @@ test('Username to small', async (done) => {
         query: `mutation{
             register(fields: {
                 username:"Yo" 
-                email:"${user.email}" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                email:"${user1.email}" 
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -123,14 +142,14 @@ test('Register a correct user', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user.username}" 
-                email:"${user.email}" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                username:"${user1.username}" 
+                email:"${user1.email}" 
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -148,14 +167,14 @@ test('Username already exists', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user.username}" 
+                username:"${user2.username}" 
                 email:"other.email@mail.com" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
@@ -173,13 +192,13 @@ test('Email already exists', async (done) => {
         query: `mutation{
             register(fields: {
                 username:"other_username" 
-                email:"${user.email}" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
+                email:"${user2.email}" 
+                password:"${user1.password}"
+                age:${user1.age}
+                receiveNewsletter:${user1.receiveNewsletter},
+                gender:${user1.gender}
+                firstName:"${user1.firstName}" 
+                lastName:"${user1.lastName}"}){
               notifications{
                   type
                   message
