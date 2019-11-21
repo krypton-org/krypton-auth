@@ -55,7 +55,7 @@ beforeAll((done) => {
             userDB: "RecoverTest"
         },
         onReady: async () => {
-            try{
+            try {
                 request = appTester.getRequestSender();
                 await appTester.register(user);
                 await appTester.register(user2);
@@ -117,10 +117,10 @@ test("Change password with recorevy token", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../lib/model/UserModel');
-    const userRetrieved = await UserModel.getUser({username: user.username}, {verified: true});
+    const userRetrieved = await UserModel.getUser({ username: user.username }, { verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
-    let newPassword = "newPassword"; 
+    let newPassword = "newPassword";
     const updatePasswordQuery = {
         query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
             notifications{
@@ -157,7 +157,7 @@ test("Wrong token", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
 
-    let newPassword = "newPassword"; 
+    let newPassword = "newPassword";
     const updatePasswordQuery = {
         query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"WRONGTOKEN"){
             notifications{
@@ -190,7 +190,7 @@ test("Password too short", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../lib/model/UserModel');
-    const userRetrieved = await UserModel.getUser({username: user3.username});
+    const userRetrieved = await UserModel.getUser({ username: user3.username });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     const updatePasswordQuery = {
@@ -222,14 +222,14 @@ test("Token too old", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../lib/model/UserModel');
-    const userRetrieved = await UserModel.getUser({username: user4.username});
+    const userRetrieved = await UserModel.getUser({ username: user4.username });
     let oldDate = new Date()
-    oldDate.setHours(oldDate.getHours()-2);
-    await UserModel.updateUser({email: user4.email}, {"passwordRecoveryRequestDate":oldDate});
+    oldDate.setHours(oldDate.getHours() - 2);
+    await UserModel.updateUser({ email: user4.email }, { "passwordRecoveryRequestDate": oldDate });
 
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
-    let newPassword = "newPassword"; 
+    let newPassword = "newPassword";
     const updatePasswordQuery = {
         query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
             notifications{
@@ -241,6 +241,21 @@ test("Token too old", async (done) => {
 
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("This link has expired, please ask a new one.")).toBeTruthy();
+    done();
+});
+
+test("Acces reset password form", async (done) => {
+    res = await request.get("/form/reset/password?token=" + "ATOKEN");
+    expect(res.statusCode).toBe(200);
+    expect(res.text.includes("Reset your password")).toBeTruthy();
+    done();
+});
+
+test("Can't access reset password form when logged in", async (done) => {
+    res = await request.get("/form/reset/password?token=" + "ATOKEN")
+    .set("Authorization", "Bearer " + token).send();
+    expect(res.statusCode).toBe(200);
+    expect(res.text.includes("Oups, you are already logged in!")).toBeTruthy();
     done();
 });
 

@@ -1,7 +1,7 @@
 {
   "name": "graphql-authentification-service",
   "version": "0.0.2",
-  "description": "A REST back-end to handle login, registration, access control and password recovery with JsonWebToken.",
+  "description": "A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken.",
   "main": "app.js",
   "dependencies": {
     "agenda": "^2.1.0",
