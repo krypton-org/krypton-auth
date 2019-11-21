@@ -6,6 +6,7 @@ let appTester;
 let request;
 let token1;
 let token2;
+let token3;
 let user1 = {
     username: "username",
     email: "test@test.com",
@@ -28,6 +29,17 @@ let user2 = {
     receiveNewsletter: true
 };
 
+let user3 = {
+    username: "username3",
+    email: "test3@test.com",
+    password: "password3",
+    firstName: "firstname3",
+    lastName: "lastname3",
+    age: 24,
+    gender: "Mrs",
+    receiveNewsletter: true
+};
+
 let updates = {
     username:"otherUsername",
     email: "otheremail@mail.com",
@@ -44,11 +56,11 @@ beforeAll((done) => {
                 request = appTester.getRequestSender();
                 let res = await appTester.register(user1);
                 res = await appTester.register(user2);
+                res = await appTester.register(user3);
                 res = await appTester.login(user1.email, user1.password);
                 token1 = res.data.login.token;
                 res = await appTester.login(user2.email, user2.password);
                 token2 = res.data.login.token;
-                
                 done();
             } catch (err) {
                 done(err);
@@ -233,7 +245,9 @@ test('Wrong gender', async (done) => {
 
 test('Update email of a verified user', async (done) => {
     const UserModel = require('../../lib/model/UserModel');
-    await UserModel.updateUser({username: user2.username}, {verified: true});
+    await UserModel.updateUser({username: user3.username}, {verified: true});
+    let res = await appTester.login(user3.email, user3.password);
+    token3 = res.data.login.token;
     const newEmail = "yoyo@whatever.com";
     const query = {
         query: `mutation{
@@ -245,7 +259,7 @@ test('Update email of a verified user', async (done) => {
             }
           }`
     }
-    let res = await request.postGraphQL(query, token2);
+    res = await request.postGraphQL(query, token3);
     expect(res.data.updateMe.notifications.filter(notif => notif.message.includes("You will receive a confirmation link at your email address in a few minutes")).length).toBe(1);
     done();  
 });
