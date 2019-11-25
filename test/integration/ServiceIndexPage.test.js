@@ -19,7 +19,7 @@ beforeAll((done) => {
 test("Access index page", async (done) => {
     res = await request.get("/");
     expect(res.statusCode).toBe(200);
-    expect(res.text.includes('Welcome to GraphQL-Authentification-Service version '+pkg.version)).toBeTruthy();
+    expect(JSON.parse(res.text).notifications[0].message).toBe('Welcome to GraphQL Auth Service - version '+pkg.version);
     done();
 });
 
