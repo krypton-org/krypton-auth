@@ -1,10 +1,8 @@
-const GraphQLAuthentificationService = require('../index');
+const GraphQLAuthService = require('../index');
 const port = process.env.PORT || 80;
 
 
 const options = {
-    //Enter your email options for the userspace from where will be sent the emails
-    //Check nodemailer confirguration for more options (https://nodemailer.com)
     emailConfig: {
         from: 'myemail@myhost.com', //email address
         host: 'smtp.myhost.com', // hostname 
@@ -16,13 +14,14 @@ const options = {
         }
     },
     dbOptions = {
-        hostname: "dbuser:dbpassword@host.com",
-        port: "19150",
-        database: "user_management"
+        address: 'user:password@host.com', //Mongo adress, 'localhost' by default
+        port: '27017', //Mongo port, '27017' by default 
+        agendaDB: 'agenda', //DB name for the email processing queue, 'agenda' by default
+        userDB: 'users' //DB name where will be stored the users, 'users' by default
     }
 };
 
-const app = GraphQLAuthentificationService(options);
+const app = GraphQLAuthService(options);
 
 
 app.listen(port, (err) => {

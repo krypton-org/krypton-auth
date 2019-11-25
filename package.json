@@ -1,6 +1,6 @@
 {
-  "name": "graphql-authentification-service",
-  "version": "0.0.2",
+  "name": "graphql-auth-service",
+  "version": "0.0.1",
   "description": "A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken.",
   "main": "app.js",
   "dependencies": {
@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JohannC/REST-Authentification"
+    "url": "git+https://github.com/JohannC/GraphQL-Auth-Service"
   },
   "keywords": [
     "NodeJS",
@@ -45,7 +45,7 @@
     "GraphQL",
     "graph",
     "ql",
-    "authentification",
+    "authentication",
     "registration",
     "login",
     "backend",
@@ -59,7 +59,7 @@
   "author": "Johann Corcuff <johann.corcuff@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JohannC/NUSID/issues"
+    "url": "https://github.com/JohannC/GraphQL-Auth-Service/issues"
   },
-  "homepage": "https://github.com/JohannC/NUSID#readme"
+  "homepage": "https://github.com/JohannC/GraphQL-Auth-Service#readme"
 }

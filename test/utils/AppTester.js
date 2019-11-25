@@ -1,7 +1,7 @@
 const db = require('../../lib/service/db/db');
 const request = require('supertest');
 const mongoose = require('mongoose');
-const GraphQLAuthentificationService = require("../../index");
+const GraphQLAuthService = require("../../index");
 
 const AppTester = function (options) {
 
@@ -59,7 +59,7 @@ const AppTester = function (options) {
         }
     }
 
-    this.request = request(new GraphQLAuthentificationService(options));
+    this.request = request(new GraphQLAuthService(options));
 
     this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject) => {
         let request = this.request.get('/graphql')
