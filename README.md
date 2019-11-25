@@ -58,7 +58,7 @@ const options = {
             pass: 'mypassword' //email password
         }
     },
-    //Only if you have don't have local MongoDB instance running on mongodb://localhost:27017
+    //Only if you have don't have a local MongoDB instance running on mongodb://localhost:27017
     dbOptions = {
         address: 'user:password@host.com', //Mongo adress, 'localhost' by default
         port: '27017', //Mongo port, '27017' by default 
