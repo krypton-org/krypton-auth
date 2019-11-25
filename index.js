@@ -3,7 +3,7 @@
  * MIT Licensed
  */
 
-module.exports = require('./lib/GraphQLAuthentificationService');
+module.exports = require('./lib/GraphQLAuthService');
 
 
 
