@@ -5,7 +5,7 @@ let request;
 
 beforeAll((done) => {
     appTester = new AppTester({onReady: done});
-}, 15000);
+}, 40000);
 
 test('Get service public key', async (done) => {
     request = appTester.getRequestSender();
@@ -23,4 +23,4 @@ test('Get service public key', async (done) => {
 
 afterAll(async (done) => {
     await appTester.close(done);
-}, 10000);
+}, 40000);
