@@ -2,3 +2,4 @@ node_modules
 lib/public-key.txt
 lib/private-key.txt
 lib/email-not-sent.log
+coverage
