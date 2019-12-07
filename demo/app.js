@@ -18,7 +18,8 @@ const options = {
         port: '27017', //Mongo port, '27017' by default 
         agendaDB: 'agenda', //DB name for the email processing queue, 'agenda' by default
         userDB: 'users' //DB name where will be stored the users, 'users' by default
-    }
+    },
+    graphiql: true
 };
 
 const app = GraphQLAuthService(options);
