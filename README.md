@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken. It is easily customizable to your own user data.
+A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken. It is easily customizable to your own user data. [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql).
 
 ## Features
   * Registration
@@ -45,6 +45,10 @@ yarn add graphql-auth-service
 ```
 ```javascript
 const GraphQLAuthService = require('graphql-auth-service')
+const express = require('express');
+
+const app = express(); // Create an express app
+
 const options = {
     //Mandatory
     emailConfig: {
@@ -59,7 +63,7 @@ const options = {
         }
     },
     //Only if you have don't have a local MongoDB instance running on mongodb://localhost:27017
-    dbOptions = {
+    dbConfig: {
         address: 'user:password@host.com', //Mongo adress, 'localhost' by default
         port: '27017', //Mongo port, '27017' by default 
         agendaDB: 'agenda', //DB name for the email processing queue, 'agenda' by default
@@ -67,7 +71,7 @@ const options = {
     }
 };
 
-const app = GraphQLAuthService(options); //Return an ExpressJS App
+GraphQLAuthService(app, options); //Mount GraphQL Auth Service
 
 app.listen(process.env.PORT || 5000, (err) => {
     if (err)  return console.log('Something bad happened')
@@ -79,7 +83,175 @@ You can provide the pair of Public and Private Keys or the path to the files con
 
 ## The GraphQL API
 
-Under construction. Release in a few days! :)
+### Register
+```js
+fetch(yourURL+'/graphql', {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `mutation{
+      register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
+        notifications{
+          type
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+### Login
+Once logged-in, store the token in the local storage of your app. You will be able to access private mutations/queries by including it in the `Authorization` header of the request.
+```js
+fetch(yourURL+'/graphql', {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `mutation{
+      login(login: "your@mail.com", password:"yourpassword"){
+        token
+      }
+}`}),})
+.then(response => response.json())
+.then(res => localStorage.token = res.data.login.token);
+```
+### Get the Public Key
+```js
+fetch(yourURL+'/graphql', {
+  method: 'post',
+  headers: {
+	'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `query{
+      publicKey{
+        value
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+### Update user information
+To access this mutation you need to include the bearer token in the `Authorization` header of the request. Then you can update the user token
+```js
+//Include 'Authorization' 
+fetch(yourURL+'/graphql', {
+  method: 'post',
+  headers: {
+	'Content-Type': 'application/json',
+	'Authorization': 'Bearer '+localStorage.token
+  },
+  body: JSON.stringify({
+    query: `mutation{
+      updateMe(fields:{username:"newusername"}){
+        token
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => localStorage.token = res.data.updateMe.token);
+```
+
+### Change password
+```js
+fetch('http://localhost:5000/graphql', {
+  method: 'post',
+  headers: {
+	'Content-Type': 'application/json',
+	'Authorization': 'Bearer '+localStorage.token
+  },
+  body: JSON.stringify({
+    query: `mutation{
+      updateMe(fields:{previousPassword:"yourpassword", password:"newpassword"}){
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+
+### Resend verification email
+```js
+fetch('http://localhost:5000/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+localStorage.token
+  },
+  body: JSON.stringify({
+    query: `query{
+      sendVerificationEmail{
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+
+### Reset forgotten password
+```js
+fetch('http://localhost:5000/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `query{
+      sendPasswordRecorevyEmail(email:"your@mail.com"){
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+
+### Delete Account
+```js
+fetch('http://localhost:5000/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json',
+    'Authorization': 'Bearer '+localStorage.token
+  },
+  body: JSON.stringify({
+    query: `mutation{
+      deleteMe(password:"yourpassword"){
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(response => response.json())
+.then(res => console.log(res));
+```
+
+### Fetch public user data
+There are many query types to fetch `public` user data. You don't need to be authenticated to perform those queries.
+* userById
+
+* userByIds
+
+* userOne
+
+* userMany
+
+* userCount
+
+* userConnection
+
+* userPagination
 
 ## Properties
 
