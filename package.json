@@ -8,7 +8,6 @@
     "agenda": "^2.1.0",
     "body-parser": "^1.19.0",
     "ejs": "^2.6.2",
-    "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
     "graphql-compose": "^7.4.0",
@@ -20,6 +19,7 @@
     "nodemailer": "^6.2.1"
   },
   "devDependencies": {
+    "express": "^4.17.1",
     "coveralls": "^3.0.4",
     "jest": "^24.9.0",
     "supertest": "^3.3.0",

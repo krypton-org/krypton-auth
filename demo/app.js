@@ -1,6 +1,8 @@
 const GraphQLAuthService = require('../index');
 const port = process.env.PORT || 80;
+const express = require('express');
 
+const app = express();
 
 const options = {
     emailConfig: {
@@ -13,7 +15,7 @@ const options = {
             pass: 'mypassword' //email password
         }
     },
-    dbOptions = {
+    dbConfig: {
         address: 'user:password@host.com', //Mongo adress, 'localhost' by default
         port: '27017', //Mongo port, '27017' by default 
         agendaDB: 'agenda', //DB name for the email processing queue, 'agenda' by default
@@ -22,8 +24,7 @@ const options = {
     graphiql: true
 };
 
-const app = GraphQLAuthService(options);
-
+GraphQLAuthService(app, options);
 
 app.listen(port, (err) => {
     if (err) {
