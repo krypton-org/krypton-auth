@@ -84,8 +84,11 @@ You can provide the pair of Public and Private Keys or the path to the files con
 ## The GraphQL API
 
 ### Register
+
+To register simply use the `register` mutation. You will have to provide the different `fields` of your user model. *Please refer to the properties section to learn how to customize your user model.*
+
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
     'Content-Type': 'application/json'
@@ -102,10 +105,23 @@ fetch(yourURL+'/graphql', {
 .then(response => response.json())
 .then(res => console.log(res));
 ```
+Once registered you will receive an email to verify your account. *This email is customizable, go check the properties section.*
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/JohannC/img/master/graphql_auth_service-verification-email.png" alt="GraphiQL Auth Token - User verification email"/>
+</p>
+
+
+Clicking on the link will lead you to a notification page. *This page is customizable, go check the properties section.*
+<p align="center">
+  <img src="https://raw.githubusercontent.com/JohannC/img/master/graphql_auth_service-verification-page.png" alt="GraphiQL Auth Token - User verification page"/>
+</p>
+
 ### Login
-Once logged-in, store the token in the local storage of your app. You will be able to access private mutations/queries by including it in the `Authorization` header of the request.
+
+To log-in simply use the `login` mutation. You will have to provide the `login` which can be the the email or username of your user account and your `password`. Once logged-in, store the token in the local storage of your app. You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`.
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
     'Content-Type': 'application/json'
@@ -116,12 +132,12 @@ fetch(yourURL+'/graphql', {
         token
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => localStorage.token = res.data.login.token);
 ```
 ### Get the Public Key
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
 	'Content-Type': 'application/json'
@@ -132,14 +148,16 @@ fetch(yourURL+'/graphql', {
         value
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => console.log(res));
 ```
 ### Update user information
-To access this mutation you need to include the bearer token in the `Authorization` header of the request. Then you can update the user token
+
+To change any of your user fields, use the `updateMe` mutation. You have to be logged in and include your `Bearer token` in the `Authorization` header of your request. If you update your `email` you will receive a verification email like for registration. To change your password, please see in the next section. 
+
 ```js
 //Include 'Authorization' 
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
 	'Content-Type': 'application/json',
@@ -154,13 +172,18 @@ fetch(yourURL+'/graphql', {
         }
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => localStorage.token = res.data.updateMe.token);
 ```
 
 ### Change password
+
+To change your email use the `updateMe` mutation passing your `previousPassword` and your new desired `password`. You have to be logged in and include your `Bearer token` in the `Authorization` header of your request.
+
+**Note:** By updating your user data, remember to also update the user token stored in the local storage of your client. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data. 
+
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
 	'Content-Type': 'application/json',
@@ -174,13 +197,16 @@ fetch(yourURL+'/graphql', {
         }
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => console.log(res));
 ```
 
 ### Resend verification email
+
+To resend the verification email use the `sendVerificationEmail` query. You have to be logged in and include your `Bearer token` in the `Authorization` header of your request.
+
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json',
@@ -194,13 +220,16 @@ fetch(yourURL+'/graphql', {
         }
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => console.log(res));
 ```
 
 ### Reset forgotten password
+
+To reset your forgotten password use the `sendPasswordRecorevyEmail` query passing the `email` address of your account.
+
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json'
@@ -213,13 +242,29 @@ fetch(yourURL+'/graphql', {
         }
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => console.log(res));
 ```
 
+If your email is present in the user database you will receive an email to reset your password. *This email is customizable, go check the properties section.*
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/JohannC/img/master/graphql_auth_service-reset-password-email.png" alt="GraphiQL Auth Token - Reset password email"/>
+</p>
+
+
+Clicking on the link will lead you to a notification page. *This page is customizable, go check the properties section.*
+<p align="center">
+  <img src="https://raw.githubusercontent.com/JohannC/img/master/graphql_auth_service-reset-password-page.png" alt="GraphiQL Auth Token - Reset password page"/>
+</p>
+
+
 ### Delete Account
+
+To delete your account use the `deleteMe` mutation. You have to be logged in and include your `Bearer token` in the `Authorization` header of your request.
+
 ```js
-fetch(yourURL+'/graphql', {
+fetch(serviceURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json',
@@ -233,17 +278,66 @@ fetch(yourURL+'/graphql', {
         }
       }
 }`}),})
-.then(response => response.json())
+.then(res => res.json())
 .then(res => console.log(res));
 ```
 
 ### Fetch public user data
-There are many query types to fetch `public` user data. You don't need to be authenticated to perform those queries.
-* userById
+There are many query types to fetch `public` user data. You don't need to be authenticated to perform those queries. It will retrieve only the user data declared as public in your user model. *Please refer to the properties section to learn how to customize your user model.*
 
+* userById
+To fetch user public information from its `id` use use the `userById` query. 
+```js
+fetch(serviceURL+'/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `query{
+      userById(_id:"5dexacb7e951cd02cb8d889"){
+        username
+      }
+}`}),})
+.then(res => res.json())
+.then(res => console.log(res));
+```
 * userByIds
+To fetch user public information from a list of `id`s use use the `userByIds` query.
+
+```js
+fetch(serviceURL+'/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `query{
+      userByIds(_ids:["5deeacb7e9acd02cb8efd889", "5deee11b8938bc27989d63fb"]){
+        username
+      }
+}`}),})
+.then(res => res.json())
+.then(res => console.log(res));
+```
 
 * userOne
+To fetch one user public information from any of its public fields use the `userOne` query.
+```js
+fetch(serviceURL+'/graphql', {
+  method: 'post',
+  headers: {
+        'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: `query{
+      userOne(filter:{username:"yourname"}){
+        _id
+      }
+}`}),})
+.then(res => res.json())
+.then(res => console.log(res));
+```
 
 * userMany
 
