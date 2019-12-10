@@ -160,7 +160,7 @@ fetch(yourURL+'/graphql', {
 
 ### Change password
 ```js
-fetch('http://localhost:5000/graphql', {
+fetch(yourURL+'/graphql', {
   method: 'post',
   headers: {
 	'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ fetch('http://localhost:5000/graphql', {
 
 ### Resend verification email
 ```js
-fetch('http://localhost:5000/graphql', {
+fetch(yourURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ fetch('http://localhost:5000/graphql', {
 
 ### Reset forgotten password
 ```js
-fetch('http://localhost:5000/graphql', {
+fetch(yourURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json'
@@ -219,7 +219,7 @@ fetch('http://localhost:5000/graphql', {
 
 ### Delete Account
 ```js
-fetch('http://localhost:5000/graphql', {
+fetch(yourURL+'/graphql', {
   method: 'post',
   headers: {
         'Content-Type': 'application/json',
