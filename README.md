@@ -341,12 +341,142 @@ fetch(serviceURL+'/graphql', {
 
 * userMany
 
+To fetch one or many user public information from any of its public fields.
+
 * userCount
+
+To count users according to criterias based on any user public fields.
 
 * userConnection
 
 * userPagination
 
+To list users.
+
 ## Properties
 
-Under construction. Release in a few days! :)
+### hasUsername
+`Boolean` property to enable or disable username. Default value is `true`.
+
+###  dbConfig: 
+Object property that can contain 4 properties:
+* address:
+* port:
+* agendaDB:
+* userDB:
+
+###  publicKey
+`String` property to pass the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt`.
+
+###  publicKeyFilePath
+`String` property containing the pass to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt`.
+
+###  privateKey
+`String` property to pass the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt`.
+
+###  privateKeyFilePath
+`String` property containing the pass to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt`.
+
+###  emailNotSentLogFile
+`String` property containing the pass to the file where will be logged the emails failed to be sent. It will create the file if it doesn't exist. If undefined, the file will be created in `./nodes_module/graphql-auth-service/lib/email-not-sent.log`.
+
+###  verifyEmailTemplate
+`String` property containing the pass to the [EJS](https://ejs.co/) template file of the email to verify user account. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `user` - The current user: `<p>Hi <%= user.username %></p>`
+* `link` - The verification link: `Click here: <a href="<%= link %>"><%= link %>`
+
+###  resetPasswordEmailTemplate
+`String` property containing the pass to the [EJS](https://ejs.co/) template file of the email to reset forgotten password. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `user` - The current user: `<p>Hi <%= user.username %></p>`
+* `link` - The link to the reset form: `Click here: <a href="<%= link %>"><%= link %>`
+
+###  resetPasswordFormTemplate
+`String` property containing the pass to the [EJS](https://ejs.co/) template file of the reset password form. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/forms/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/forms/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `link`: The link of the API: `xhr.open("POST", '<%= link %>');`
+* `token`: The reset password token to include in the GraphQL `resetMyPassword` mutation (exemple below)
+
+```js
+const xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open("POST", '<%= link %>');
+xhr.setRequestHeader("Content-Type", "application/json");
+const mutation = {
+    query: `mutation{resetMyPassword(password:"${formData.get("password")}" passwordRecoveryToken:<%= token %>){
+        notifications{
+        type
+        message
+        }
+    }}`
+}
+xhr.send(JSON.stringify(mutation));
+```
+###  notificationPageTemplate
+`String` property containing the pass to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `notifications`: `Array` of `Object` notification. Each notification object contains two properties;
+    * `type`: `String Enum` either equal to `success` - `warning` - `error` - `info`
+    * `message`: `String` property containing the notificaiton message
+
+###  errorlogFile
+
+`String` property containing the pass to the file where will be logged the different errors. It will create the file if it doesn't exist. If undefined, the file will be created in `./nodes_module/graphql-auth-service/lib/errors.log`.
+
+###  extendedSchema
+
+The real power of GraphQL-Auth-Service is the ability to customize the user model to your own need. 
+
+To achieve that you simply need to pass the different [Mongoose Schema](https://mongoosejs.com/docs/guide.html) fields you want to add. Under the hood those extra fields will be converted in GraphQL types thanks to [graphql-compose-mongoose](https://github.com/graphql-compose/graphql-compose-mongoose), and added to the different queries and mutations automatically.
+
+[Mongoose Schema](https://mongoosejs.com/docs/guide.html) is very powerful, you can define the field type, default value, [custom validators](https://mongoosejs.com/docs/validation.html#custom-validators) & error messages to display, if it is [required](https://mongoosejs.com/docs/validation.html#required-validators-on-nested-objects), if it should be [unique](https://mongoosejs.com/docs/validation.html#the-unique-option-is-not-a-validator)... Please refer to its [documentation](https://mongoosejs.com/docs/guide.html).
+
+**!! Note !!** In each schema field you can define the `isPrivate` attribute. It is a `Boolean` attribute telling whether or not this field can be accessible by the public `queries` like [userById](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), [userByOne](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), etc.
+
+For example, you could pass the following `extendedSchema`:
+
+```js
+extendedSchema: {
+    firstName: {
+        type: String,
+        required: false,
+        maxlength: 256,
+        validate: {
+            validator: v => v.length >= 2,
+            message: () => "A minimum of 2 letters are required for your first name!",
+        },
+        isPublic: false
+    },
+    lastName: {
+        type: String,
+        required: false,
+        maxlength: 256,
+        validate: {
+            validator: v => v.length >= 2,
+            message: () => "A minimum of 2 letters are required for your last name!",
+        },
+        isPublic: false
+    },
+    gender: {
+        type: String,
+        required: true,
+        enum: ["M", "Mrs", "Other"],
+        isPublic: true
+    },
+    age: {
+        type: Number,
+        required: true,
+        isPublic: true,
+        min: 0
+    },
+    receiveNewsletter: {
+        type: Boolean,
+        required: true,
+        default: false,
+        isPublic: false
+    }
+},
+
+```
+###  graphiql
+`Boolean` property to enable or disable graphiql. Default value is `true`.
+###  onReady
+`Function` property containing the callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL-Auth-Service is ready!");`.
+
