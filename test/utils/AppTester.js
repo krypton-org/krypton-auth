@@ -62,21 +62,25 @@ const AppTester = function (options) {
 
     this.request = request(new GraphQLAuthService(express(), options));
 
-    this.request.getGraphQL = (query, bearerToken) => new Promise((resolve, reject) => {
+    this.request.getGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
         let request = this.request.get('/graphql')
             .set('Accept', 'application/json')
             .set("Content-Type", "application/json");
-        if (bearerToken) request = request.set("Authorization", "Bearer " + bearerToken);
+        if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);
+        if (refreshToken) request.set('Cookie', ['refreshToken='+refreshToken])
+
         request.send(JSON.stringify(query))
             .then(res => resolve(JSON.parse(res.text)))
             .catch(err => reject(err));
     });
 
-    this.request.postGraphQL = (query, bearerToken) => new Promise((resolve, reject) => {
+    this.request.postGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
         let request = this.request.post('/graphql')
             .set('Accept', 'application/json')
             .set("Content-Type", "application/json");
-        if (bearerToken) request = request.set("Authorization", "Bearer " + bearerToken);
+        if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);
+        if (refreshToken) request.set('Cookie', ['refreshToken='+refreshToken])
+
         request.send(JSON.stringify(query))
             .then(res => resolve(JSON.parse(res.text)))
             .catch(err => reject(err));
@@ -116,6 +120,7 @@ const AppTester = function (options) {
             query: `mutation{
                 login(login:"${login}" password:"${password}"){
                 token
+                expiryDate
             }}`
         }
         this.request.postGraphQL(loginQuery)
