@@ -23,7 +23,7 @@ This authentication system works with a pair of Private and Public Keys:
 Below the corresponding sequence diagram:
 
 <p align="center">
-  <img src="https://nusid.net/img/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
+  <img src="https://raw.githubusercontent.com/JohannC/img/master/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
 </p>
 
 This library aims to be replicated behind a load balancer. It is completely stateless (no session stored). All your replicas would have to be sharing the same pair of Private and Public Keys.
@@ -42,16 +42,15 @@ By loging-in a user will receive a short-lived authentication token and long-liv
 
 By default, the authentication token is valid for 15 minuts. Afterwards you will have to make a call to the `refreshToken` mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the `refreshToken` mutation so that an active user never gets disconnected.
 
-This is safe from CSRF attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
-
 <p align="center">
-  <img src="https://nusid.net/img/system_design_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - System Design diagram"/>
+  <img src="https://nusid.net/img/sequence_diagram-security.svg" alt="GraphQL Auth Service - System Design diagram"/>
 </p>
+
+This process is safe from CSRF attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
 
 The only risk left, is that by an XSS attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
 
 Anyway you should learn on how to protect your application from XSS attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
-
 
 ## Installation
 
