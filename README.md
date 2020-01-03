@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken. It is easily customizable to your own user data. [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql).
+A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken. It is easily [customizable to your own user data](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql).
 
 ## Features
   * Registration
@@ -13,6 +13,7 @@ A GraphQL API to handle login, registration, access control and password recover
   * Account modification
   * Account deletion
   * API to fetch user public info
+  * XSS and CSRF protection
 
 ## How does it work?
 
@@ -23,7 +24,7 @@ This authentication system works with a pair of Private and Public Keys:
 Below the corresponding sequence diagram:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/JohannC/img/master/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
+  <img src="https://nusid.net/img/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
 </p>
 
 This library aims to be replicated behind a load balancer. It is completely stateless (no session stored). All your replicas would have to be sharing the same pair of Private and Public Keys.
@@ -33,24 +34,6 @@ Below a possible system design you could use:
 <p align="center">
   <img src="https://nusid.net/img/system_design_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - System Design diagram"/>
 </p>
-
-## Security
-
-GraphQL-Auth-Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
-
-By loging-in a user will receive a short-lived authentication token and long-lived refresh token. The authentication token should not be saved in the localstorage (prone to XSS), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from XSS). 
-
-By default, the authentication token is valid for 15 minuts. Afterwards you will have to make a call to the `refreshToken` mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the `refreshToken` mutation so that an active user never gets disconnected.
-
-<p align="center">
-  <img src="https://nusid.net/img/sequence_diagram-security.svg" alt="GraphQL Auth Service - System Design diagram"/>
-</p>
-
-This process is safe from CSRF attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
-
-The only risk left, is that by an XSS attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
-
-Anyway you should learn on how to protect your application from XSS attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
 ## Installation
 
@@ -97,7 +80,25 @@ app.listen(process.env.PORT || 5000, (err) => {
 })
 ```
 
-You can provide the pair of Public and Private Keys or the path to the files containing them. If not, the system will generate a pair for you ([you can retrieve them after]()). There are plenty of other options that let you customize almost everything, from the user model to the email templates. Please read the category [Properties](/#Properties).
+You can [provide the pair of Public and Private Keys](https://github.com/JohannC/GraphQL-Auth-Service#publickey) or [the path to the files containing them](https://github.com/JohannC/GraphQL-Auth-Service#publickeyfilepath). If not, the system will generate a pair for you ([you can retrieve them after](https://github.com/JohannC/GraphQL-Auth-Service#publickeyfilepath)). There are plenty of other options that let you customize almost everything, from the [user model](https://github.com/JohannC/GraphQL-Auth-Service#extendedschema) to the [email templates](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). Please read the [property](https://github.com/JohannC/GraphQL-Auth-Service#properties) section.
+
+## Security
+
+GraphQL-Auth-Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
+
+By loging-in a user will receive a short-lived authentication token and long-lived refresh token. The authentication token should not be saved in the localstorage (prone to XSS), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from XSS). 
+
+By default, the authentication token is valid for 15 minuts. Afterwards you will have to make a call to the `refreshToken` mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the `refreshToken` mutation so that an active user never gets disconnected.
+
+<p align="center">
+  <img src="https://nusid.net/img/sequence_diagram-security.svg" alt="GraphQL Auth Service - System Design diagram"/>
+</p>
+
+This process is safe from CSRF attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
+
+The only risk left, is that by an XSS attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
+
+Anyway you should learn on how to protect your application from XSS attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
 ## The GraphQL API
 
@@ -406,16 +407,16 @@ Object property that can contain 4 properties:
 * userDB: `String` property - The user database name. Default value is `users`.
 
 ###  publicKey
-`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt`. If the algorith is different
+`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  publicKeyFilePath
-`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt`.
+`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  privateKey
-`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt`.
+`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  privateKeyFilePath
-`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt`.
+`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ### algorithm
 `String` property - The algorithm of the JSON Web Token. Default value is `HS256`.
