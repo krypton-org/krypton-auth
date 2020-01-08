@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken. It is easily [customizable to your own user data](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql).
+A GraphQL API to handle login, registration, access control and password recovery with JSON Web Tokens. It automatically adapts [to your own user data](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql).
 
 ## Features
   * Registration
@@ -13,12 +13,12 @@ A GraphQL API to handle login, registration, access control and password recover
   * Account modification
   * Account deletion
   * API to fetch user public info
-  * XSS and CSRF protection
+  * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
 ## How does it work?
 
 This authentication system works with a pair of Private and Public Keys:
-1. When a user will log-in, GraphQL Auth Service will generate a token from the Private Key (with jsonwebtoken). This token will encode the user data.
+1. When a user will log-in, GraphQL Auth Service will generate a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
 2. The user will then be able to make authenticated requests to other servers by including the token into the request headers. Those servers will try to decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
 
 Below the corresponding sequence diagram:
@@ -86,7 +86,7 @@ You can [provide the pair of Public and Private Keys](https://github.com/JohannC
 
 GraphQL-Auth-Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
 
-By loging-in a user will receive a short-lived authentication token and long-lived refresh token. The authentication token should not be saved in the localstorage (prone to XSS), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from XSS). 
+By loging-in a user will receive a short-lived authentication token and long-lived refresh token. The authentication token should not be saved in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). 
 
 By default, the authentication token is valid for 15 minuts. Afterwards you will have to make a call to the `refreshToken` mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the `refreshToken` mutation so that an active user never gets disconnected.
 
@@ -94,35 +94,53 @@ By default, the authentication token is valid for 15 minuts. Afterwards you will
   <img src="https://nusid.net/img/sequence_diagram-security.svg" alt="GraphQL Auth Service - System Design diagram"/>
 </p>
 
-This process is safe from CSRF attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
+This process is safe from [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attacks, because even though a form submit attack can make a call to the `refreshToken` mutation, the attacker cannot get the new JWT token value that is returned.
 
-The only risk left, is that by an XSS attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
+The only risk left, is that by an [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
 
-Anyway you should learn on how to protect your application from XSS attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
+Anyway you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
 ## The GraphQL API
+
+To use GraphQL Auth Service, you can use the `fetch` method or the `XMLHttpRequest` Object of JavaScript just like below:
+
+```js
+fetch(serviceURL+'/graphql', {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json',
+    //Include in the Authorization header your authentication token to make an authenticated request
+	'Authorization': 'Bearer '+authInfo.token
+  },
+  body: JSON.stringify({
+    //the GraphQL query
+    query: `mutation{
+      updateMe(fields:{username:"newusername"}){
+        token
+        notifications{
+          message
+        }
+      }
+}`}),})
+.then(res => res.json())
+.then(res => console.log(res));
+```
+
+You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) not set to `false`). Just open up a web browser and go to `https://my-service-URL.com/graphl` you will be able to to type the graphiql queries.
 
 ### Register
 
 To register simply use the `register` mutation. You will have to provide the different `fields` of your user model. *Please refer to the properties section to learn how to customize your user model.*
 
 ```js
-fetch(serviceURL+'/graphql', {
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    query: `mutation{
-      register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
+mutation{
+    register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
         notifications{
-          type
-          message
+            type
+            message
         }
-      }
-}`}),})
-.then(response => response.json())
-.then(res => console.log(res));
+    }
+}
 ```
 Once registered you will receive an email to verify your account. *This email is customizable, go check the properties section.*
 
@@ -138,24 +156,15 @@ Clicking on the link will lead you to a notification page. *This page is customi
 
 ### Login
 
-To log-in simply use the `login` mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set a HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in the local memory of your app. You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minuts). When outdated refresh it by calling the `refreshToken` mutation.
+To log-in simply use the `login` mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set a HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minuts). When outdated refresh it by calling the `refreshToken` mutation.
 
 ```js
-let authInfo;
-fetch(serviceURL+'/graphql', {
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    query: `mutation{
-      login(login: "your@mail.com", password:"yourpassword"){
+mutation{
+    login(login: "your@mail.com", password:"yourpassword"){
         token
         expiryDate
-      }
-}`}),})
-.then(res => res.json())
-.then(res => authInfo = res.data.login.token);
+    }
+}
 ```
 
 ### Refresh the authentication token
@@ -163,38 +172,18 @@ fetch(serviceURL+'/graphql', {
 By default your authentication token is valid for 15 minuts. To refresh it use the `refreshToken` mutation. It will send you back a new authentication token and expiry date. You don't need to pass your actual authentication token in the `Authorization` header, it only needs the cookie containing your refresh token transmitted by default by your browser. This refresh token will also be refreshed. Thus, unless you stay inactive during a long period (by default 7 days), you will never have to log-in again . 
 
 ```js
-
-fetch(serviceURL+'/graphql', {
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    query: `mutation{
-      refreshToken{
+mutation{
+    refreshToken{
         expiryDate
         token
-      }
-}`}),})
-.then(res => res.json())
-.then(res => authInfo = res.data.login.token);
-
+    }
+}
 ```
 ### Get the Public Key
 ```js
-fetch(serviceURL+'/graphql', {
-  method: 'post',
-  headers: {
-	'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    query: `query{
-      publicKey{
-        value
-      }
-}`}),})
-.then(res => res.json())
-.then(res => console.log(res));
+query{
+    publicKey
+}
 ```
 ### Update user information
 
@@ -396,8 +385,12 @@ To list users with pagination configuration.
 
 ## Properties
 
-### hasUsername
-`Boolean` property - Enable or disable username. Default value is `true`.
+### algorithm
+`String` property - The algorithm of the JSON Web Token. Default value is `HS256`.
+
+### authTokenExpiryTime
+
+`Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minuts). Call the `refreshToken` mutation to renew it.
 
 ###  dbConfig: 
 Object property that can contain 4 properties:
@@ -406,69 +399,8 @@ Object property that can contain 4 properties:
 * agendaDB: `String` property - The database name for the email processing queue. Default value is `agenda`.
 * userDB: `String` property - The user database name. Default value is `users`.
 
-###  publicKey
-`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
-
-###  publicKeyFilePath
-`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
-
-###  privateKey
-`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
-
-###  privateKeyFilePath
-`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
-
-### algorithm
-`String` property - The algorithm of the JSON Web Token. Default value is `HS256`.
-
-### authTokenExpiryTime
-
-`Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minuts). Call the `refreshToken` mutation to renew it.
-
-### refreshTokenExpiryTime
-
-`Number` property - The time until the refresh token expires in milliseconds. If a user is inactive during this period he will have to login in order to get a new refresh token. Default value is `7 * 24 * 60 * 60 * 1000` (7 days).
-
-**Note:** before the refresh token has expired, you can call the `refreshToken` mutation. Both the auth token and the refresh token will be renewed and your user won't face any service interruption.
-
 ###  emailNotSentLogFile
 `String` property - The filepath to the file where will be logged the emails failed to be sent. It will create the file if it doesn't exist. If undefined, the file will be created in `./nodes_module/graphql-auth-service/lib/email-not-sent.log`.
-
-###  verifyEmailTemplate
-`String` property - The filepath to the [EJS](https://ejs.co/) template file of the email to verify user account. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
-* `user` - The current user: `<p>Hi <%= user.username %></p>`
-* `link` - The verification link: `Click here: <a href="<%= link %>"><%= link %>`
-
-###  resetPasswordEmailTemplate
-`String` property - The filepath to the [EJS](https://ejs.co/) template file of the email to reset forgotten password. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
-* `user` - The current user: `<p>Hi <%= user.username %></p>`
-* `link` - The link to the reset form: `Click here: <a href="<%= link %>"><%= link %>`
-
-###  resetPasswordFormTemplate
-`String` property - The filepath to the [EJS](https://ejs.co/) template file of the reset password form. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/forms/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/forms/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
-* `link`: The link of the API: `xhr.open("POST", '<%= link %>');`
-* `token`: The reset password token to include in the GraphQL `resetMyPassword` mutation (exemple below)
-
-```js
-const xhr = new XMLHttpRequest();
-xhr.responseType = 'json';
-xhr.open("POST", '<%= link %>');
-xhr.setRequestHeader("Content-Type", "application/json");
-const mutation = {
-    query: `mutation{resetMyPassword(password:"${formData.get("password")}" passwordRecoveryToken:<%= token %>){
-        notifications{
-        type
-        message
-        }
-    }}`
-}
-xhr.send(JSON.stringify(mutation));
-```
-###  notificationPageTemplate
-`String` property - The filepath to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
-* `notifications`: `Array` of `Object` notification. Each notification object contains two properties;
-    * `type`: `String Enum` either equal to `success` - `warning` - `error` - `info`
-    * `message`: `String` property containing the notificaiton message
 
 ###  errorlogFile
 
@@ -529,8 +461,70 @@ extendedSchema: {
 },
 
 ```
+
 ###  graphiql
 `Boolean` property - Enable or disable graphiql. Default value is `true`.
+
+### hasUsername
+`Boolean` property - Enable or disable username. Default value is `true`.
+
+###  notificationPageTemplate
+`String` property - The filepath to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `notifications`: `Array` of `Object` notification. Each notification object contains two properties;
+    * `type`: `String Enum` either equal to `success` - `warning` - `error` - `info`
+    * `message`: `String` property containing the notificaiton message
+
 ###  onReady
 `Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL-Auth-Service is ready!");`.
+
+###  privateKey
+`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+
+###  privateKeyFilePath
+`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+
+###  publicKey
+`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+
+###  publicKeyFilePath
+`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+
+### refreshTokenExpiryTime
+
+`Number` property - The time until the refresh token expires in milliseconds. If a user is inactive during this period he will have to login in order to get a new refresh token. Default value is `7 * 24 * 60 * 60 * 1000` (7 days).
+
+**Note:** before the refresh token has expired, you can call the `refreshToken` mutation. Both the auth token and the refresh token will be renewed and your user won't face any service interruption.
+
+###  resetPasswordEmailTemplate
+`String` property - The filepath to the [EJS](https://ejs.co/) template file of the email to reset forgotten password. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `user` - The current user: `<p>Hi <%= user.username %></p>`
+* `link` - The link to the reset form: `Click here: <a href="<%= link %>"><%= link %>`
+
+###  resetPasswordFormTemplate
+`String` property - The filepath to the [EJS](https://ejs.co/) template file of the reset password form. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/forms/ResetPassword.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/forms/ResetPassword.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `link`: The link of the API: `xhr.open("POST", '<%= link %>');`
+* `token`: The reset password token to include in the GraphQL `resetMyPassword` mutation (exemple below)
+
+```js
+const xhr = new XMLHttpRequest();
+xhr.responseType = 'json';
+xhr.open("POST", '<%= link %>');
+xhr.setRequestHeader("Content-Type", "application/json");
+const mutation = {
+    query: `mutation{resetMyPassword(password:"${formData.get("password")}" passwordRecoveryToken:<%= token %>){
+        notifications{
+        type
+        message
+        }
+    }}`
+}
+xhr.send(JSON.stringify(mutation));
+```
+
+###  verifyEmailTemplate
+`String` property - The filepath to the [EJS](https://ejs.co/) template file of the email to verify user account. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
+* `user` - The current user: `<p>Hi <%= user.username %></p>`
+* `link` - The verification link: `Click here: <a href="<%= link %>"><%= link %>`
+
+
 
