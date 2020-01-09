@@ -15,6 +15,43 @@ A GraphQL API to handle login, registration, access control and password recover
   * API to fetch user public info
   * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
+## Table of contents
+- [How does it work?](#how-does-it-work-)
+- [Installation](#installation)
+- [Security](#security)
+- [How to decode the user token in other web server ?](#how-to-decode-the-user-token-in-other-web-server--)
+- [The GraphQL API](#the-graphql-api)
+    + [How to perform a query?](#how-to-perform-a-query-)
+  * [Register](#register)
+  * [Login](#login)
+  * [Refresh the authentication token](#refresh-the-authentication-token)
+  * [Get the Public Key](#get-the-public-key)
+  * [Update user information](#update-user-information)
+  * [Change password](#change-password)
+  * [Resend verification email](#resend-verification-email)
+  * [Reset forgotten password](#reset-forgotten-password)
+  * [Delete Account](#delete-account)
+  * [Fetch public user data](#fetch-public-user-data)
+- [Properties](#properties)
+  * [algorithm](#algorithm)
+  * [authTokenExpiryTime](#authtokenexpirytime)
+  * [dbConfig:](#dbconfig-)
+  * [emailNotSentLogFile](#emailnotsentlogfile)
+  * [errorlogFile](#errorlogfile)
+  * [extendedSchema](#extendedschema)
+  * [graphiql](#graphiql)
+  * [hasUsername](#hasusername)
+  * [notificationPageTemplate](#notificationpagetemplate)
+  * [onReady](#onready)
+  * [privateKey](#privatekey)
+  * [privateKeyFilePath](#privatekeyfilepath)
+  * [publicKey](#publickey)
+  * [publicKeyFilePath](#publickeyfilepath)
+  * [refreshTokenExpiryTime](#refreshtokenexpirytime)
+  * [resetPasswordEmailTemplate](#resetpasswordemailtemplate)
+  * [resetPasswordFormTemplate](#resetpasswordformtemplate)
+  * [verifyEmailTemplate](#verifyemailtemplate)
+
 ## How does it work?
 
 This authentication system works with a pair of Private and Public Keys:
