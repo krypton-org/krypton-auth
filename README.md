@@ -188,7 +188,7 @@ query{
 ```
 ### Update user information
 
-To change any of your user fields, use the `updateMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query?). If you update your `email` you will receive a verification email like for registration. To change your password, please see in the next section. 
+To change any of your user fields, use the `updateMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query). If you update your `email` you will receive a verification email like for registration. To change your password, please see in the next section. 
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -204,7 +204,7 @@ mutation{
 
 ### Change password
 
-To change your email use the `updateMe` mutation passing your `previousPassword` and your new desired `password`. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query?).
+To change your email use the `updateMe` mutation passing your `previousPassword` and your new desired `password`. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query).
 
 **Note:** By updating your user data, remember to refresh your auth token by calling the `refreshToken` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data. 
 
@@ -221,7 +221,7 @@ mutation{
 
 ### Resend verification email
 
-To resend the verification email use the `sendVerificationEmail` query. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query?).
+To resend the verification email use the `sendVerificationEmail` query. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query).
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -262,7 +262,7 @@ Clicking on the link will lead you to a notification page. *This page is customi
 
 ### Delete Account
 
-To delete your account use the `deleteMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query?).
+To delete your account use the `deleteMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#how-to-perform-a-query).
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -400,7 +400,8 @@ extendedSchema: {
 ```
 
 ###  graphiql
-`Boolean` property - Enable or disable graphiql. Default value is `true`.
+`Boolean` property - Enable or disable graphiql. Default value is `true`. In the page header, you will find an input field to include your auth token and be able to make authenticated requests.
+**!! Note !!** Include your auth token directly, no need to precede it with 'Bearer '.
 
 ### hasUsername
 `Boolean` property - Enable or disable username. Default value is `true`.
