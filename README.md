@@ -100,6 +100,36 @@ The only risk left, is that by an [XSS](https://www.owasp.org/index.php/Cross-si
 
 Anyway you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
+## How to decode the user token in other web server ?
+
+To decode the authentication token on other servers or apps, simply use a library implementing the JSON Web Tokens specification. Then, just call its `verify` method passing as parameters the authentication token, the Public Key and the encoding algorithm (by default `RS256` unless you specify a different encoding in the [`algorithm`](https://github.com/JohannC/GraphQL-Auth-Service#algorithm) option). 
+
+If the operation succeeds, it means that only the Private Key could encode the token and that the user is correctly authenticated. It returns the user data.
+
+* In JavaScript:
+
+Install the npm package [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken):
+
+```bash
+npm install jsonwebtoken
+```
+Excute the following code:
+
+```js
+const jwt = require('jsonwebtoken');
+jwt.verify(token, publicKey, { algorithm: 'RS256' }, (err, user) => {
+    if (err) throw err;
+    console.log(user)
+});
+```
+
+* In Python:
+
+Install the pip package [pyjwt](https://pyjwt.readthedocs.io/en/latest/):
+
+
+**!! Note !!** You can easily fetch the Public Key by invoking [this query](https://github.com/JohannC/GraphQL-Auth-Service#get-the-public-key).
+
 ## The GraphQL API
 
 #### How to perform a query?
@@ -181,6 +211,9 @@ mutation{
 }
 ```
 ### Get the Public Key
+
+Easily fetch the Public Key of the service with this query in order to [decode the authentication token on your other web servers / apps](https://github.com/JohannC/GraphQL-Auth-Service#how-to-decode-the-user-token-in-other-web-server).
+
 ```js
 query{
     publicKey
