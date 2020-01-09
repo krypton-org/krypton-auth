@@ -400,7 +400,7 @@ extendedSchema: {
 ```
 
 ###  graphiql
-`Boolean` property - Enable or disable graphiql. Default value is `true`. In the page header, you will find an input field to include your auth token and be able to make authenticated requests.
+`Boolean` property - Enable or disable GraphiQL IDE. Default value is `true`. In the page header, you will find an input field to include your auth token and be able to make authenticated requests.
 **!! Note !!** Include your auth token directly, no need to precede it with 'Bearer '.
 
 ### hasUsername
