@@ -16,7 +16,7 @@ A GraphQL API to handle login, registration, access control and password recover
   * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
 ## Table of contents
-- [How does it work?](#how-does-it-work-)
+- [How does it work?](#how-does-it-work)
 - [Installation](#installation)
 - [Security](#security)
 - [The GraphQL API](#the-graphql-api)
