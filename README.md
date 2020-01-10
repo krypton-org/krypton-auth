@@ -521,10 +521,28 @@ Excute the following code:
 
 ```js
 const jwt = require('jsonwebtoken');
+let token  = "ey...."; 
+let publicKey =  "-----BEGIN PUBLIC KEY-----\n....\n-----END PUBLIC KEY-----\n"
 jwt.verify(token, publicKey, { algorithm: 'RS256' }, (err, user) => {
     if (err) throw err;
     console.log(user)
 });
+```
+
+* In Python:
+
+Install the pip package [pyjwt](https://pyjwt.readthedocs.io/en/latest/) with the crypto:
+```bash
+pip install pyjwt
+pip install pyjwt[crypto]
+```
+Excute the following code:
+
+```python
+token = "ey...."; 
+public_key = b'-----BEGIN PUBLIC KEY-----\n....\n-----END PUBLIC KEY-----\n'
+user = jwt.decode(token, public_key, algorithms=['RS256'])
+print(user)
 ```
 
 **!! Note !!** You can easily fetch the Public Key by invoking [this query](https://github.com/JohannC/GraphQL-Auth-Service#get-the-public-key).
