@@ -506,7 +506,7 @@ xhr.send(JSON.stringify(mutation));
 
 ## Decode auth tokens in other web servers
 
-To decode authentication tokens on other servers or apps, simply use a library implementing the JSON Web Tokens specification. Then, just call its `verify` or `decode` method passing as parameters the authentication token, the Public Key and the encoding algorithm (by default `RS256` unless you specify a different encoding in the [`algorithm`](https://github.com/JohannC/GraphQL-Auth-Service#algorithm) option). 
+To decode authentication tokens in other servers or apps, simply use a library implementing the JSON Web Tokens specification. Then, just call its `verify` or `decode` method passing as parameters the authentication token, the Public Key and the encoding algorithm (by default `RS256` unless you specify a different encoding in the [`algorithm`](https://github.com/JohannC/GraphQL-Auth-Service#algorithm) option). 
 
 If the operation succeeds, it means that only the Private Key could encode the token and that the user is correctly authenticated. It returns the user data.
 
