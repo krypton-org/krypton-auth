@@ -23,7 +23,7 @@ A GraphQL API to handle login, registration, access control and password recover
 - [The GraphQL API](#the-graphql-api)
   * [Register](#register)
   * [Login](#login)
-  * [Refresh the authentication token](#refresh-authentication-tokens)
+  * [Refresh authentication tokens](#refresh-authentication-tokens)
   * [Get the Public Key](#get-the-public-key)
   * [Update user information](#update-user-information)
   * [Change password](#change-password)
@@ -166,7 +166,7 @@ fetch(yourServiceURL+'/graphql', {
 You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) not set to `false`). Just open up a web browser and go to `https://your-service-URL.com/graphl` you will be able to type the graphiql queries in the IDE.
 
 
-## API
+## The GraphQL API
 
 ### Register
 
