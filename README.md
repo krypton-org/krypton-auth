@@ -16,12 +16,11 @@ A GraphQL API to handle login, registration, access control and password recover
   * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
 ## Table of contents
-- [How does it work?](#how-does-it-work)
+- [How does it work?](#how-does-it-work-)
 - [Installation](#installation)
 - [Security](#security)
-- [Decode auth tokens in other web servers](#decode-auth-tokens-in-other-web-servers)
 - [The GraphQL API](#the-graphql-api)
-    + [Perform a query](#perform-a-query)
+  * [Perform a query](#perform-a-query)
   * [Register](#register)
   * [Login](#login)
   * [Refresh the authentication token](#refresh-the-authentication-token)
@@ -51,6 +50,7 @@ A GraphQL API to handle login, registration, access control and password recover
   * [resetPasswordEmailTemplate](#resetpasswordemailtemplate)
   * [resetPasswordFormTemplate](#resetpasswordformtemplate)
   * [verifyEmailTemplate](#verifyemailtemplate)
+- [Decode auth tokens in other web servers](#decode-auth-tokens-in-other-web-servers)
 
 ## How does it work?
 
@@ -136,36 +136,6 @@ This process is safe from [CSRF](https://www.owasp.org/index.php/Cross-Site_Requ
 The only risk left, is that by an [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the `updateMe` mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
 
 Anyway you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
-
-## Decode auth tokens in other web servers
-
-To decode the authentication token on other servers or apps, simply use a library implementing the JSON Web Tokens specification. Then, just call its `verify` method passing as parameters the authentication token, the Public Key and the encoding algorithm (by default `RS256` unless you specify a different encoding in the [`algorithm`](https://github.com/JohannC/GraphQL-Auth-Service#algorithm) option). 
-
-If the operation succeeds, it means that only the Private Key could encode the token and that the user is correctly authenticated. It returns the user data.
-
-* In JavaScript:
-
-Install the npm package [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken):
-
-```bash
-npm install jsonwebtoken
-```
-Excute the following code:
-
-```js
-const jwt = require('jsonwebtoken');
-jwt.verify(token, publicKey, { algorithm: 'RS256' }, (err, user) => {
-    if (err) throw err;
-    console.log(user)
-});
-```
-
-* In Python:
-
-Install the pip package [pyjwt](https://pyjwt.readthedocs.io/en/latest/):
-
-
-**!! Note !!** You can easily fetch the Public Key by invoking [this query](https://github.com/JohannC/GraphQL-Auth-Service#get-the-public-key).
 
 ## The GraphQL API
 
@@ -534,5 +504,27 @@ xhr.send(JSON.stringify(mutation));
 * `user` - The current user: `<p>Hi <%= user.username %></p>`
 * `link` - The verification link: `Click here: <a href="<%= link %>"><%= link %>`
 
+## Decode auth tokens in other web servers
 
+To decode authentication tokens on other servers or apps, simply use a library implementing the JSON Web Tokens specification. Then, just call its `verify` or `decode` method passing as parameters the authentication token, the Public Key and the encoding algorithm (by default `RS256` unless you specify a different encoding in the [`algorithm`](https://github.com/JohannC/GraphQL-Auth-Service#algorithm) option). 
 
+If the operation succeeds, it means that only the Private Key could encode the token and that the user is correctly authenticated. It returns the user data.
+
+* In JavaScript:
+
+Install the npm package [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken):
+
+```bash
+npm install jsonwebtoken
+```
+Excute the following code:
+
+```js
+const jwt = require('jsonwebtoken');
+jwt.verify(token, publicKey, { algorithm: 'RS256' }, (err, user) => {
+    if (err) throw err;
+    console.log(user)
+});
+```
+
+**!! Note !!** You can easily fetch the Public Key by invoking [this query](https://github.com/JohannC/GraphQL-Auth-Service#get-the-public-key).
