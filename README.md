@@ -51,6 +51,8 @@ A GraphQL API to handle login, registration, access control and password recover
   * [resetPasswordFormTemplate](#resetpasswordformtemplate)
   * [verifyEmailTemplate](#verifyemailtemplate)
 - [Decode auth tokens in other web servers](#decode-auth-tokens-in-other-web-servers)
+  * [In JavaScript](#in-javascript)
+  * [In Python](#in-python)
 
 ## How does it work?
 
@@ -512,7 +514,7 @@ To decode authentication tokens in other servers or apps, simply use a library i
 
 If the operation succeeds, it means that only the Private Key could encode the token and that the user is correctly authenticated. It returns the user data.
 
-* In JavaScript:
+### In JavaScript
 
 Install the npm package [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken):
 
@@ -531,7 +533,7 @@ jwt.verify(token, publicKey, { algorithm: 'RS256' }, (err, user) => {
 });
 ```
 
-* In Python:
+### In Python
 
 Install the pip package [pyjwt](https://pyjwt.readthedocs.io/en/latest/) with the crypto:
 ```bash
