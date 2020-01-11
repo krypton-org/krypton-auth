@@ -223,7 +223,7 @@ mutation{
 ```
 ### Get the Public Key
 
-Easily fetch the Public Key of the service with this query in order to [decode the authentication token on your other web servers / apps](https://github.com/JohannC/GraphQL-Auth-Service#how-to-decode-the-user-token-in-other-web-server).
+Easily fetch the Public Key of the service with this query in order to [decode the authentication token on your other web servers / apps](#decode-auth-tokens-in-other-web-servers).
 
 ```js
 query{
