@@ -5,7 +5,7 @@
 
 A GraphQL API to handle login, registration, access control and password recovery with JSON Web Tokens. It automatically adapts [to your own user data](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
 
-*It is kind of a free & open source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/)*
+*It is kind of a free & open source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 
 ## Features
   * Registration
@@ -14,7 +14,7 @@ A GraphQL API to handle login, registration, access control and password recover
   * Password recovery
   * Account modification
   * Account deletion
-  * API to fetch user public info
+  * API to fetch public user info
   * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
 ## Table of contents
@@ -59,8 +59,8 @@ A GraphQL API to handle login, registration, access control and password recover
 ## How does it work?
 
 This authentication system works with a pair of Private and Public Keys:
-1. When a user will log-in, GraphQL Auth Service will generate a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
-2. The user will then be able to make authenticated requests to other servers by including the token into the request headers. Those servers will try to decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
+1. When a user logs-in, GraphQL Auth Service generates a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
+2. Then, the user is be able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
 
 Below the corresponding sequence diagram:
 
@@ -167,7 +167,7 @@ fetch(yourServiceURL+'/graphql', {
 .then(res => console.log(res));
 ```
 
-You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) not set to `false`). Just open up a web browser and go to `https://your-service-URL.com/graphl` you will be able to type the graphiql queries in the IDE.
+You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) is not set to `false`). Just open up a web browser and go to `https://your-service-URL.com/graphql` you will be able to type the graphql queries in the IDE.
 
 
 ## The GraphQL API
@@ -325,7 +325,7 @@ mutation{
 There are many query types to fetch `public` user data. You don't need to be authenticated to perform those queries. It will retrieve only the user data declared as public in your user model. *Please refer to the properties section to learn how to customize your user model.*
 
 * userById
-To fetch user public information from its `id` use use the `userById` query. 
+To fetch public user information from its `id` use use the `userById` query. 
 ```js
 query{
     userById(_id:"5dexacb7e951cd02cb8d889"){
@@ -334,7 +334,7 @@ query{
 }
 ```
 * userByIds
-To fetch user public information from a list of `id`s use use the `userByIds` query.
+To fetch public user information from a list of `id`s use use the `userByIds` query.
 
 ```js
 query{
@@ -345,7 +345,7 @@ query{
 ```
 
 * userOne
-To fetch one user public information from any of its public fields use the `userOne` query.
+To fetch one public user information from any of its public fields use the `userOne` query.
 ```js
 query{
     userOne(filter:{username:"yourname"}){
@@ -377,7 +377,7 @@ To list users with pagination configuration.
 
 ###  dbConfig: 
 Object property that can contain 4 properties:
-* address: `String` property - The adress of the MongoDB server. Example : `user:password@host.com`. Default value is `localhost'.
+* address: `String` property - The adress of the MongoDB server. Example : `user:password@host.com`. Default value is `localhost`.
 * port: `String` property - The port of the MongoDB server. Default value is `27017`.
 * agendaDB: `String` property - The database name for the email processing queue. Default value is `agenda`.
 * userDB: `String` property - The user database name. Default value is `users`.
