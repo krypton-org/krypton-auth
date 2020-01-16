@@ -1,6 +1,6 @@
 {
   "name": "graphql-auth-service",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A GraphQL API to handle login, registration, access control and password recovery with JsonWebToken.",
   "main": "app.js",
   "dependencies": {

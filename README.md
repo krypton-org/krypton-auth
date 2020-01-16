@@ -42,6 +42,7 @@ A GraphQL API to handle login, registration, access control and password recover
   * [extendedSchema](#extendedschema)
   * [graphiql](#graphiql)
   * [hasUsername](#hasusername)
+  * [host](#host)
   * [notificationPageTemplate](#notificationpagetemplate)
   * [onReady](#onready)
   * [privateKey](#privatekey)
@@ -451,6 +452,9 @@ extendedSchema: {
 
 ### hasUsername
 `Boolean` property - Enable or disable username. Default value is `true`.
+
+### host
+`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. Default value is `null`. When `null` GraphQL Auth Service use the address located in `req.headers.host` that can correspond the machine `localhost`.
 
 ###  notificationPageTemplate
 `String` property - The filepath to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
