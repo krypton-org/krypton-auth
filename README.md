@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-A GraphQL API to handle login, registration, password recovery and account management with JSON Web Tokens. It features [a flexible user data model you can easily customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
+A GraphQL API to handle login, registration, password recovery and account management with JSON Web Tokens. It features [a flexible user data model you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
 
 *It is kind of a free & open source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 
