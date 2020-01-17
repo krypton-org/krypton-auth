@@ -61,7 +61,7 @@ A GraphQL API to handle login, registration, password recovery and account manag
 
 This authentication system works with a pair of Private and Public Keys:
 1. When a user logs-in, GraphQL Auth Service generates a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
-2. Then, the user is be able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
+2. Then, the user is able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
 
 Below the corresponding sequence diagram:
 
@@ -79,7 +79,7 @@ Below a possible system design you could use:
 
 ## Installation
 
-This is an [ExpressJS](https://expressjs.com/) app working with [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). You need to provide a [Nodemailer](https://nodemailer.com) configuration from where the system will send administration emails to users. You also need to configure the connection to [MongoDB](https://www.mongodb.com/). If you don't provide any it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on 'mongodb://localhost:27017/users'.
+This is an [ExpressJS](https://expressjs.com/) app working with [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). You need to provide a [Nodemailer](https://nodemailer.com) configuration from where the system will send administration emails to users. You also need to configure the connection to [MongoDB](https://www.mongodb.com/). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/users`.
 
 ```bash
 npm install graphql-auth-service --save
@@ -128,9 +128,9 @@ You can [provide the pair of Public and Private Keys](https://github.com/JohannC
 
 GraphQL-Auth-Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
 
-By loging-in a user will receive a short-lived authentication token and long-lived refresh token. The authentication token should not be saved in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). 
+By logging-in a user will receive a short-lived authentication token and a long-lived refresh token. The authentication token should not be saved in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). 
 
-By default, the authentication token is valid for 15 minuts. Afterwards you will have to make a call to the [`refreshToken`](#refresh-authentication-tokens) mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the [`refreshToken`](#refresh-authentication-tokens) mutation so that an active user never gets disconnected.
+By default, the authentication token is valid for 15 minutes. Afterwards you will have to make a call to the [`refreshToken`](#refresh-authentication-tokens) mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the [`refreshToken`](#refresh-authentication-tokens) mutation so that an active user never gets disconnected.
 
 <p align="center">
   <img src="https://nusid.net/img/sequence_diagram-security.svg" alt="GraphQL Auth Service - System Design diagram"/>
@@ -138,7 +138,7 @@ By default, the authentication token is valid for 15 minuts. Afterwards you will
 
 This process is safe from [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attacks, because even though a form submit attack can make a call to the [`refreshToken`](#refresh-authentication-tokens) mutation, the attacker cannot get the new JWT token value that is returned.
 
-The only risk left, is that by an [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attack an authentication token get stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the [`updateMe`](#update-user-information) mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targetted user account by modifying those fields.
+The only risk left is that by an [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attack an authentication token gets stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the [`updateMe`](#update-user-information) mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targeted user account by modifying those fields.
 
 Anyway you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
@@ -168,7 +168,7 @@ fetch(yourServiceURL+'/graphql', {
 .then(res => console.log(res));
 ```
 
-You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) is not set to `false`). Just open up a web browser and go to `https://your-service-URL.com/graphql` you will be able to type the graphql queries in the IDE.
+You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) is not set to `false`). Just open a web browser to `https://your-service-URL.com/graphql` you will be able to type the graphql queries in the IDE.
 
 
 ## The GraphQL API
@@ -201,7 +201,7 @@ Clicking on the link will lead you to a notification page. *This page is customi
 
 ### Login
 
-To log-in simply use the [`login`](#login) mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set a HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minuts). When outdated refresh it by calling the [`refreshToken`](#refresh-authentication-tokens) mutation.
+To log-in simply use the [`login`](#login) mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set a HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minutes). When outdated refresh it by calling the [`refreshToken`](#refresh-authentication-tokens) mutation.
 
 ```js
 mutation{
@@ -214,7 +214,7 @@ mutation{
 
 ### Refresh authentication tokens
 
-By default your authentication token is valid for 15 minuts. To refresh it use the `refreshToken` mutation. It will send you back a new authentication token and expiry date. You don't need to pass your actual authentication token in the `Authorization` header, it only needs the cookie containing your refresh token **transmitted by default** by your browser. This refresh token will also be refreshed. Thus, unless you stay inactive during a long period of time (by default 7 days), you will never have to log-in again . 
+By default your authentication token is valid for 15 minutes. To refresh it, use the `refreshToken` mutation. It will send you back a new authentication token and expiry date. You don't need to pass your actual authentication token in the `Authorization` header, it only needs the cookie containing your refresh token **transmitted by default** by your browser. This refresh token will also be refreshed. Thus, unless you stay inactive during a long period of time (by default 7 days), you will never have to log-in again . 
 
 ```js
 mutation{
@@ -235,7 +235,7 @@ query{
 ```
 ### Update user information
 
-To change any of your user fields, use the `updateMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query). If you update your `email` you will receive a verification email like for registration. To change your password, please see in the next section. 
+To change any of your user fields, use the `updateMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query). If you update your `email`, you will receive a verification email like for registration. To change your password, please see in the next section. 
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -253,7 +253,7 @@ mutation{
 
 ### Change password
 
-To change your email use the `updateMe` mutation passing your `previousPassword` and your new desired `password`. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query). 
+To change your email, use the `updateMe` mutation passing your `previousPassword` and your new desired `password`. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query). 
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -268,7 +268,7 @@ mutation{
 
 ### Resend verification email
 
-To resend the verification email use the `sendVerificationEmail` query. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query).
+To resend the verification email, use the `sendVerificationEmail` query. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query).
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -283,7 +283,7 @@ query{
 
 ### Reset forgotten password
 
-To reset your forgotten password use the `sendPasswordRecorevyEmail` query passing the `email` address of your account.
+To reset your forgotten password, use the `sendPasswordRecorevyEmail` query passing the `email` address of your account.
 
 ```js
 query{
@@ -309,7 +309,7 @@ Clicking on the link will lead you to a notification page. *This page is customi
 
 ### Delete Account
 
-To delete your account use the `deleteMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query).
+To delete your account, use the `deleteMe` mutation. You have to be logged in to perform this request. Simply [include your authentication token as `Bearer token` in the `Authorization` header of your request](https://github.com/JohannC/GraphQL-Auth-Service#performing-a-graphql-query).
 
 ```js
 //Include your auth token as 'Bearer token' in the 'Authorization' header of your request
@@ -374,7 +374,7 @@ To list users with pagination configuration.
 
 ### authTokenExpiryTime
 
-`Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minuts). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
+`Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minutes). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
 
 ###  dbConfig: 
 Object property that can contain 4 properties:
@@ -454,7 +454,7 @@ extendedSchema: {
 `Boolean` property - Enable or disable username. Default value is `true`.
 
 ### host
-`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. Default value is `null`. When `null` GraphQL Auth Service use the address located in `req.headers.host` that can correspond the machine `localhost`.
+`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. Default value is `null`. When `null`, GraphQL Auth Service use the address located in `req.headers.host` that can correspond the machine `localhost`.
 
 ###  notificationPageTemplate
 `String` property - The filepath to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
