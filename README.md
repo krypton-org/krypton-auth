@@ -126,7 +126,7 @@ You can [provide the pair of Public and Private Keys](https://github.com/JohannC
 
 ## Security
 
-GraphQL-Auth-Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
+GraphQL Auth Service follows the security guidelines of this article : [The Ultimate Guide to handling JWTs on frontend clients](https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/).
 
 By logging-in a user will receive a short-lived authentication token and a long-lived refresh token. The authentication token should not be saved in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). 
 
@@ -392,13 +392,13 @@ Object property that can contain 4 properties:
 
 ###  extendedSchema
 
-The real power of GraphQL-Auth-Service is the ability to customize the user model to your own need. 
+The real power of GraphQL Auth Service is the ability to customize the user model to your own need. 
 
 To achieve that you simply need to pass the different [Mongoose Schema](https://mongoosejs.com/docs/guide.html) fields you want to add. Under the hood those extra fields will be converted in GraphQL types thanks to [graphql-compose-mongoose](https://github.com/graphql-compose/graphql-compose-mongoose), and added to the different queries and mutations automatically.
 
 [Mongoose Schema](https://mongoosejs.com/docs/guide.html) is very powerful, you can define the field type, default value, [custom validators](https://mongoosejs.com/docs/validation.html#custom-validators) & error messages to display, if it is [required](https://mongoosejs.com/docs/validation.html#required-validators-on-nested-objects), if it should be [unique](https://mongoosejs.com/docs/validation.html#the-unique-option-is-not-a-validator)... Please refer to its [documentation](https://mongoosejs.com/docs/guide.html).
 
-**!! Note !!** In each schema field you can define the `isPrivate` attribute. It is a `Boolean` attribute telling whether or not this field can be accessible by the public `queries` like [userById](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), [userByOne](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), etc.
+**!! Note !!** In each schema field you can define the `isPrivate` attribute. It is a `Boolean` attribute telling whether or not this field can be accessible by public `queries` like [userById](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), [userByOne](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), etc.
 
 For example, you could pass the following `extendedSchema`:
 
@@ -463,7 +463,7 @@ extendedSchema: {
     * `message`: `String` property containing the notificaiton message
 
 ###  onReady
-`Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL-Auth-Service is ready!");`.
+`Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL Auth Service is ready!");`.
 
 ###  privateKey
 `String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
