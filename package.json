@@ -20,18 +20,31 @@
     "nodemailer": "^6.4.1"
   },
   "devDependencies": {
+    "@types/express": "^4.17.2",
+    "@types/jest": "^24.9.0",
+    "@types/mongoose": "^5.5.41",
+    "@types/node": "^13.1.8",
+    "@types/nodemailer": "^6.4.0",
     "coveralls": "^3.0.9",
     "express": "^4.17.1",
     "jest": "^24.9.0",
+    "prettier": "^1.19.1",
     "supertest": "^3.3.0",
+    "ts-jest": "^24.3.0",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.7.5",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "coverage": "jest --coverage --forceExit",
-    "test": "jest --forceExit",
-    "start": "node app.js"
+    "coverage": "jest --config jestconfig.json --coverage --forceExit",
+    "test": "jest --config jestconfig.json --forceExit",
+    "start": "node app.js",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -55,6 +68,9 @@
     "JsonWebToken",
     "jwt",
     "stateless"
+  ],
+  "files": [
+    "lib/**/*"
   ],
   "author": "Johann Corcuff <johann.corcuff@gmail.com>",
   "license": "MIT",

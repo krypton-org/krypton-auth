@@ -1,0 +1,15 @@
+import mailer = require('../service/mailer/Mailer');
+import fs = require('fs');
+import config = require('../config');
+
+module.exports = function (agenda) {
+    agenda.define('email', async job => {
+        try {
+            await mailer.send(job.attrs.data);
+        } catch (err) {
+            console.log(err);
+            if (config.emailNotSentLogFile) fs.appendFile(config.emailNotSentLogFile, JSON.stringify(job.attrs.data) + '\n');
+        }
+    });
+
+};

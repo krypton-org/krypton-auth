@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "declaration": true,
+      "outDir": "./lib",
+      "strict": false,
+      "esModuleInterop": true,
+      "resolveJsonModule": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "test", "demo"]
+  }
