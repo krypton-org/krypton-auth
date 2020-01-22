@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
-import { ConfigServiceReady } from '../../config';
+import config from '../../config';
 
-const init = async (serviceConfig: ConfigServiceReady, cb?: () => void): Promise<void | never> => {
+const init = async (cb?: () => void): Promise<void | never> => {
     let connectionString = 'mongodb://' +
-        serviceConfig.dbConfig.address + ':' +
-        serviceConfig.dbConfig.port + '/' +
-        serviceConfig.dbConfig.userDB;
+        config.dbConfig.address + ':' +
+        config.dbConfig.port + '/' +
+        config.dbConfig.userDB;
 
     mongoose.set('useUnifiedTopology', true);
     mongoose.set('useNewUrlParser', true);
@@ -19,7 +19,7 @@ const init = async (serviceConfig: ConfigServiceReady, cb?: () => void): Promise
     // When successfully connected
     mongoose.connection.on('connected', function () {
         console.log('Mongoose default connection open to ' + connectionString);
-        serviceConfig.serviceReady({ isMongooseReady: true });
+        config.serviceReady({ isMongooseReady: true });
         if (cb) cb();
     });
 

@@ -1,14 +1,15 @@
-import mailer = require('../service/mailer/Mailer');
-import fs = require('fs');
-import config = require('../config');
+import Mailer, { Email } from '../service/mailer/Mailer';
+import fs from 'fs';
+import config from '../config';
+import Agenda from 'Agenda';
 
-module.exports = function (agenda) {
-    agenda.define('email', async job => {
+export default function (agenda: Agenda) : void {
+    agenda.define('email', async (job: Agenda.Job<Email>) => {
         try {
-            await mailer.send(job.attrs.data);
+            await Mailer.send(job.attrs.data);
         } catch (err) {
             console.log(err);
-            if (config.emailNotSentLogFile) fs.appendFile(config.emailNotSentLogFile, JSON.stringify(job.attrs.data) + '\n');
+            if (config.emailNotSentLogFile) fs.appendFileSync(config.emailNotSentLogFile, JSON.stringify(job.attrs.data) + '\n');
         }
     });
 

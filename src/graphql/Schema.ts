@@ -1,13 +1,13 @@
 import { composeWithMongoose } from 'graphql-compose-mongoose';
-import {schemaComposer} from 'graphql-compose';
-import config from '../config');
+import { schemaComposer } from 'graphql-compose';
+import config from '../config';
 import { UserSchema, internalFields, privateFields, uneditableFields } from '../model/UserSchema';
 import UserModel from '../model/UserModel';
 import mongoose from 'mongoose';
 import UserController from '../controllers/UserController';
 import { WrongTokenError } from '../service/error/ErrorTypes';
 
-const  MongooseSchema = mongoose.Schema;
+const MongooseSchema = mongoose.Schema;
 
 
 const UserPublicInfoTC = composeWithMongoose(UserModel, {
@@ -207,4 +207,4 @@ schemaComposer.Mutation.addFields({
     },
 });
 
-module.exports = schemaComposer.buildSchema();
+export default schemaComposer.buildSchema();

@@ -7,7 +7,7 @@
  * @argument GraphiQLData data 
  * @render string HTML file
  */
-export default function renderGraphiQL(data) {
+export default function renderGraphiQL(data) : string {
     const queryString = data.query;
     const variablesString = data.variables != null ? JSON.stringify(data.variables, null, 2) : null;
     const operationName = data.operationName;

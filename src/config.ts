@@ -16,8 +16,8 @@ export interface Config {
     hasUsername?: boolean,
     dbConfig: DBConfig
     publicKey?: string,
-    publicKeyFilePath?: string ,
-    privateKey?: string ,
+    publicKeyFilePath?: string,
+    privateKey?: string,
     privateKeyFilePath?: string,
     emailNotSentLogFile?: string,
     verifyEmailTemplate?: string,
@@ -37,7 +37,7 @@ export interface Config {
 
 export class DefaultConfig implements Config {
     hasUsername = true;
-    dbConfig =  {
+    dbConfig = {
         address: 'localhost',
         port: '27017',
         agendaDB: 'agenda',
@@ -56,24 +56,25 @@ export class DefaultConfig implements Config {
     graphiql = true;
     publicKey = undefined;
     publicKeyFilePath = undefined;
-    privateKey= undefined;
+    privateKey = undefined;
+    host = undefined;
     privateKeyFilePath = undefined;
-
+    emailConfig: undefined;
     onReady = () => console.log("GraphQL-Auth-Service is ready!");
 
     private isAgendaReady: boolean = false;
     private isMongooseReady: boolean = false;
-    serviceReady = (status: DBReadyStatus) : void=> {
+    serviceReady = (status: DBReadyStatus): void => {
         if (status.isAgendaReady) this.isAgendaReady = true;
         if (status.isMongooseReady) this.isMongooseReady = true;
         if (this.isAgendaReady && this.isMongooseReady) this.onReady()
     }
 };
 
-export interface ConfigServiceReady extends Config {
-    serviceReady (status: DBReadyStatus) : void;
-}
+// export interface ConfigServiceReady extends Config {
+//     serviceReady(status: DBReadyStatus): void;
+// }
 
-const serviceConfig = new DefaultConfig();
+const config = new DefaultConfig();
 
-export default serviceConfig;
+export default config;

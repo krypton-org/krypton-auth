@@ -7,5 +7,4 @@ router.get('/', MiscellaneousController.getIndex);
 router.get('/user/email/confirmation', UserController.confirmEmail);
 router.get('/form/reset/password', UserController.resetPasswordForm);
 
-
-module.exports = router;
+export default router;

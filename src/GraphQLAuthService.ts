@@ -5,16 +5,10 @@ import graphqlHTTP from 'express-graphql';
 import renderGraphiQL from './graphiql/renderGraphiQL';
 import accepts from 'accepts';
 import cookieParser from 'cookie-parser';
-import serviceConfig, { Config } from './config';
+import config, { Config } from './config';
 import { Express } from 'express';
-
-import db from './service/db/db';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
-import Router from './router/Router';
-import ErrorHandler from './service/error/ErrorHandler';
-import UserModel from './model/UserModel';
-import graphqlSchema from './graphql/Schema';
 
 declare global {
     namespace Express {
@@ -27,15 +21,13 @@ declare global {
 const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, './public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, './private-key.txt');
 
-const config : Config = new DefaultConfig();
-
 /**
  * Mount the GraphQL Auth Service on the Express app passed in argument.
  * @param {Express app} app Express app instance
  * @param {Config} options GraphQL Auth Service config
  * @api public
  */
-function mount(app: Express, options: Config): Express {
+async function mount(app: Express, options: Config): Promise<void> {
     if (!options) options = config;
 
     if (options.publicKey === undefined || options.privateKey === undefined) {
@@ -72,7 +64,11 @@ function mount(app: Express, options: Config): Express {
         }
     });
     //export config;
-
+    const db : any = await import('./service/db/db');
+    const Router : any= await import('./router/Router');
+    const ErrorHandler : any = await import('./service/error/ErrorHandler');
+    const UserModel : any = await import('./model/UserModel');
+    const graphqlSchema : any = await import('./graphql/Schema');
     db.init();
     app.use(cookieParser())
     app.use(bodyParser.json());
@@ -84,7 +80,7 @@ function mount(app: Express, options: Config): Express {
             const bearer = bearerHeader.split(' ');
             const bearerToken = bearer[1];
             try {
-                const user = await UserModel.verify(bearerToken, serviceConfig.publicKey);
+                const user = await UserModel.verify(bearerToken, config.publicKey);
                 req.user = user;
             } catch (err) {
             }
@@ -93,7 +89,7 @@ function mount(app: Express, options: Config): Express {
     });
     app.use(Router);
     app.use(ErrorHandler);
-    if (serviceConfig.graphiql) {
+    if (config.graphiql) {
         app.use('/graphql', async (req, res, next) => {
             const params = await (graphqlHTTP as any).getGraphQLParams(req);
             if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {
@@ -116,13 +112,12 @@ function mount(app: Express, options: Config): Express {
     );
 
     app.use(function (err, req, res, next) {
-        if (options.errorlogFile) fs.appendFile(serviceConfig.errorlogFile, JSON.stringify(job.attrs.data) + '\n', () => { });
+        if (options.errorlogFile) fs.appendFile(config.errorlogFile, JSON.stringify(err) + '\n', () => { });
         const notifications = [];
         notifications.push({ type: 'error', message: 'A mistake has happened. Sorry for the inconvenience, we are going to investigate it.' })
         res.json({ notifications: notifications });
     });
 
-    return app;
 };
 
-exports default mount;
+export default mount;

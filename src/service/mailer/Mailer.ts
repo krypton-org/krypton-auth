@@ -1,35 +1,46 @@
-const nodemailer = require("nodemailer");
+import nodemailer, { Transporter } from 'nodemailer';
 import config from '../../config';
-const ejs = require('ejs');
-const { EmailNotSentError } = require('../error/ErrorTypes');
+import ejs from 'ejs';
+import { EmailNotSentError } from '../error/ErrorTypes';
 
-let transporter = nodemailer.createTransport(config.emailConfig);
+const transporter: Transporter = nodemailer.createTransport(config.emailConfig);
 
-exports.send = (params) => {
-    return new Promise(function (resolve, reject) {
-        const email = params.email;
-        const subject = params.subject;
-        const locals = params.locals;
-        const template = params.template;
-        const from = config.emailConfig.from;
-        ejs.renderFile(template, locals, {}, function (err, html) {
-            if (err) {
-                reject(err);
-            } else {
-                const mailOptions = {
-                    from: from,
-                    to: email,
-                    subject: subject,
-                    html: html
-                };
-                transporter.sendMail(mailOptions, function (err, info) {
-                    if (err) {
-                        reject(new EmailNotSentError(err.message));
-                    } else {
-                        resolve(info);
-                    }
-                });
-            }
+export interface Email {
+    recipient: string;
+    subject: string;
+    locals: any;
+    template: string;
+    from: string;
+}
+
+export default class Mailer {
+    static send(email: Email): Promise<any> {
+        return new Promise(function (resolve, reject) {
+            const recipient = email.recipient;
+            const subject = email.subject;
+            const locals = email.locals;
+            const template = email.template;
+            //@ts-ignore
+            const from = config.emailConfig.from;
+            ejs.renderFile(template, locals, {}, function (err, html) {
+                if (err) {
+                    reject(err);
+                } else {
+                    const mailOptions = {
+                        from: from,
+                        to: recipient,
+                        subject: subject,
+                        html: html
+                    };
+                    transporter.sendMail(mailOptions, function (err, info) {
+                        if (err) {
+                            reject(new EmailNotSentError(err.message));
+                        } else {
+                            resolve(info);
+                        }
+                    });
+                }
+            });
         });
-    });
+    }
 };

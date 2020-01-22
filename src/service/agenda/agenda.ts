@@ -5,9 +5,9 @@ let connectionString = 'mongodb://' +
     config.dbConfig.address + ':' +
     config.dbConfig.port + '/' +
     config.dbConfig.agendaDB;
-let collection = 'jobs';
-const connectionOpts = { db: { address: connectionString, collection: collection } };
-let agenda = new Agenda(connectionOpts);
+const collection = 'jobs';
+const connectionOpts = { db: { address: connectionString, collection } };
+const agenda: Agenda = new Agenda(connectionOpts);
 require('./../../jobs/email')(agenda);
 
 agenda.start()
