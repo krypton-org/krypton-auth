@@ -1,6 +1,7 @@
 import path from 'path';
 import { generateKeys } from './service/crypto/RSAKeysGeneration';
 import fs from 'fs';
+import { Algorithm } from 'jsonwebtoken';
 
 const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, './public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, './private-key.txt');
@@ -33,7 +34,7 @@ export interface ConfigProperties {
     extendedSchema?: Object,
     refreshTokenExpiryTime?: number,
     authTokenExpiryTime?: number,
-    algorithm?: string,
+    algorithm?: Algorithm,
     emailConfig: any;
     graphiql?: boolean,
     host?: string,
@@ -57,7 +58,7 @@ export class Config implements ConfigProperties {
     extendedSchema = {};
     refreshTokenExpiryTime = 7 * 24 * 60 * 60 * 1000;
     authTokenExpiryTime = 15 * 60 * 1000;
-    algorithm = 'RS256';
+    algorithm = 'RS256' as Algorithm ;
     graphiql = true;
     publicKey = undefined;
     publicKeyFilePath = undefined;
@@ -75,7 +76,7 @@ export class Config implements ConfigProperties {
         if (this.isAgendaReady && this.isMongooseReady) this.onReady()
     }
 
-    set(options? : ConfigProperties){
+    set(options?: ConfigProperties) {
         if (options.publicKey === undefined || options.privateKey === undefined) {
             if (options.publicKeyFilePath !== undefined || options.privateKeyFilePath !== undefined) {
                 options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();
@@ -83,7 +84,7 @@ export class Config implements ConfigProperties {
                 // fs.stat(DEFAULT_PRIVATE_KEY_FILE, function (err, stats) { 
                 //     if ((0 + 0o077) & stats.mode > 0) console.log(`The permissions of your private key are too open!\nYou should set it 400 (only user read) with chmod!`);
                 // });
-    
+
             } else if (fs.existsSync(DEFAULT_PUBLIC_KEY_FILE) && fs.existsSync(DEFAULT_PRIVATE_KEY_FILE)) {
                 options.publicKey = fs.readFileSync(DEFAULT_PUBLIC_KEY_FILE).toString();
                 options.privateKey = fs.readFileSync(DEFAULT_PRIVATE_KEY_FILE).toString();
@@ -99,7 +100,7 @@ export class Config implements ConfigProperties {
                 options.privateKey = privateKey;
             }
         };
-        
+
         Object.keys(options).map(prop => {
             if (typeof (this[prop]) === "object" && typeof (options[prop]) !== "string") {
                 this[prop] = {

@@ -35,18 +35,15 @@ const convertedPrivateFields = composeWithMongoose(mongoose.model('mock', new Mo
 const UserTC = UserPublicInfoTC.clone("User");
 UserTC.addFields(convertedPrivateFields)
 
-const UserRegisterInputTC = schemaComposer.createInputTC({
-    name: 'UserRegisterInput',
-});
+const UserRegisterInputTC = schemaComposer.createInputTC('UserRegisterInput');
+//@ts-ignore
 UserRegisterInputTC.addFields(UserTC.getFields());
 UserRegisterInputTC.addFields({
     password: 'String!',
 })
 UserRegisterInputTC.removeField([...uneditableFields, "_id"]);
-
-const UserUpdateInputTC = schemaComposer.createInputTC({
-    name: 'UserUpdateInput',
-});
+const UserUpdateInputTC = schemaComposer.createInputTC('UserUpdateInput');
+//@ts-ignore
 UserUpdateInputTC.addFields(UserTC.getFields());
 UserUpdateInputTC.addFields({
     password: 'String',

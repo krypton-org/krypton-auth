@@ -107,9 +107,9 @@ User.statics.refreshAuthToken = async function (filter: any, privateKey: string)
     return { token, expiryDate };
 }
 
-User.statics.verify = function (token: string, publicKey: string): Promise<{ user: any } | never> {
+User.statics.verify = function (token: string, publicKey: string): Promise<object | string | never> {
     return new Promise((resolve, reject) => {
-        jwt.verify(token, publicKey, { algorithm: config.algorithm }, async (err, userDecrypted) => {
+        jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
                 reject(new WrongTokenError('User not found, please log in!'));
             } else {
