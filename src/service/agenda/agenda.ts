@@ -1,6 +1,6 @@
 import Agenda from 'agenda';
 import config from '../../config';
-
+import emailJob from '../../jobs/email'
 let connectionString = 'mongodb://' +
     config.dbConfig.address + ':' +
     config.dbConfig.port + '/' +
@@ -8,7 +8,7 @@ let connectionString = 'mongodb://' +
 const collection = 'jobs';
 const connectionOpts = { db: { address: connectionString, collection } };
 const agenda: Agenda = new Agenda(connectionOpts);
-require('./../../jobs/email')(agenda);
+emailJob(agenda);
 
 agenda.start()
     .then(() => {
