@@ -36,7 +36,7 @@
             "args": [
               "${fileBasenameNoExtension}",
               "--config",
-              "jest.config.js"
+              "jest.config.json",
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

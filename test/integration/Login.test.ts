@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
-const jwt = require('jsonwebtoken');
-const config = require('../../lib/config')
+import AppTester from '../utils/AppTester';
+import jwt from 'jsonwebtoken';
+import config from '../../lib/config';
 
 let appTester;
 let request;
@@ -95,7 +95,7 @@ test('Login by email & decrypting token to get user data', async (done) => {
     const res = await request.postGraphQL(query);
     expect(typeof res.data.login.token === "string").toBeTruthy();
     expect(res.data.login.token.length > 10).toBeTruthy();
-    jwt.verify(res.data.login.token, config.publicKey, { algorithm: 'RS256' }, async (err, userDecrypted) => {
+    jwt.verify(res.data.login.token, config.publicKey, { algorithms: ['RS256'] }, async (err, userDecrypted: any) => {
         if (err) {
             done(new Error('Wrong token'));
         } else {
@@ -125,7 +125,7 @@ test("Can't decrypt token with a wrong public key", async (done) => {
     const res = await request.postGraphQL(query);
     expect(typeof res.data.login.token === "string").toBeTruthy();
     expect(res.data.login.token.length > 10).toBeTruthy();
-    jwt.verify(res.data.login.token, "wrongPublicKey", { algorithm: 'RS256' }, async (err, userDecrypted) => {
+    jwt.verify(res.data.login.token, "wrongPublicKey", { algorithms: ['RS256'] }, async (err, userDecrypted) => {
         if (err) {
             expect(err).toBeTruthy();
             done()

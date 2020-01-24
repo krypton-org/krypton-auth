@@ -1,4 +1,4 @@
-const AppTester = require('../utils/AppTester');
+import AppTester from '../utils/AppTester';
 const pkg = require('../../package.json');
 
 
@@ -17,7 +17,7 @@ beforeAll((done) => {
 }, 40000);
 
 test("Access index page", async (done) => {
-    res = await request.get("/");
+    const res = await request.get("/");
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.text).notifications[0].message).toBe('Welcome to GraphQL Auth Service - version '+pkg.version);
     done();

@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
-const jwt = require('jsonwebtoken');
-const config = require('../../lib/config')
+import AppTester from '../utils/AppTester';
+import jwt from 'jsonwebtoken';
+import config from '../../lib/config';
 
 let appTester;
 let request;
@@ -25,7 +25,7 @@ beforeAll((done) => {
             try{
                 request = appTester.getRequestSender();
                 await appTester.register(user);
-                res = await appTester.login(user.email, user.password);
+                const res = await appTester.login(user.email, user.password);
                 token = res.data.login.token;
                 done();
             } catch (err) {

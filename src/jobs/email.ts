@@ -1,4 +1,4 @@
-import Mailer, { Email } from '../service/mailer/Mailer';
+import Mailer, { Email } from '../services/mailer/Mailer';
 import fs from 'fs';
 import config from '../config';
 import Agenda from 'Agenda';

@@ -1,13 +1,13 @@
 import {model, Schema, Document, Model} from 'mongoose';
 import jwt from 'jsonwebtoken';
 import config from '../config';
-import PasswordEncryption from '../service/crypto/PasswordEncryption';
+import PasswordEncryption from '../services/crypto/PasswordEncryption';
 import {
     UserNotFound,
     WrongPasswordError,
     WrongTokenError,
     EncryptionFailedError
-} from '../service/error/ErrorTypes';
+} from '../services/error/ErrorTypes';
 
 const computeUserToken = (user: any, privateKey: string, expiresIn: number): Promise<string | never> => {
     return new Promise((resolve, reject) => {

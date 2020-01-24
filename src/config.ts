@@ -1,10 +1,10 @@
 import path from 'path';
-import { generateKeys } from './service/crypto/RSAKeysGeneration';
+import { generateKeys } from './services/crypto/RSAKeysGeneration';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 
-const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, './public-key.txt');
-const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, './private-key.txt');
+const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, '../public-key.txt');
+const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, '../private-key.txt');
 
 export interface DBConfig {
     address: string,
@@ -101,7 +101,7 @@ export class Config implements ConfigProperties {
             }
         };
 
-        Object.keys(options).map(prop => {
+        Object.keys(options).map(function(prop){
             if (typeof (this[prop]) === "object" && typeof (options[prop]) !== "string") {
                 this[prop] = {
                     ...this[prop], ...options[prop]
@@ -109,7 +109,7 @@ export class Config implements ConfigProperties {
             } else {
                 this[prop] = options[prop];
             }
-        });
+        }.bind(this));
     }
 };
 

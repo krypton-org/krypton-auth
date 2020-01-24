@@ -1,5 +1,9 @@
+declare function require(moduleName: string): any;
 import config, { ConfigProperties } from './config';
 import { Express } from 'express';
+import MongooseConnection from "./services/db/db";
+import Router from "./router/Router";
+
 
 declare global {
     namespace Express {
@@ -15,12 +19,13 @@ declare global {
  * @param {ConfigProperties} properties GraphQL Auth Service config
  * @api public
  */
-async function GraphQLAuthService(app: Express, properties: ConfigProperties): Promise<void> {
+function GraphQLAuthService(app: Express, properties: ConfigProperties): Express {
     if (properties) config.set(properties);
-    const db: any = await import('./service/db/db');
-    const Router: any = await import('./router/Router');
+    const db: typeof MongooseConnection = require('./services/db/db').default;
+    const router : typeof Router = require('./router/Router').default;
     db.init();
-    app.use(Router);
+    app.use(router);
+    return app
 };
 
 export default GraphQLAuthService;

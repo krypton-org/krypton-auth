@@ -1,4 +1,4 @@
-const AppTester = require('../utils/AppTester');
+import AppTester from '../utils/AppTester';
 
 let appTester;
 let request;

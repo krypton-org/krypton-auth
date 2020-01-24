@@ -1,4 +1,4 @@
-const AppTester = require('../utils/AppTester');
+import AppTester from '../utils/AppTester';
 
 let appTester;
 let request;
@@ -38,7 +38,7 @@ let user3 = {
     receiveNewsletter: true
 };
 
-buildRefreshTokenQuery = () => {
+const buildRefreshTokenQuery = () => {
     return {
         query: `mutation{
             refreshToken{
@@ -49,7 +49,7 @@ buildRefreshTokenQuery = () => {
     }
 }
 
-wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 
 beforeAll((done) => {

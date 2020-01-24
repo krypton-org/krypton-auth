@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import User from '../model/UserModel';
-import agenda from '../service/agenda/agenda';
+import agenda from '../services/agenda/agenda';
 import config from '../config';
 import ejs from 'ejs';
 import {
@@ -14,7 +14,7 @@ import {
     UserValidationError,
     UpdatePasswordTooLateError,
     AlreadyLoggedInError
-} from '../service/error/ErrorTypes';
+} from '../services/error/ErrorTypes';
 const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
 const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;

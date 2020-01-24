@@ -1,4 +1,4 @@
-const AppTester = require('../utils/AppTester');
+import AppTester from '../utils/AppTester';
 
 let appTester;
 let request;
@@ -55,7 +55,7 @@ beforeAll(async (done) => {
         onReady: async () => {
             try{
                 request = appTester.getRequestSender();
-                res = await appTester.register(user2);
+                const res = await appTester.register(user2);
                 done();
             } catch (err) {
                 done(err);

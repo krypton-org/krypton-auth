@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
-const jwt = require('jsonwebtoken');
-const config = require('../../lib/config')
+import AppTester from '../utils/AppTester';
+import jwt from 'jsonwebtoken';
+import config from '../../lib/config';
 
 let appTester;
 let request;
@@ -118,7 +118,7 @@ test('Update usersname - email - password', async (done) => {
     expect(typeof res.data.login.token === "string").toBeTruthy();
     expect(res.data.login.token.length > 10).toBeTruthy();
     token1 = res.data.login.token
-    jwt.verify(res.data.login.token, config.publicKey, { algorithm: 'RS256' }, async (err, userDecrypted) => {
+    jwt.verify(res.data.login.token, config.publicKey, { algorithms: ['RS256'] }, async (err, userDecrypted: any) => {
         if (err) {
             done(new Error('Wrong token'));
         } else {

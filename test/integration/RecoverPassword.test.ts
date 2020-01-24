@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
-const jwt = require('jsonwebtoken');
-const config = require('../../lib/config')
+import AppTester from '../utils/AppTester';
+import jwt from 'jsonwebtoken';
+import config from '../../lib/config';
 
 let appTester;
 let request;
@@ -61,7 +61,7 @@ beforeAll((done) => {
                 await appTester.register(user2);
                 await appTester.register(user3);
                 await appTester.register(user4);
-                res = await appTester.login(user.email, user.password);
+                const res = await appTester.login(user.email, user.password);
                 token = res.data.login.token;
                 done();
             } catch (err) {
@@ -245,14 +245,14 @@ test("Token too old", async (done) => {
 });
 
 test("Acces reset password form", async (done) => {
-    res = await request.get("/form/reset/password?token=" + "ATOKEN");
+    const res = await request.get("/form/reset/password?token=" + "ATOKEN");
     expect(res.statusCode).toBe(200);
     expect(res.text.includes("Reset your password")).toBeTruthy();
     done();
 });
 
 test("Can't access reset password form when logged in", async (done) => {
-    res = await request.get("/form/reset/password?token=" + "ATOKEN")
+    const res = await request.get("/form/reset/password?token=" + "ATOKEN")
     .set("Authorization", "Bearer " + token).send();
     expect(res.statusCode).toBe(200);
     expect(res.text.includes("Oups, you are already logged in!")).toBeTruthy();

@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
-const jwt = require('jsonwebtoken');
-const config = require('../../lib/config')
+import AppTester from '../utils/AppTester';
+import jwt from 'jsonwebtoken';
+import config from '../../lib/config';
 
 let appTester;
 let request;
@@ -37,7 +37,7 @@ beforeAll((done) => {
                 request = appTester.getRequestSender();
                 await appTester.register(user);
                 await appTester.register(user2);
-                res = await appTester.login(user.email, user.password);
+                const res = await appTester.login(user.email, user.password);
                 token = res.data.login.token;
                 done();
             } catch (err) {
@@ -72,7 +72,7 @@ test("Confirm email", async (done) => {
 });
 
 test("wrong verify token", async (done) => {
-    res = await request.get("/user/email/confirmation?token=" + "WRONGTOKEN");
+    const res = await request.get("/user/email/confirmation?token=" + "WRONGTOKEN");
     expect(res.statusCode).toBe(200);
     expect(res.text.includes("This link is not valid!")).toBeTruthy();
     done();

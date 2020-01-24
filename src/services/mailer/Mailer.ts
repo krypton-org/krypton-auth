@@ -1,9 +1,9 @@
-import nodemailer, { Transporter } from 'nodemailer';
+import nodemailer, { Transporter, Transport } from 'nodemailer';
 import config from '../../config';
 import ejs from 'ejs';
 import { EmailNotSentError } from '../error/ErrorTypes';
 
-const transporter: Transporter = nodemailer.createTransport(config.emailConfig);
+const transporter: Transporter = nodemailer.createTransport(config.emailConfig as Transport);
 
 export interface Email {
     recipient: string;

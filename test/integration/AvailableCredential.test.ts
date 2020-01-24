@@ -1,6 +1,6 @@
-const AppTester = require('../utils/AppTester');
+import AppTester from '../utils/AppTester';
 
-let appTester;
+let appTester: AppTester;
 let request;
 
 let user1 = {
@@ -25,7 +25,7 @@ let user2 = {
     receiveNewsletter: true
 };
 
-buildUsernameAvailableQuery = (username) => {
+const buildUsernameAvailableQuery = (username) => {
     return {
         query: `query{
             usernameAvailable(username:"${username}"){
@@ -35,7 +35,7 @@ buildUsernameAvailableQuery = (username) => {
     }
 }
 
-buildEmailAvailableQuery = (email) => {
+const buildEmailAvailableQuery = (email) => {
     return {
         query: `query{
             emailAvailable(email:"${email}"){
