@@ -63,7 +63,7 @@ test("Confirm email", async (done) => {
     
     
     
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({username: user.username}, {verified: true});
     res = await request.get("/user/email/confirmation?token="+userRetrieved.verificationToken);
     expect(res.statusCode).toBe(200);

@@ -103,7 +103,7 @@ test('Update usersname - email - password', async (done) => {
           }`
     }
 
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user1.username });
     let res = await request.postGraphQL(query, token1, refreshToken);
 
@@ -149,7 +149,7 @@ test('Wrong previous password', async (done) => {
             }
           }`
     }
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     let res = await request.postGraphQL(query, token2, refreshToken);
     expect(res.errors[0].message.includes("Your previous password is wrong!")).toBeTruthy();
@@ -179,7 +179,7 @@ test('Password too short', async (done) => {
           }`
     }
 
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     let res = await request.postGraphQL(query, token2, refreshToken);
     expect(res.errors[0].message.includes("The password must contain at least 8 characters")).toBeTruthy();
@@ -209,7 +209,7 @@ test('Username too short', async (done) => {
           }`
     }
 
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
@@ -229,7 +229,7 @@ test('Username already exists', async (done) => {
           }`
     }
 
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("Username already exists")).toBeTruthy();
@@ -249,7 +249,7 @@ test('Email already exists', async (done) => {
           }`
     }
 
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user4.username });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("Email already exists")).toBeTruthy();
@@ -268,7 +268,7 @@ test('Wrong gender', async (done) => {
             }
           }`
     }
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("found Mutant")).toBeTruthy();
@@ -276,7 +276,7 @@ test('Wrong gender', async (done) => {
 });
 
 test('Update email of a verified user', async (done) => {
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     await UserModel.updateUser({ username: user3.username }, { verified: true });
     let res = await appTester.login(user3.email, user3.password);
     token3 = res.data.login.token;

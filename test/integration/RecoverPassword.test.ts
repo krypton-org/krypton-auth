@@ -116,7 +116,7 @@ test("Change password with recorevy token", async (done) => {
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user.username }, { verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
@@ -189,7 +189,7 @@ test("Password too short", async (done) => {
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user3.username });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
@@ -221,7 +221,7 @@ test("Token too old", async (done) => {
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
-    const UserModel = require('../../lib/model/UserModel');
+    const UserModel = require('../../lib/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user4.username });
     let oldDate = new Date()
     oldDate.setHours(oldDate.getHours() - 2);
