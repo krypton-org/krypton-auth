@@ -1,6 +1,6 @@
 import AppTester from '../utils/AppTester';
 import jwt from 'jsonwebtoken';
-import config from '../../lib/config';
+import config from '../../src/config';
 
 let appTester;
 let request;
@@ -63,7 +63,7 @@ test("Confirm email", async (done) => {
     
     
     
-    const UserModel = require('../../lib/model/UserModel').default;
+    const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({username: user.username}, {verified: true});
     res = await request.get("/user/email/confirmation?token="+userRetrieved.verificationToken);
     expect(res.statusCode).toBe(200);

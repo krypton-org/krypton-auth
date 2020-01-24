@@ -3,12 +3,12 @@ const SALT_LENGTH = 64; // Length of the salt, in bytes
 const HASH_LENGTH = 64; // Length of the hash, in bytes
 const HASH_ITERATIONS = 128;
 
-const hashAndSalt = (password: string): Promise<{ salt: string, hash: string }> => {
+export const hashAndSalt = (password: string): Promise<{ salt: string, hash: string }> => {
     let salt = crypto.randomBytes(SALT_LENGTH)
     return hash(password, salt);
 }
 
-const hash = (password: string, salt: Buffer): Promise<{ salt: string, hash: string }> => {
+export const hash = (password: string, salt: Buffer): Promise<{ salt: string, hash: string }> => {
     if (typeof salt === "string")
         salt = new Buffer(salt, 'base64');
     return new Promise((resolve, reject) => {
@@ -24,5 +24,3 @@ const hash = (password: string, salt: Buffer): Promise<{ salt: string, hash: str
         });
     });
 };
-
-export default { hash, hashAndSalt };

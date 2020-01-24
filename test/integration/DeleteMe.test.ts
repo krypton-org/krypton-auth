@@ -1,6 +1,6 @@
 import AppTester from '../utils/AppTester';
 import jwt from 'jsonwebtoken';
-import config from '../../lib/config';
+import config from '../../src/config';
 
 let appTester;
 let request;

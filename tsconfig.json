@@ -2,10 +2,14 @@
     "compilerOptions": {
       "module": "commonjs",
       "declaration": true,
+      "target": "ES6",
+      "moduleResolution": "node",
+      "sourceMap": true,
       "outDir": "./lib",
       "strict": false,
       "esModuleInterop": true,
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "allowJs": true
     },
     "include": ["src"],
     "exclude": ["node_modules", "test", "demo"]

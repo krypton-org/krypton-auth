@@ -79,7 +79,7 @@ test("Refresh auth token", async (done) => {
     let resLogin = await appTester.login(user1.email, user1.password);
     let token1 = resLogin.data.login.token;
     expect(new Date(resLogin.data.login.expiryDate) >= upLimit).toBeTruthy();
-    const UserModel = require('../../lib/model/UserModel').default;
+    const UserModel = require('../../src/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user1.username });
     await wait(authTokenExpiryTime)
     let resRefresh = await request.postGraphQL(buildRefreshTokenQuery(), token1,refreshToken);
@@ -94,7 +94,7 @@ test("Refresh token expired - relog-in", async (done) => {
     let resLogin = await appTester.login(user2.email, user2.password);
     let token1 = resLogin.data.login.token;
     expect(new Date(resLogin.data.login.expiryDate) >= upLimit).toBeTruthy();
-    const UserModel = require('../../lib/model/UserModel').default;
+    const UserModel = require('../../src/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     await wait(refreshTokenExpiryTime)
     let resRefresh = await request.postGraphQL(buildRefreshTokenQuery(), token1,refreshToken);
@@ -144,7 +144,7 @@ test("Can't update user with expired auth token", async (done) => {
             }
           }`
     }
-    const UserModel = require('../../lib/model/UserModel').default;
+    const UserModel = require('../../src/model/UserModel').default;
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     await wait(authTokenExpiryTime)
     let resUpdate = await request.postGraphQL(query, token3, refreshToken);

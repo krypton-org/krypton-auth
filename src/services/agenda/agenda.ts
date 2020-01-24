@@ -1,6 +1,7 @@
 import Agenda from 'agenda';
 import config from '../../config';
-import emailJob from '../../jobs/email'
+import emailJob from '../../jobs/email';
+
 let connectionString = 'mongodb://' +
     config.dbConfig.address + ':' +
     config.dbConfig.port + '/' +

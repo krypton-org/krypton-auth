@@ -1,7 +1,7 @@
-import {model, Schema, Document, Model} from 'mongoose';
+import { model, Schema, Document, Model } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import config from '../config';
-import PasswordEncryption from '../services/crypto/PasswordEncryption';
+import * as PasswordEncryption from '../services/crypto/PasswordEncryption';
 import {
     UserNotFound,
     WrongPasswordError,
@@ -28,7 +28,7 @@ const noninternalFieldsFilter: string = "-" + internalFields.join(" -");
 const internalFieldsMap: Map<string, boolean> = new Map();
 internalFields.map(x => internalFieldsMap.set(x, true));
 
-const User : Schema = new Schema(UserSchema);
+const User: Schema = new Schema(UserSchema);
 
 User.statics.userExists = function (filter: any): Promise<boolean> {
     return this.findOne(filter)
@@ -140,7 +140,7 @@ User.statics.updateUser = async function (filter: any, data: any): Promise<void 
     await this.updateOne(filter, data, { runValidators: true });
 };
 
-User.statics.removeUser = function (filter: any) : Promise<void> {
+User.statics.removeUser = function (filter: any): Promise<void> {
     return this.deleteOne(filter);
 };
 
@@ -156,16 +156,18 @@ function escapeHtml(unsafe: string): string {
 
 
 export interface UserModel extends Model<any> {
-    userExists (filter: any): Promise<boolean>
-    getUser (filter: any): Promise<any | never>
-    getUserNonInternalFields (filter: any): Promise<any | never>
-    createUser (data: any): Promise<any | never>
-    isPasswordValid (filter: any, password: string): Promise<boolean>
-    sign (filter: any, password: string, privateKey: string): Promise<{ user: any, token: string, expiryDate: Date } | never>
-    refreshAuthToken (filter: any, privateKey: string): Promise<{ token: string, expiryDate: Date }>
-    verify (token: string, publicKey: string): Promise<{ user: any } | never>
-    updateUser (filter: any, data: any): Promise<void | never>;
-    removeUser (filter: any) : Promise<void>
-  }
+    userExists(filter: any): Promise<boolean>
+    getUser(filter: any): Promise<any | never>
+    getUserNonInternalFields(filter: any): Promise<any | never>
+    createUser(data: any): Promise<any | never>
+    isPasswordValid(filter: any, password: string): Promise<boolean>
+    sign(filter: any, password: string, privateKey: string): Promise<{ user: any, token: string, expiryDate: Date } | never>
+    refreshAuthToken(filter: any, privateKey: string): Promise<{ token: string, expiryDate: Date }>
+    verify(token: string, publicKey: string): Promise<{ user: any } | never>
+    updateUser(filter: any, data: any): Promise<void | never>;
+    removeUser(filter: any): Promise<void>
+}
 
-export default model<Document, UserModel>("User", User);
+const UserModel = model<Document, UserModel>("User", User);
+
+export default UserModel;

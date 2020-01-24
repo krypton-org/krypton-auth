@@ -76,7 +76,7 @@ export class Config implements ConfigProperties {
         if (this.isAgendaReady && this.isMongooseReady) this.onReady()
     }
 
-    set(options?: ConfigProperties) {
+    merge(options?: ConfigProperties) {
         if (options.publicKey === undefined || options.privateKey === undefined) {
             if (options.publicKeyFilePath !== undefined || options.privateKeyFilePath !== undefined) {
                 options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();

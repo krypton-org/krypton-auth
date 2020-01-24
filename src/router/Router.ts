@@ -1,5 +1,5 @@
-import UserController from "../controllers/UserController";
-import MiscellaneousController from "../controllers/MiscellaneousController";
+import * as UserController from "../controllers/UserController";
+import * as MiscellaneousController from "../controllers/MiscellaneousController";
 import express from 'express';
 import ErrorHandler from '../services/error/ErrorHandler';
 import UserModel from '../model/UserModel';

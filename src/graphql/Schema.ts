@@ -4,7 +4,7 @@ import config from '../config';
 import { UserSchema, internalFields, privateFields, uneditableFields } from '../model/UserSchema';
 import UserModel from '../model/UserModel';
 import mongoose from 'mongoose';
-import UserController from '../controllers/UserController';
+import * as UserController from '../controllers/UserController';
 import { WrongTokenError } from '../services/error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
