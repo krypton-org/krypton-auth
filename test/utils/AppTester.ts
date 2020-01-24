@@ -117,7 +117,7 @@ export default class AppTester {
 
         console.log("yoooo");
 
-        this.request = request(new GraphQLAuthService(express(), options));
+        this.request = request(GraphQLAuthService(express(), options));
 
         this.request.getGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
             let request = this.request.get('/graphql')
