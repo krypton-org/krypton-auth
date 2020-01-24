@@ -1,7 +1,7 @@
 import Mailer, { Email } from '../services/mailer/Mailer';
 import fs from 'fs';
 import config from '../config';
-import Agenda from 'Agenda';
+import Agenda from 'agenda';
 
 export default function (agenda: Agenda) : void {
     agenda.define('email', async (job: Agenda.Job<Email>) => {
