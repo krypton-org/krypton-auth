@@ -2,11 +2,9 @@ import mongoose from 'mongoose';
 import config from '../../config';
 
 export default class MongooseConnection {
-    static async init(cb?: () => void): Promise<void | never> {
-        let connectionString = 'mongodb://' +
-            config.dbConfig.address + ':' +
-            config.dbConfig.port + '/' +
-            config.dbConfig.userDB;
+    public static async init(cb?: () => void): Promise<void | never> {
+        const connectionString =
+            'mongodb://' + config.dbConfig.address + ':' + config.dbConfig.port + '/' + config.dbConfig.userDB;
 
         mongoose.set('useUnifiedTopology', true);
         mongoose.set('useNewUrlParser', true);
@@ -18,46 +16,46 @@ export default class MongooseConnection {
 
         // CONNECTION EVENTS
         // When successfully connected
-        mongoose.connection.on('connected', function () {
+        mongoose.connection.on('connected', () => {
             console.log('Mongoose default connection open to ' + connectionString);
             config.serviceReady({ isMongooseReady: true });
-            if (cb) cb();
+            if (cb) { cb(); }
         });
 
         // If the connection throws an error
-        mongoose.connection.on('error', function (err) {
+        mongoose.connection.on('error', (err) => {
             console.log('Connection error with MongoDB. Error:', err);
         });
 
         // When the connection is disconnected
-        mongoose.connection.on('disconnected', function () {
+        mongoose.connection.on('disconnected', () => {
             console.log('Mongoose default connection disconnected');
         });
 
         // If the Node process ends, close the Mongoose connection
-        process.on('SIGINT', function () {
-            mongoose.connection.close(function () {
+        process.on('SIGINT', () => {
+            mongoose.connection.close(() => {
                 console.log('Mongoose default connection disconnected through app termination');
                 process.exit(0);
             });
         });
 
-        process.on("unhandledRejection", function (err) {
-            console.log("yoooo");
+        process.on('unhandledRejection', (err) => {
+            console.log('yoooo');
         });
 
-        process.on("uncaughtException", function (err) {
-            console.log("yoooo");
-        })
+        process.on('uncaughtException', (err) => {
+            console.log('yoooo');
+        });
 
         // Create the database connection
-        await mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
+        await mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
     }
 
-    static async close(cb?: () => void): Promise<void | never> {
+    public static async close(cb?: () => void): Promise<void | never> {
         await mongoose.connection.close(() => {
             console.log('Mongoose connection closed');
-            if (cb) cb();
+            if (cb) { cb(); }
         });
     }
 }

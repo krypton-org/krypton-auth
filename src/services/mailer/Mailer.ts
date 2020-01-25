@@ -1,6 +1,6 @@
-import nodemailer, { Transporter, Transport } from 'nodemailer';
-import config from '../../config';
 import ejs from 'ejs';
+import nodemailer, { Transport, Transporter } from 'nodemailer';
+import config from '../../config';
 import { EmailNotSentError } from '../error/ErrorTypes';
 
 const transporter: Transporter = nodemailer.createTransport(config.emailConfig as Transport);
@@ -14,25 +14,25 @@ export interface Email {
 }
 
 export default class Mailer {
-    static send(email: Email): Promise<any> {
-        return new Promise(function (resolve, reject) {
+    public static send(email: Email): Promise<any> {
+        return new Promise((resolve, reject) => {
             const recipient = email.recipient;
             const subject = email.subject;
             const locals = email.locals;
             const template = email.template;
-            //@ts-ignore
+            // @ts-ignore
             const from = config.emailConfig.from;
-            ejs.renderFile(template, locals, {}, function (err, html) {
+            ejs.renderFile(template, locals, {}, (err, html) => {
                 if (err) {
                     reject(err);
                 } else {
                     const mailOptions = {
-                        from: from,
+                        from,
                         to: recipient,
-                        subject: subject,
-                        html: html
+                        subject,
+                        html,
                     };
-                    transporter.sendMail(mailOptions, function (err, info) {
+                    transporter.sendMail(mailOptions, (err, info) => {
                         if (err) {
                             reject(new EmailNotSentError(err.message));
                         } else {
@@ -43,4 +43,4 @@ export default class Mailer {
             });
         });
     }
-};
+}

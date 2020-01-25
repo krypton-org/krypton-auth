@@ -1,206 +1,205 @@
-import { composeWithMongoose } from 'graphql-compose-mongoose';
 import { schemaComposer } from 'graphql-compose';
-import config from '../config';
-import { UserSchema, internalFields, privateFields, uneditableFields } from '../model/UserSchema';
-import UserModel from '../model/UserModel';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
+import config from '../config';
 import * as UserController from '../controllers/UserController';
+import UserModel from '../model/UserModel';
+import { internalFields, privateFields, uneditableFields, UserSchema } from '../model/UserSchema';
 import { WrongTokenError } from '../services/error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
 
-
 const UserPublicInfoTC = composeWithMongoose(UserModel, {
-    name: "UserPublicInfo",
     fields: {
-        remove: [...internalFields, ...privateFields]
-    }
+        remove: [...internalFields, ...privateFields],
+    },
+    name: 'UserPublicInfo',
 });
 
 schemaComposer.Query.addFields({
     userById: UserPublicInfoTC.getResolver('findById'),
     userByIds: UserPublicInfoTC.getResolver('findByIds'),
-    userOne: UserPublicInfoTC.getResolver('findOne'),
-    userMany: UserPublicInfoTC.getResolver('findMany'),
     userCount: UserPublicInfoTC.getResolver('count'),
-    userPagination: UserPublicInfoTC.getResolver('pagination')
+    userMany: UserPublicInfoTC.getResolver('findMany'),
+    userOne: UserPublicInfoTC.getResolver('findOne'),
+    userPagination: UserPublicInfoTC.getResolver('pagination'),
 });
 
 const convertedPrivateFields = composeWithMongoose(mongoose.model('mock', new MongooseSchema(UserSchema)), {
     fields: {
-        remove: [...internalFields]
-    }
-}).getFields()
+        remove: [...internalFields],
+    },
+}).getFields();
 
-const UserTC = UserPublicInfoTC.clone("User");
-UserTC.addFields(convertedPrivateFields)
+const UserTC = UserPublicInfoTC.clone('User');
+UserTC.addFields(convertedPrivateFields);
 
 const UserRegisterInputTC = schemaComposer.createInputTC('UserRegisterInput');
-//@ts-ignore
+// @ts-ignore
 UserRegisterInputTC.addFields(UserTC.getFields());
 UserRegisterInputTC.addFields({
     password: 'String!',
-})
-UserRegisterInputTC.removeField([...uneditableFields, "_id"]);
+});
+UserRegisterInputTC.removeField([...uneditableFields, '_id']);
 const UserUpdateInputTC = schemaComposer.createInputTC('UserUpdateInput');
-//@ts-ignore
+// @ts-ignore
 UserUpdateInputTC.addFields(UserTC.getFields());
 UserUpdateInputTC.addFields({
     password: 'String',
     previousPassword: 'String',
-})
-UserUpdateInputTC.removeField([...uneditableFields, "_id"]);
+});
+UserUpdateInputTC.removeField([...uneditableFields, '_id']);
 
 const NotificationTypeTC = schemaComposer.createEnumTC({
     name: 'NotificationType',
     values: {
-        ERROR: { value: "error" },
-        SUCCESS: { value: "success" },
-        WARNING: { value: "warning" },
-        INFO: { value: "info" },
+        ERROR: { value: 'error' },
+        INFO: { value: 'info' },
+        SUCCESS: { value: 'success' },
+        WARNING: { value: 'warning' },
     },
 });
 
 const NotificationTC = schemaComposer.createObjectTC({
-    name: 'Notification',
     fields: {
-        type: 'NotificationType!',
         message: 'String!',
+        type: 'NotificationType!',
     },
+    name: 'Notification',
 });
 
 const NotificationsTC = schemaComposer.createObjectTC({
-    name: 'Notifications',
     fields: {
-        notifications: '[Notification]'
+        notifications: '[Notification]',
     },
+    name: 'Notifications',
 });
 
 const PublicKeyTC = schemaComposer.createObjectTC({
-    name: 'PublicKey',
     fields: {
         value: 'String!',
     },
+    name: 'PublicKey',
 });
 
 const IsAvailableTC = schemaComposer.createObjectTC({
-    name: 'IsAvailable',
     fields: {
         isAvailable: 'Boolean!',
     },
+    name: 'IsAvailable',
 });
 
 const UserAndTokenTC = schemaComposer.createObjectTC({
-    name: 'UserAndToken',
     fields: {
-        user: UserTC,
         expiryDate: 'Date!',
         token: 'String!',
+        user: UserTC,
     },
+    name: 'UserAndToken',
 });
 
 const TokenTC = schemaComposer.createObjectTC({
-    name: 'Token',
     fields: {
         expiryDate: 'Date!',
         token: 'String!',
     },
+    name: 'Token',
 });
 
 const UserAndNotifications = schemaComposer.createObjectTC({
-    name: 'UserAndNotifications',
     fields: {
-        user: UserTC,
         notifications: [NotificationTC],
+        user: UserTC,
     },
+    name: 'UserAndNotifications',
 });
 
 schemaComposer.Query.addFields({
-    me: {
-        type: UserTC,
-        resolve: async (_, { }, context) => {
-            try {
-                return await UserModel.findById(context.req.user._id)
-            } catch (err) {
-                throw new WrongTokenError("User not found, please log in!")
-            }
-        }
-    },
-    publicKey: {
-        type: 'String!',
-        resolve: () => {
-            return config.publicKey
-        },
-    },
-    usernameAvailable: {
-        type: "IsAvailable",
-        args: {
-            username: 'String!', //email or username
-        },
-        resolve: async (_, { username }) => await UserController.checkUsernameAvailable(username),
-    },
     emailAvailable: {
-        type: "IsAvailable",
         args: {
-            email: 'String!', //email or username
+            email: 'String!', // email or username
         },
         resolve: async (_, { email }) => await UserController.checkEmailAvailable(email),
+        type: 'IsAvailable',
     },
-    sendVerificationEmail: {
-        type: NotificationsTC,
-        resolve: async (_, { }, { req }) => UserController.resendConfirmationEmail(req),
-
+    me: {
+        resolve: async (_, {}, context) => {
+            try {
+                return await UserModel.findById(context.req.user._id);
+            } catch (err) {
+                throw new WrongTokenError('User not found, please log in!');
+            }
+        },
+        type: UserTC,
+    },
+    publicKey: {
+        resolve: () => {
+            return config.publicKey;
+        },
+        type: 'String!',
     },
     sendPasswordRecorevyEmail: {
-        type: NotificationsTC,
         args: {
             email: 'String!',
         },
         resolve: (_, { email }, { req }) => UserController.sendPasswordRecoveryEmail(email, req),
-    }
+        type: NotificationsTC,
+    },
+    sendVerificationEmail: {
+        resolve: async (_, {}, { req }) => UserController.resendConfirmationEmail(req),
+        type: NotificationsTC,
+    },
+    usernameAvailable: {
+        args: {
+            username: 'String!', // email or username
+        },
+        resolve: async (_, { username }) => await UserController.checkUsernameAvailable(username),
+        type: 'IsAvailable',
+    },
 });
 
 schemaComposer.Mutation.addFields({
-    login: {
-        type: UserAndTokenTC,
-        args: {
-            login: 'String!', //email or username
-            password: 'String!',
-        },
-        resolve: async (_, { login, password }, { res }) => await UserController.login(login, password, res),
-    },
-    refreshToken: {
-        type: TokenTC,
-        resolve: async (_, { }, { req, res }) => await UserController.refreshToken(req, res),
-    },
-    register: {
-        type: NotificationsTC,
-        args: {
-            fields: 'UserRegisterInput!',
-        },
-        resolve: async (_, { fields }, { req }) => await UserController.createUser(fields, req),
-    },
-    updateMe: {
-        type: UserAndNotifications,
-        args: {
-            fields: 'UserUpdateInput!',
-        },
-        resolve: async (_, { fields }, { req, res }) => UserController.updateUser(fields, req, res),
-    },
     deleteMe: {
-        type: NotificationsTC,
         args: {
             password: 'String!',
         },
         resolve: async (_, { password }, { req }) => UserController.deleteUser(password, req),
+        type: NotificationsTC,
+    },
+    login: {
+        args: {
+            login: 'String!', // email or username
+            password: 'String!',
+        },
+        resolve: async (_, { login, password }, { res }) => await UserController.login(login, password, res),
+        type: UserAndTokenTC,
+    },
+    refreshToken: {
+        resolve: async (_, {}, { req, res }) => await UserController.refreshToken(req, res),
+        type: TokenTC,
+    },
+    register: {
+        args: {
+            fields: 'UserRegisterInput!',
+        },
+        resolve: async (_, { fields }, { req }) => await UserController.createUser(fields, req),
+        type: NotificationsTC,
     },
     resetMyPassword: {
-        type: NotificationsTC,
         args: {
             password: 'String!',
-            passwordRecoveryToken: "String!"
+            passwordRecoveryToken: 'String!',
         },
-        resolve: async (_, { password, passwordRecoveryToken }) => UserController.recoverPassword(password, passwordRecoveryToken),
+        resolve: async (_, { password, passwordRecoveryToken }) =>
+            UserController.recoverPassword(password, passwordRecoveryToken),
+        type: NotificationsTC,
+    },
+    updateMe: {
+        args: {
+            fields: 'UserUpdateInput!',
+        },
+        resolve: async (_, { fields }, { req, res }) => UserController.updateUser(fields, req, res),
+        type: UserAndNotifications,
     },
 });
 

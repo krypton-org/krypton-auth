@@ -4,10 +4,10 @@
  *
  * When shown, it will be pre-populated with the result of having executed the
  * requested query.
- * @argument GraphiQLData data 
+ * @argument GraphiQLData data
  * @render string HTML file
  */
-export default function renderGraphiQL(data) : string {
+export default function renderGraphiQL(data): string {
     const queryString = data.query;
     const variablesString = data.variables != null ? JSON.stringify(data.variables, null, 2) : null;
     const operationName = data.operationName;
@@ -135,7 +135,5 @@ export default function renderGraphiQL(data) : string {
 
 // Ensures string values are safe to be used within a <script> tag.
 function safeSerialize(data) {
-    return data != null
-        ? JSON.stringify(data).replace(/\//g, '\\/')
-        : 'undefined';
+    return data != null ? JSON.stringify(data).replace(/\//g, '\\/') : 'undefined';
 }
