@@ -1,3 +1,13 @@
+/**
+ * Module defining common error that can be raised by normal service usage. Like trying to log-in with a wrong password. Those errors have to be handle within the application logic code.
+ * @module services/error/ErrorTypes;'
+ */
+
+/**
+ * Common errors raised by service functions under certain conditions. Should be handled within the application.
+ * @class
+ * @classdesc This is a description of the MyClass class.
+ */
 export default class OperationalError extends Error {
     constructor(message) {
         super();

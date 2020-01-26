@@ -1,6 +1,6 @@
 /**
  * Module returning the Mongoose model built with the UserSchema importer from {@link module:Model/UserSchema}
- * @module Model/UserModel
+ * @module model/UserModel
  */
 
 import * as PasswordEncryption from '../services/crypto/PasswordEncryption';
@@ -9,6 +9,91 @@ import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
 import { EncryptionFailedError, UserNotFound, WrongPasswordError, WrongTokenError } from '../services/error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
+
+export interface IUserModel extends Model<any> {
+    /**
+     * Retruns true if a user exists in the database according to `filter`.
+     * @param  {any} filter
+     * @returns {Promise<boolean>} Promise to the boolean result
+     */
+    userExists(filter: any): Promise<boolean>;
+
+    /**
+     * Fetch user according to `filter`.
+     * @throws {UserNotFound}
+     * @param  {any} filter
+     * @returns {Promise<any>} Promise to the user fetched
+     */
+    getUser(filter: any): Promise<any>;
+
+    /**
+     * Return private and public user fields, user selected by `filter`.
+     * @throws {UserNotFound}
+     * @param  {any} filter
+     * @returns {Promise<any>}
+     */
+    getUserNonInternalFields(filter: any): Promise<any>;
+
+    /**
+     * Create user from `data`.
+     * @throws {EncryptionFailedError} Password encryption failed
+     * @param  {any} data
+     * @returns {Promise<void>}
+     */
+    createUser(data: any): Promise<any>;
+
+    /**
+     * Returns true if `password` is valid for the user selected by `filter`.
+     * @param  {any} filter
+     * @param  {string} password
+     * @returns {Promise<boolean>} Promise to the result
+     */
+    isPasswordValid(filter: any, password: string): Promise<boolean>;
+
+    /**
+     * Sign-in user selected by `filter`.
+     * @throws {WrongPasswordError}
+     * @param  {any} filter
+     * @param  {string} password
+     * @param  {string} privateKey
+     * @returns {Promise<{ user: any; token: string; expiryDate: Date }>} Promise to the `user` data, authentication `token` and its `expiryDate`
+     */
+    sign(filter: any, password: string, privateKey: string): Promise<{ user: any; token: string; expiryDate: Date }>;
+
+    /**
+     * Returns a new authentication token. Should be called only after checking that user refresh token set on cookies is valid.
+     * @param  {any} filter
+     * @param  {string} privateKey
+     * @returns {Promise<{ token: string; expiryDate: Date }>}
+     */
+    refreshAuthToken(filter: any, privateKey: string): Promise<{ token: string; expiryDate: Date }>;
+
+    /**
+     * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
+     * Returns the user data decrypted.
+     * @throws {WrongTokenError} - token not valid
+     * @param  {string} token
+     * @param  {string} publicKey
+     * @returns {Promise<object | string>} Promise to the user data decrypted
+     */
+    verify(token: string, publicKey: string): Promise<object | string>;
+
+    /**
+     * @throws {EncryptionFailedError}
+     * Update user data selected by `filter`.
+     * @param  {any} filter
+     * @param  {any} data
+     * @returns {Promise<void>}
+     */
+    updateUser(filter: any, data: any): Promise<void>;
+
+    /**
+     * Remove user selected by `filter`.
+     * @param  {any} filter
+     * @returns {Promise<void>}
+     */
+    removeUser(filter: any): Promise<void>;
+}
 
 /**
  * Compute users JsonWebTokens encoding the `user` data with the `privateKey`. This authentication token will be valid for `expiresIn` number of milliseconds.
@@ -186,91 +271,6 @@ function escapeHtml(unsafe: string): string {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
-}
-
-export interface IUserModel extends Model<any> {
-    /**
-     * Retruns true if a user exists in the database according to `filter`.
-     * @param  {any} filter
-     * @returns {Promise<boolean>} Promise to the boolean result
-     */
-    userExists(filter: any): Promise<boolean>;
-
-    /**
-     * Fetch user according to `filter`.
-     * @throws {UserNotFound}
-     * @param  {any} filter
-     * @returns {Promise<any>} Promise to the user fetched
-     */
-    getUser(filter: any): Promise<any>;
-
-    /**
-     * Return private and public user fields, user selected by `filter`.
-     * @throws {UserNotFound}
-     * @param  {any} filter
-     * @returns {Promise<any>}
-     */
-    getUserNonInternalFields(filter: any): Promise<any>;
-
-    /**
-     * Create user from `data`.
-     * @throws {EncryptionFailedError} Password encryption failed
-     * @param  {any} data
-     * @returns {Promise<void>}
-     */
-    createUser(data: any): Promise<any>;
-
-    /**
-     * Returns true if `password` is valid for the user selected by `filter`.
-     * @param  {any} filter
-     * @param  {string} password
-     * @returns {Promise<boolean>} Promise to the result
-     */
-    isPasswordValid(filter: any, password: string): Promise<boolean>;
-
-    /**
-     * Sign-in user selected by `filter`.
-     * @throws {WrongPasswordError}
-     * @param  {any} filter
-     * @param  {string} password
-     * @param  {string} privateKey
-     * @returns {Promise<{ user: any; token: string; expiryDate: Date }>} Promise to the `user` data, authentication `token` and its `expiryDate`
-     */
-    sign(filter: any, password: string, privateKey: string): Promise<{ user: any; token: string; expiryDate: Date }>;
-
-    /**
-     * Returns a new authentication token. Should be called only after checking that user refresh token set on cookies is valid.
-     * @param  {any} filter
-     * @param  {string} privateKey
-     * @returns {Promise<{ token: string; expiryDate: Date }>}
-     */
-    refreshAuthToken(filter: any, privateKey: string): Promise<{ token: string; expiryDate: Date }>;
-
-    /**
-     * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
-     * Returns the user data decrypted.
-     * @throws {WrongTokenError} - token not valid
-     * @param  {string} token
-     * @param  {string} publicKey
-     * @returns {Promise<object | string>} Promise to the user data decrypted
-     */
-    verify(token: string, publicKey: string): Promise<object | string>;
-
-    /**
-     * @throws {EncryptionFailedError}
-     * Update user data selected by `filter`.
-     * @param  {any} filter
-     * @param  {any} data
-     * @returns {Promise<void>}
-     */
-    updateUser(filter: any, data: any): Promise<void>;
-
-    /**
-     * Remove user selected by `filter`.
-     * @param  {any} filter
-     * @returns {Promise<void>}
-     */
-    removeUser(filter: any): Promise<void>;
 }
 
 const UserModel = model<Document, IUserModel>('User', User);

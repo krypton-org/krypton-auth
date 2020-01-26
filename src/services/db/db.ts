@@ -1,3 +1,8 @@
+/**
+ * Module defining functions for Mongoose connection and disconnection.
+ * @module services/db/db
+ */
+
 import mongoose from 'mongoose';
 import config from '../../config';
 

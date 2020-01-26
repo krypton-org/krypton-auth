@@ -1,3 +1,8 @@
+/**
+ * Module returning the Mongoose schema merging the default one with the fields provided by the package user through the `extendedSchema` property.
+ * @module router/Router
+ */
+
 import accepts from 'accepts';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';

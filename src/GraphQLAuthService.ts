@@ -17,6 +17,7 @@ declare global {
  * Mount GraphQL Auth Service on the Express app passed and configure it with properties.
  * @param {Express app} app Express app instance
  * @param {IConfigProperties} properties GraphQL Auth Service config
+ * @returns {Express}
  * @api public
  */
 function GraphQLAuthService(app: Express, properties: IConfigProperties): Express {

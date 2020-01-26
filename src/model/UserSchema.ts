@@ -1,6 +1,6 @@
 /**
  * Module returning the Mongoose schema merging the default one with the fields provided by the package user through the `extendedSchema` property.
- * @module Model/UserSchema
+ * @module model/UserSchema
  */
 
 import config from '../config';

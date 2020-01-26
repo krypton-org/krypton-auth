@@ -4,7 +4,7 @@
  */
 
 import pkg from '../../package.json';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 /**
  * Returning the index page
