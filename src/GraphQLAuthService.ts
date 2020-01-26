@@ -20,9 +20,9 @@ declare global {
  * @api public
  */
 function GraphQLAuthService(app: Express, properties: IConfigProperties): Express {
-    if (properties){
+    if (properties) {
         config.merge(properties);
-    } 
+    }
     const db: typeof MongooseConnection = require('./services/db/db').default;
     const router: typeof Router = require('./router/Router').default;
     db.init();

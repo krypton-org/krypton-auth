@@ -1,5 +1,5 @@
 /**
- * Service logic for user management. 
+ * Service logic for user management.
  * @module controllers/UserController
  */
 
@@ -31,14 +31,14 @@ const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
 type Notification = {
     type: string;
     message: string;
-}
+};
 
 /**
  * Return true if user issuing the request is logged in.
  * @param  {Request} req
  * @returns {boolean} user is logged in
  */
-const isUserLoggedIn = (req: Request): boolean => req.user !== undefined; 
+const isUserLoggedIn = (req: Request): boolean => req.user !== undefined;
 
 /**
  * Return a token of size `tokenLength`.
@@ -83,7 +83,7 @@ export const checkEmailAvailable = async (email: string): Promise<{ isAvailable:
  * @param  {string} username
  * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
  */
-export const checkUsernameAvailable = async (username: string): Promise<{ isAvailable: boolean }>  => {
+export const checkUsernameAvailable = async (username: string): Promise<{ isAvailable: boolean }> => {
     const usernameExists = await User.userExists({ username });
     return { isAvailable: !usernameExists };
 };
@@ -101,7 +101,9 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     const token = req.query.token;
     try {
         const exists = await User.userExists({ verificationToken: token });
-        if (!exists) { throw new UserNotFound('This link is no longer valid.'); }
+        if (!exists) {
+            throw new UserNotFound('This link is no longer valid.');
+        }
         const user = await User.getUser({ verificationToken: token });
         await User.update({ email: user.email }, { verificationToken: null, verified: true });
         notifications.push({ type: 'success', message: 'You are now verified!' });
@@ -128,14 +130,13 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
  * @param  {Request} req
  * @returns {Promise<{ user: any; notifications: Notification[] }>} Promise to the notifications of success or failure
  */
-export const createUser = async (
-    user: any,
-    req: Request,
-): Promise<{ user: any; notifications: Notification[] }> => {
+export const createUser = async (user: any, req: Request): Promise<{ user: any; notifications: Notification[] }> => {
     const notifications: Notification[] = [];
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
-    if (!user.password) { throw new WrongPasswordError('Please provide a password!'); }
+    if (!user.password) {
+        throw new WrongPasswordError('Please provide a password!');
+    }
 
     if (user.password.length < 8) {
         throw new WrongPasswordError('The password must contain at least 8 characters!');
@@ -161,14 +162,14 @@ export const createUser = async (
 };
 
 /**
- * Resend an account verification email to logged in user. 
+ * Resend an account verification email to logged in user.
  * @throws {UnknownUser}
  * @throws {EmailAlreadyConfirmedError}
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
  */
 export const resendConfirmationEmail = async (req: Request): Promise<{ notifications: Notification[] }> => {
-    if (!isUserLoggedIn(req)){
+    if (!isUserLoggedIn(req)) {
         throw new UnknownUser('Please login!');
     }
     const notifications: Notification[] = [];
@@ -203,7 +204,9 @@ export const recoverPassword = async (
         throw new WrongPasswordError('The password must contain at least 8 characters!');
     }
     const userExists = await User.userExists({ passwordRecoveryToken });
-    if (!userExists) { throw new UserNotFound('Unvalid token!'); }
+    if (!userExists) {
+        throw new UserNotFound('Unvalid token!');
+    }
     const user = await User.getUser({ passwordRecoveryToken });
     const resetDate = new Date(user.passwordRecoveryRequestDate);
     const actualDate = new Date();
@@ -236,7 +239,7 @@ export const updateUser = async (
     req: Request,
     res: Response,
 ): Promise<{ user: any; notifications: Notification[] }> => {
-    if (!isUserLoggedIn(req)){
+    if (!isUserLoggedIn(req)) {
         throw new UnknownUser('Please login!');
     }
     const notifications = [];
@@ -303,11 +306,8 @@ export const updateUser = async (
  * @param  {Request} req
  * @returns Notification
  */
-export const deleteUser = async (
-    password: string,
-    req: Request,
-): Promise<{ notifications: Notification[] }> => {
-    if (!isUserLoggedIn(req)){
+export const deleteUser = async (password: string, req: Request): Promise<{ notifications: Notification[] }> => {
+    if (!isUserLoggedIn(req)) {
         throw new UnknownUser('Please login!');
     }
     const notifications: Notification[] = [];
@@ -328,17 +328,15 @@ export const deleteUser = async (
  * @param  {Response} res
  * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
  */
-export const login = async (
-    login: string,
-    password: string,
-    res: Response,
-): Promise<{ token: string; user: any }> => {
+export const login = async (login: string, password: string, res: Response): Promise<{ token: string; user: any }> => {
     let payload: { token: string; user: any };
     const emailExists = await User.userExists({ email: login });
     const usernameExists = await User.userExists({ username: login });
-    if (emailExists) { payload = await User.sign({ email: login }, password, config.privateKey); }
-    else if (usernameExists) { payload = await User.sign({ username: login }, password, config.privateKey); }
-    else {
+    if (emailExists) {
+        payload = await User.sign({ email: login }, password, config.privateKey);
+    } else if (usernameExists) {
+        payload = await User.sign({ username: login }, password, config.privateKey);
+    } else {
         res.status(401);
         throw new WrongLoginError('Wrong credentials!');
     }
@@ -378,13 +376,12 @@ export const sendPasswordRecoveryEmail = async (
     }
 
     const exists = await User.userExists({ email });
-    if (!exists) { return { notifications }; }
+    if (!exists) {
+        return { notifications };
+    }
     const passwordRecoveryToken = generateToken(TOKEN_LENGTH);
     const passwordRecoveryRequestDate = new Date();
-    await User.update(
-        { email },
-        { passwordRecoveryToken, passwordRecoveryRequestDate },
-    );
+    await User.update({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
     const user = await User.getUser({ email });
     const host = config.host ? config.host : req.headers.host;
     agenda.now('email', {

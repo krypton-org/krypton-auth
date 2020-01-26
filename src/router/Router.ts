@@ -38,7 +38,9 @@ if (config.graphiql) {
         if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.send(renderGraphiQL(params));
-        } else { next(); }
+        } else {
+            next();
+        }
     });
 }
 
@@ -54,7 +56,9 @@ router.use(
 );
 
 router.use(function(err, req, res, next) {
-    if (config.errorlogFile) { fs.appendFile(config.errorlogFile, JSON.stringify(err) + '\n', () => {}); }
+    if (config.errorlogFile) {
+        fs.appendFile(config.errorlogFile, JSON.stringify(err) + '\n', () => {});
+    }
     const notifications = [];
     notifications.push({
         type: 'error',

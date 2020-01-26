@@ -9,7 +9,9 @@ export const hashAndSalt = (password: string): Promise<{ salt: string; hash: str
 };
 
 export const hash = (password: string, salt: Buffer): Promise<{ salt: string; hash: string }> => {
-    if (typeof salt === 'string') { salt = new Buffer(salt, 'base64'); }
+    if (typeof salt === 'string') {
+        salt = new Buffer(salt, 'base64');
+    }
     return new Promise((resolve, reject) => {
         crypto.pbkdf2(password, salt, HASH_ITERATIONS, HASH_LENGTH, 'sha512', function(err, hash) {
             if (err) {

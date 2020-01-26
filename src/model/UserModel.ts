@@ -29,7 +29,6 @@ const computeUserToken = (user: any, privateKey: string, expiresIn: number): Pro
     });
 };
 
-
 const noninternalFieldsFilter: string = '-' + internalFields.join(' -');
 
 const internalFieldsMap: Map<string, boolean> = new Map();
@@ -38,12 +37,12 @@ internalFields.map(x => internalFieldsMap.set(x, true));
 const User: Schema = new Schema(UserSchema);
 
 /** @see {@link IUserModel#userExists} */
-User.statics.userExists = function (filter: any): Promise<boolean> {
+User.statics.userExists = function(filter: any): Promise<boolean> {
     return this.findOne(filter).then(result => !!result);
 };
 
 /** @see {@link IUserModel#getUser} */
-User.statics.getUser = function (filter: any): Promise<any> {
+User.statics.getUser = function(filter: any): Promise<any> {
     return this.findOne(filter).then(user => {
         if (user == null) {
             throw new UserNotFound('User not found!');
@@ -53,7 +52,7 @@ User.statics.getUser = function (filter: any): Promise<any> {
 };
 
 /** @see {@link IUserModel#getUserNonInternalFields} */
-User.statics.getUserNonInternalFields = function (filter: any): Promise<any> {
+User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
     return this.findOne(filter)
         .select(noninternalFieldsFilter)
         .lean()
@@ -66,7 +65,7 @@ User.statics.getUserNonInternalFields = function (filter: any): Promise<any> {
 };
 
 /** @see {@link IUserModel#createUser} */
-User.statics.createUser = function (data: any): Promise<void> {
+User.statics.createUser = function(data: any): Promise<void> {
     const UserModel = model('user', User);
     return PasswordEncryption.hashAndSalt(data.password).then(
         results => {
@@ -90,7 +89,7 @@ User.statics.createUser = function (data: any): Promise<void> {
     );
 };
 /** @see {@link IUserModel#isPasswordValid} */
-User.statics.isPasswordValid = function (filter: any, password: string): Promise<boolean> {
+User.statics.isPasswordValid = function(filter: any, password: string): Promise<boolean> {
     let user;
     return this.getUser(filter)
         .then(userFound => {
@@ -103,13 +102,15 @@ User.statics.isPasswordValid = function (filter: any, password: string): Promise
 };
 
 /** @see {@link IUserModel#sign} */
-User.statics.sign = async function (
+User.statics.sign = async function(
     filter: any,
     password: string,
     privateKey: string,
 ): Promise<{ user: any; token: string; expiryDate: Date }> {
     const isPasswordValid = await this.isPasswordValid(filter, password);
-    if (!isPasswordValid) { throw new WrongPasswordError('Wrong credentials!'); }
+    if (!isPasswordValid) {
+        throw new WrongPasswordError('Wrong credentials!');
+    }
     const user = await this.getUserNonInternalFields(filter);
     const expiryDate = new Date();
     expiryDate.setTime(expiryDate.getTime() + config.authTokenExpiryTime);
@@ -118,7 +119,7 @@ User.statics.sign = async function (
 };
 
 /** @see {@link IUserModel#refreshAuthToken} */
-User.statics.refreshAuthToken = async function (
+User.statics.refreshAuthToken = async function(
     filter: any,
     privateKey: string,
 ): Promise<{ token: string; expiryDate: Date }> {
@@ -130,7 +131,7 @@ User.statics.refreshAuthToken = async function (
 };
 
 /** @see {@link IUserModel#verify} */
-User.statics.verify = function (token: string, publicKey: string): Promise<object | string> {
+User.statics.verify = function(token: string, publicKey: string): Promise<object | string> {
     return new Promise((resolve, reject) => {
         jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
@@ -143,7 +144,7 @@ User.statics.verify = function (token: string, publicKey: string): Promise<objec
 };
 
 /** @see {@link IUserModel#updateUser} */
-User.statics.updateUser = async function (filter: any, data: any): Promise<void> {
+User.statics.updateUser = async function(filter: any, data: any): Promise<void> {
     if (data.password) {
         try {
             const results = await PasswordEncryption.hashAndSalt(data.password);
@@ -165,7 +166,7 @@ User.statics.updateUser = async function (filter: any, data: any): Promise<void>
 };
 
 /** @see {@link IUserModel#removeUser} */
-User.statics.removeUser = function (filter: any): Promise<void> {
+User.statics.removeUser = function(filter: any): Promise<void> {
     return this.deleteOne(filter);
 };
 
@@ -175,8 +176,9 @@ User.statics.removeUser = function (filter: any): Promise<void> {
  * @returns {string} Safe string
  */
 function escapeHtml(unsafe: string): string {
-    if (typeof unsafe !== 'string') { return unsafe; }
-    else {
+    if (typeof unsafe !== 'string') {
+        return unsafe;
+    } else {
         return unsafe
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -187,14 +189,13 @@ function escapeHtml(unsafe: string): string {
 }
 
 export interface IUserModel extends Model<any> {
-
     /**
      * Retruns true if a user exists in the database according to `filter`.
      * @param  {any} filter
      * @returns {Promise<boolean>} Promise to the boolean result
      */
     userExists(filter: any): Promise<boolean>;
-    
+
     /**
      * Fetch user according to `filter`.
      * @throws {UserNotFound}
@@ -202,7 +203,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<any>} Promise to the user fetched
      */
     getUser(filter: any): Promise<any>;
-    
+
     /**
      * Return private and public user fields, user selected by `filter`.
      * @throws {UserNotFound}
@@ -210,7 +211,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<any>}
      */
     getUserNonInternalFields(filter: any): Promise<any>;
-    
+
     /**
      * Create user from `data`.
      * @throws {EncryptionFailedError} Password encryption failed
@@ -218,7 +219,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<void>}
      */
     createUser(data: any): Promise<any>;
-    
+
     /**
      * Returns true if `password` is valid for the user selected by `filter`.
      * @param  {any} filter
@@ -226,7 +227,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<boolean>} Promise to the result
      */
     isPasswordValid(filter: any, password: string): Promise<boolean>;
-    
+
     /**
      * Sign-in user selected by `filter`.
      * @throws {WrongPasswordError}
@@ -235,12 +236,8 @@ export interface IUserModel extends Model<any> {
      * @param  {string} privateKey
      * @returns {Promise<{ user: any; token: string; expiryDate: Date }>} Promise to the `user` data, authentication `token` and its `expiryDate`
      */
-    sign(
-        filter: any,
-        password: string,
-        privateKey: string,
-    ): Promise<{ user: any; token: string; expiryDate: Date }>;
-    
+    sign(filter: any, password: string, privateKey: string): Promise<{ user: any; token: string; expiryDate: Date }>;
+
     /**
      * Returns a new authentication token. Should be called only after checking that user refresh token set on cookies is valid.
      * @param  {any} filter
@@ -248,7 +245,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<{ token: string; expiryDate: Date }>}
      */
     refreshAuthToken(filter: any, privateKey: string): Promise<{ token: string; expiryDate: Date }>;
-    
+
     /**
      * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
      * Returns the user data decrypted.
@@ -258,7 +255,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<object | string>} Promise to the user data decrypted
      */
     verify(token: string, publicKey: string): Promise<object | string>;
-    
+
     /**
      * @throws {EncryptionFailedError}
      * Update user data selected by `filter`.
@@ -267,7 +264,7 @@ export interface IUserModel extends Model<any> {
      * @returns {Promise<void>}
      */
     updateUser(filter: any, data: any): Promise<void>;
-    
+
     /**
      * Remove user selected by `filter`.
      * @param  {any} filter

@@ -56,7 +56,6 @@ export interface IConfigProperties {
 }
 
 export class Config implements IConfigProperties {
-
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbConfig = {
@@ -86,15 +85,21 @@ export class Config implements IConfigProperties {
     public verifyEmailTemplate = path.resolve(__dirname, './templates/emails/VerifyEmail.ejs');
 
     /**
-     * Called by Mongoose and Agenda when connection established with MongoDB. 
+     * Called by Mongoose and Agenda when connection established with MongoDB.
      * When both calls has been made it calls {@link Config#onReady}
      * @param  {DBReadyStatus} status
      * @returns {void}
      */
     public serviceReady = (status: DBReadyStatus): void => {
-        if (status.isAgendaReady) { this.isAgendaReady = true; }
-        if (status.isMongooseReady) { this.isMongooseReady = true; }
-        if (this.isAgendaReady && this.isMongooseReady) { this.onReady(); }
+        if (status.isAgendaReady) {
+            this.isAgendaReady = true;
+        }
+        if (status.isMongooseReady) {
+            this.isMongooseReady = true;
+        }
+        if (this.isAgendaReady && this.isMongooseReady) {
+            this.onReady();
+        }
     };
 
     /**
@@ -128,7 +133,7 @@ export class Config implements IConfigProperties {
 
         //Merge taking place here
         Object.keys(options).map(
-            function (prop) {
+            function(prop) {
                 if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
                     this[prop] = {
                         ...this[prop],

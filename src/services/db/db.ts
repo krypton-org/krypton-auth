@@ -19,11 +19,13 @@ export default class MongooseConnection {
         mongoose.connection.on('connected', () => {
             console.log('Mongoose default connection open to ' + connectionString);
             config.serviceReady({ isMongooseReady: true });
-            if (cb) { cb(); }
+            if (cb) {
+                cb();
+            }
         });
 
         // If the connection throws an error
-        mongoose.connection.on('error', (err) => {
+        mongoose.connection.on('error', err => {
             console.log('Connection error with MongoDB. Error:', err);
         });
 
@@ -40,11 +42,11 @@ export default class MongooseConnection {
             });
         });
 
-        process.on('unhandledRejection', (err) => {
+        process.on('unhandledRejection', err => {
             console.log('yoooo');
         });
 
-        process.on('uncaughtException', (err) => {
+        process.on('uncaughtException', err => {
             console.log('yoooo');
         });
 
@@ -55,7 +57,9 @@ export default class MongooseConnection {
     public static async close(cb?: () => void): Promise<void | never> {
         await mongoose.connection.close(() => {
             console.log('Mongoose connection closed');
-            if (cb) { cb(); }
+            if (cb) {
+                cb();
+            }
         });
     }
 }
