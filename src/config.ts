@@ -15,10 +15,10 @@ const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, '../private-key.txt');
  * Mongo connection configuration
  */
 export interface DBConfig {
-    address: string;
-    port: string;
-    agendaDB: string;
-    userDB: string;
+    address?: string;
+    port?: string;
+    agendaDB?: string;
+    userDB?: string;
 }
 
 /**
@@ -44,7 +44,7 @@ export interface IConfigProperties {
     hasUsername?: boolean;
     host?: string;
     notificationPageTemplate?: string;
-    onReady?: () => void;
+    onReady?: () => any;
     privateKey?: string;
     privateKeyFilePath?: string;
     publicKey?: string;

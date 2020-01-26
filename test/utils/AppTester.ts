@@ -3,6 +3,7 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
 import GraphQLAuthService from '../../src/GraphQLAuthService';
+import { IConfigProperties } from '../../src/config';
 
 export default class AppTester {
     public request: any;
@@ -143,6 +144,6 @@ export default class AppTester {
                 .catch(err => reject(err));
         });
 
-        
+
     }
 };
