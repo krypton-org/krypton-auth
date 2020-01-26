@@ -11,5 +11,8 @@
         "json",
         "node"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns" : [
+        "<rootDir>/test//utils" 
+      ]
 }

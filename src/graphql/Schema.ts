@@ -1,3 +1,8 @@
+/**
+ * Module returning the GraphQL schema for the user management API.
+ * @module graphql/Schema
+ */
+
 import { schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
@@ -175,7 +180,7 @@ schemaComposer.Mutation.addFields({
         type: UserAndTokenTC,
     },
     refreshToken: {
-        resolve: async (_, {}, { req, res }) => await UserController.refreshToken(req, res),
+        resolve: async (_, {}, { req, res }) => await UserController.refreshTokens(req, res),
         type: TokenTC,
     },
     register: {

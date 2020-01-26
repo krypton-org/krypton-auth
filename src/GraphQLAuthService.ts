@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import config, { ConfigProperties } from './config';
+import config, { IConfigProperties } from './config';
 import Router from './router/Router';
 import MongooseConnection from './services/db/db';
 
@@ -16,10 +16,10 @@ declare global {
 /**
  * Mount GraphQL Auth Service on the Express app passed and configure it with properties.
  * @param {Express app} app Express app instance
- * @param {ConfigProperties} properties GraphQL Auth Service config
+ * @param {IConfigProperties} properties GraphQL Auth Service config
  * @api public
  */
-function GraphQLAuthService(app: Express, properties: ConfigProperties): Express {
+function GraphQLAuthService(app: Express, properties: IConfigProperties): Express {
     if (properties){
         config.merge(properties);
     } 

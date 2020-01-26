@@ -1,3 +1,8 @@
+/**
+ * Holding the service config
+ * @module config
+ */
+
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
@@ -6,6 +11,9 @@ import { generateKeys } from './services/crypto/RSAKeysGeneration';
 const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, '../public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, '../private-key.txt');
 
+/**
+ * Mongo connection configuration
+ */
 export interface DBConfig {
     address: string;
     port: string;
@@ -13,35 +21,42 @@ export interface DBConfig {
     userDB: string;
 }
 
+/**
+ * Internal, used in {@link Config#serviceReady}
+ */
 interface DBReadyStatus {
     isAgendaReady?: boolean;
     isMongooseReady?: boolean;
 }
 
-export interface ConfigProperties {
-    hasUsername?: boolean;
+/**
+ * Properties to configure GraphQL Auth Service
+ */
+export interface IConfigProperties {
+    algorithm?: Algorithm;
+    authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
-    publicKey?: string;
-    publicKeyFilePath?: string;
-    privateKey?: string;
-    privateKeyFilePath?: string;
+    emailConfig: any;
     emailNotSentLogFile?: string;
-    verifyEmailTemplate?: string;
-    resetPasswordEmailTemplate?: string;
-    resetPasswordFormTemplate?: string;
-    notificationPageTemplate?: string;
     errorlogFile?: string;
     extendedSchema?: Object;
-    refreshTokenExpiryTime?: number;
-    authTokenExpiryTime?: number;
-    algorithm?: Algorithm;
-    emailConfig: any;
     graphiql?: boolean;
+    hasUsername?: boolean;
     host?: string;
+    notificationPageTemplate?: string;
     onReady?: () => void;
+    privateKey?: string;
+    privateKeyFilePath?: string;
+    publicKey?: string;
+    publicKeyFilePath?: string;
+    refreshTokenExpiryTime?: number;
+    resetPasswordEmailTemplate?: string;
+    resetPasswordFormTemplate?: string;
+    verifyEmailTemplate?: string;
 }
 
-export class Config implements ConfigProperties {
+export class Config implements IConfigProperties {
+
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbConfig = {
@@ -57,27 +72,37 @@ export class Config implements ConfigProperties {
     public graphiql = true;
     public hasUsername = true;
     public host = undefined;
+    private isAgendaReady: boolean = false;
+    private isMongooseReady: boolean = false;
     public notificationPageTemplate = path.resolve(__dirname, './templates/pages/Notification.ejs');
-    public publicKey = undefined;
-    public publicKeyFilePath = undefined;
+    public onReady = () => console.log('GraphQL-Auth-Service is ready!');
     public privateKey = undefined;
     public privateKeyFilePath = undefined;
+    public publicKey = undefined;
+    public publicKeyFilePath = undefined;
     public refreshTokenExpiryTime = 7 * 24 * 60 * 60 * 1000;
     public resetPasswordEmailTemplate = path.resolve(__dirname, './templates/emails/ResetPassword.ejs');
     public resetPasswordFormTemplate = path.resolve(__dirname, './templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, './templates/emails/VerifyEmail.ejs');
-    private isAgendaReady: boolean = false;
-    private isMongooseReady: boolean = false;
 
-    public onReady = () => console.log('GraphQL-Auth-Service is ready!');
-    
+    /**
+     * Called by Mongoose and Agenda when connection established with MongoDB. 
+     * When both calls has been made it calls {@link Config#onReady}
+     * @param  {DBReadyStatus} status
+     * @returns {void}
+     */
     public serviceReady = (status: DBReadyStatus): void => {
         if (status.isAgendaReady) { this.isAgendaReady = true; }
         if (status.isMongooseReady) { this.isMongooseReady = true; }
         if (this.isAgendaReady && this.isMongooseReady) { this.onReady(); }
     };
 
-    public merge(options?: ConfigProperties) {
+    /**
+     * Merging user options and default properties
+     * @param  {IConfigProperties} options?
+     * @returns {void}
+     */
+    public merge(options?: IConfigProperties): void {
         if (options.publicKey === undefined || options.privateKey === undefined) {
             if (options.publicKeyFilePath !== undefined || options.privateKeyFilePath !== undefined) {
                 options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();
@@ -101,8 +126,9 @@ export class Config implements ConfigProperties {
             }
         }
 
+        //Merge taking place here
         Object.keys(options).map(
-            function(prop) {
+            function (prop) {
                 if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
                     this[prop] = {
                         ...this[prop],

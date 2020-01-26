@@ -1,8 +1,14 @@
+/**
+ * Service logic for user management. 
+ * @module controllers/UserController
+ */
+
 import crypto from 'crypto';
 import ejs from 'ejs';
 import config from '../config';
 import User from '../model/UserModel';
 import agenda from '../services/agenda/agenda';
+import { Request, Response, NextFunction } from 'express';
 import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
@@ -19,19 +25,37 @@ const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
 const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
 
-class Notification {
-    public type: string;
-    public message: string;
+/**
+ * Notification type.
+ */
+type Notification = {
+    type: string;
+    message: string;
 }
 
-const ensureLoggedIn = (req: any): void | never => {
-    if (req.user === undefined) { throw new UnknownUser('Please login!'); }
-};
+/**
+ * Return true if user issuing the request is logged in.
+ * @param  {Request} req
+ * @returns {boolean} user is logged in
+ */
+const isUserLoggedIn = (req: Request): boolean => req.user !== undefined; 
 
+/**
+ * Return a token of size `tokenLength`.
+ * @param  {number} tokenLength
+ * @returns {string} token generated
+ */
 const generateToken = (tokenLength: number): string => {
     return crypto.randomBytes(tokenLength).toString('hex');
 };
 
+/**
+ * Send confirmation email to `user`.
+ * @param  {any} user - user
+ * @param  {string} confirmationToken
+ * @param  {string} host - Service public address
+ * @returns {void}
+ */
 const sendConfirmationEmail = (user: any, confirmationToken: string, host: string): void => {
     agenda.now('email', {
         locals: {
@@ -44,17 +68,35 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
     });
 };
 
+/**
+ * Returns true email address not already taken by another user.
+ * @param  {string} email
+ * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
+ */
 export const checkEmailAvailable = async (email: string): Promise<{ isAvailable: boolean }> => {
     const emailExists = await User.userExists({ email });
     return { isAvailable: !emailExists };
 };
 
+/**
+ * Returns true username address not already taken by another user.
+ * @param  {string} username
+ * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
+ */
 export const checkUsernameAvailable = async (username: string): Promise<{ isAvailable: boolean }>  => {
     const usernameExists = await User.userExists({ username });
     return { isAvailable: !usernameExists };
 };
 
-export const confirmEmail = async (req: any, res: any, next: any): Promise<void | never> => {
+/**
+ * Verifying link clicked by users in the account verification email.
+ * @throws {UserNotFound} User does not exist
+ * @param  {Request} req
+ * @param  {Response} res
+ * @param  {NextFunction} next
+ * @renders notification page informing users of the operation success.
+ */
+export const confirmEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const notifications: Notification[] = [];
     const token = req.query.token;
     try {
@@ -76,10 +118,20 @@ export const confirmEmail = async (req: any, res: any, next: any): Promise<void 
     }
 };
 
+/**
+ * Create a new user.
+ * @throws {WrongPasswordError}
+ * @throws {UsernameAlreadyExistsError}
+ * @throws {EmailAlreadyExistsError}
+ * @throws {UserValidationError}
+ * @param  {any} user
+ * @param  {Request} req
+ * @returns {Promise<{ user: any; notifications: Notification[] }>} Promise to the notifications of success or failure
+ */
 export const createUser = async (
     user: any,
-    req: any,
-): Promise<{ user: any; notifications: Notification[] } | never> => {
+    req: Request,
+): Promise<{ user: any; notifications: Notification[] }> => {
     const notifications: Notification[] = [];
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
@@ -108,8 +160,17 @@ export const createUser = async (
     }
 };
 
-export const resendConfirmationEmail = async (req: any): Promise<{ notifications: Notification[] } | never> => {
-    ensureLoggedIn(req);
+/**
+ * Resend an account verification email to logged in user. 
+ * @throws {UnknownUser}
+ * @throws {EmailAlreadyConfirmedError}
+ * @param  {Request} req
+ * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
+ */
+export const resendConfirmationEmail = async (req: Request): Promise<{ notifications: Notification[] }> => {
+    if (!isUserLoggedIn(req)){
+        throw new UnknownUser('Please login!');
+    }
     const notifications: Notification[] = [];
     const user = await User.getUser({ _id: req.user._id });
     if (user.verified) {
@@ -124,10 +185,19 @@ export const resendConfirmationEmail = async (req: any): Promise<{ notifications
     return { notifications };
 };
 
+/**
+ * Updating user password from the password recovery form.
+ * @throws {WrongPasswordError}
+ * @throws {UserNotFound}
+ * @throws {UpdatePasswordTooLateError}
+ * @param  {string} password - new password
+ * @param  {string} passwordRecoveryToken - token guaranteeing user identity
+ * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
+ */
 export const recoverPassword = async (
     password: string,
     passwordRecoveryToken: string,
-): Promise<{ notifications: Notification[] } | never> => {
+): Promise<{ notifications: Notification[] }> => {
     const notifications = [];
     if (password.length < 8) {
         throw new WrongPasswordError('The password must contain at least 8 characters!');
@@ -149,13 +219,26 @@ export const recoverPassword = async (
     notifications.push({ type: 'success', message: 'Your password is updated!' });
     return { notifications };
 };
-
+/**
+ * Update the different user fields of logged in user.
+ * @throws {UnknownUser}
+ * @throws {WrongPasswordError}
+ * @throws {UsernameAlreadyExistsError}
+ * @throws {EmailAlreadyExistsError}
+ * @throws {UserValidationError}
+ * @param  {any} userUpdates - fields to update
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<{ user: any; notifications: Notification[] }>} Promise to the new user data and the notifications of success or failure
+ */
 export const updateUser = async (
     userUpdates: any,
-    req: any,
-    res: any,
-): Promise<{ user: any; notifications: Notification[] } | never> => {
-    ensureLoggedIn(req);
+    req: Request,
+    res: Response,
+): Promise<{ user: any; notifications: Notification[] }> => {
+    if (!isUserLoggedIn(req)){
+        throw new UnknownUser('Please login!');
+    }
     const notifications = [];
 
     const { refreshToken } = await User.getUser({ _id: req.user._id });
@@ -212,12 +295,21 @@ export const updateUser = async (
         throw new UserValidationError(err.message.replace('user validation failed: email: ', ''));
     }
 };
-
+/**
+ * Delete logged in user.
+ * @throws {UnknownUser}
+ * @throws {WrongPasswordError}
+ * @param  {string} password
+ * @param  {Request} req
+ * @returns Notification
+ */
 export const deleteUser = async (
     password: string,
-    req: any,
-): Promise<{ notifications: Notification[] } | never> => {
-    ensureLoggedIn(req);
+    req: Request,
+): Promise<{ notifications: Notification[] }> => {
+    if (!isUserLoggedIn(req)){
+        throw new UnknownUser('Please login!');
+    }
     const notifications: Notification[] = [];
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
     if (!isValid) {
@@ -228,11 +320,19 @@ export const deleteUser = async (
     return { notifications };
 };
 
+/**
+ * User log-in.
+ * @throws {WrongLoginError}
+ * @param  {string} login
+ * @param  {string} password
+ * @param  {Response} res
+ * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
+ */
 export const login = async (
     login: string,
     password: string,
-    res: any,
-): Promise<{ token: string; user: any } | never> => {
+    res: Response,
+): Promise<{ token: string; user: any }> => {
     let payload: { token: string; user: any };
     const emailExists = await User.userExists({ email: login });
     const usernameExists = await User.userExists({ username: login });
@@ -256,10 +356,17 @@ export const login = async (
     return payload;
 };
 
+/**
+ * Send password recovery email, when a user has lost his password.
+ * @throws {AlreadyLoggedInError}
+ * @param  {string} email
+ * @param  {Request} req
+ * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure.
+ */
 export const sendPasswordRecoveryEmail = async (
     email: string,
-    req: any,
-): Promise<{ notifications: Notification[] } | never> => {
+    req: Request,
+): Promise<{ notifications: Notification[] }> => {
     const notifications: Notification[] = [];
     notifications.push({
         message:
@@ -292,7 +399,14 @@ export const sendPasswordRecoveryEmail = async (
     return { notifications };
 };
 
-export const resetPasswordForm = (req: any, res: any, next: any): void => {
+/**
+ * Send an HTML page with the password reset form.
+ * @param  {Request} req
+ * @param  {Response} res
+ * @param  {NextFunction} next
+ * @returns an HTML page with the password reset form
+ */
+export const resetPasswordForm = (req: Request, res: Response, next: NextFunction): void => {
     const notifications: Notification[] = [];
     if (req.user) {
         notifications.push({ type: 'error', message: 'Oups, you are already logged in!' });
@@ -312,8 +426,14 @@ export const resetPasswordForm = (req: any, res: any, next: any): void => {
         }
     });
 };
-
-export const refreshToken = async (req: any, res: any): Promise<{ token: string; expiryDate: Date } | never> => {
+/**
+ * Refresh user authentication token and user refresh token set in httpOnly cookie.
+ * @throws {UnknownUser}
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
+ */
+export const refreshTokens = async (req: Request, res: Response): Promise<{ token: string; expiryDate: Date }> => {
     const user = await User.getUser({ refreshToken: req.cookies.refreshToken });
     const now = new Date();
     if (user && user.refreshTokenExpiryDate && now.getTime() < user.refreshTokenExpiryDate.getTime()) {

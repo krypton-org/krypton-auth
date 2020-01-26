@@ -1,3 +1,5 @@
+type GraphiQLData = any;
+
 /**
  * When express-graphql receives a request which does not Accept JSON, but does
  * Accept HTML, it may present GraphiQL, the in-browser GraphQL explorer IDE.
@@ -7,7 +9,7 @@
  * @argument GraphiQLData data
  * @render string HTML file
  */
-export default function renderGraphiQL(data): string {
+export default function renderGraphiQL(data: GraphiQLData): string {
     const queryString = data.query;
     const variablesString = data.variables != null ? JSON.stringify(data.variables, null, 2) : null;
     const operationName = data.operationName;
