@@ -12,7 +12,8 @@
         "node"
     ],
     "testEnvironment": "node",
-    "testPathIgnorePatterns" : [
-        "<rootDir>/test//utils" 
-      ]
+    "coveragePathIgnorePatterns": [
+        "<rootDir>/test",
+        "/node_modules/"
+    ]
 }
