@@ -49,8 +49,11 @@ export default class Mailer {
             const subject = email.subject;
             const locals = email.locals;
             const template = email.template;
-            // @ts-ignore
-            const from = config.emailConfig.from;
+            let from = null;
+            if (config.emailConfig) {
+                const emailConfig : any = config.emailConfig;
+                from = emailConfig.from;
+            }
             ejs.renderFile(template, locals, {}, (err, html) => {
                 if (err) {
                     reject(err);
