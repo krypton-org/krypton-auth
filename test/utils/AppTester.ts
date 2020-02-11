@@ -2,7 +2,7 @@ import MongooseConnection from '../../src/services/db/db';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
-import GraphQLAuthService from '../../src/GraphQLAuthService';
+import GraphQLAuthService from '../../src/index';
 import { IConfigProperties } from '../../src/config';
 
 export default class AppTester {
@@ -63,7 +63,6 @@ export default class AppTester {
 
     constructor(options) {
         options = {
-            ...options,
             ...{
                 emailConfig: {
                     host: 'smtp.ethereal.email',
@@ -113,12 +112,14 @@ export default class AppTester {
                     }
                 },
                 graphiql: true
-            }
+            },
+            ...options
         }
 
         console.log("yoooo");
-
-        this.request = request(GraphQLAuthService(express(), options));
+        const app = express();
+        app.use(GraphQLAuthService(options));
+        this.request = request(app);
 
         this.request.getGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
             let request = this.request.get('/graphql')

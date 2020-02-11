@@ -7,6 +7,7 @@ import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
 import { generateKeys } from './services/crypto/RSAKeysGeneration';
+import {Transport, TransportOptions} from 'nodemailer';
 
 const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, '../public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, '../private-key.txt');
@@ -36,7 +37,7 @@ export interface IConfigProperties {
     algorithm?: Algorithm;
     authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
-    emailConfig: any;
+    emailConfig?: Transport | TransportOptions;
     emailNotSentLogFile?: string;
     errorlogFile?: string;
     extendedSchema?: Object;

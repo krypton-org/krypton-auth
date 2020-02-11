@@ -3,7 +3,6 @@
  * @module controllers/MiscellaneousController
  */
 
-import pkg from '../../package.json';
 import { NextFunction, Request, Response } from 'express';
 
 /**
@@ -15,6 +14,6 @@ import { NextFunction, Request, Response } from 'express';
  */
 export const getIndex = (req: Request, res: Response, next: NextFunction): void => {
     const notifications = [];
-    notifications.push({ type: 'success', message: 'Welcome to GraphQL Auth Service - version ' + pkg.version });
+    notifications.push({ type: 'success', message: 'Welcome to GraphQL Auth Service' });
     res.json({ notifications });
 };

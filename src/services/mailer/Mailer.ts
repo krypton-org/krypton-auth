@@ -8,12 +8,31 @@ import nodemailer, { Transport, Transporter, SentMessageInfo } from 'nodemailer'
 import config from '../../config';
 import { EmailNotSentError } from '../error/ErrorTypes';
 
-const transporter: Transporter = nodemailer.createTransport(config.emailConfig as Transport);
+let transporter: Transporter;
+
+if (config.emailConfig) {
+    transporter = nodemailer.createTransport(config.emailConfig as Transport);
+} else {
+    nodemailer.createTestAccount((err, account) => {
+
+        console.log('Testing email credentials obtained!');
+        // create reusable transporter object using the default SMTP transport
+        transporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 465,
+            secure: true, // true for 465, false for other ports
+            auth: {
+                user: account.user, // generated ethereal user
+                pass: account.pass  // generated ethereal password
+            }
+        });
+    });
+}
 
 export interface Email {
     recipient: string;
     subject: string;
-    locals: any;
+    locals?: any;
     template: string;
     from: string;
 }
@@ -46,6 +65,10 @@ export default class Mailer {
                         if (err) {
                             reject(new EmailNotSentError(err.message));
                         } else {
+                            if (!config.emailConfig) {
+                                console.log('Message sent: %s', info.messageId);
+                                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                            }
                             resolve(info);
                         }
                     });

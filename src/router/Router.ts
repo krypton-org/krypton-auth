@@ -17,8 +17,9 @@ import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
 import ErrorHandler from '../services/error/ErrorHandler';
+import { Router } from 'express';
 
-const router = express.Router();
+const router : Router = express.Router();
 
 router.use(cookieParser());
 router.use(bodyParser.json());
