@@ -7,19 +7,20 @@ beforeAll((done) => {
     appTester = new AppTester({
         dbConfig: {
             userDB: "TestFakeEMailAccount",
-            emailConfig: undefined
         },
+        emailConfig: undefined,
         onReady: async () => {
             done();
         }
     });
 }, 40000);
 
+const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 
 test('Update email of a verified user', async (done) => {
     const Mailer = require('../../src/services/mailer/Mailer').default;
     const config = require('../../src/config').default;
-
+    await wait(10000)
     const infos = await Mailer.send({
         locals: {
             link: test,
@@ -33,7 +34,7 @@ test('Update email of a verified user', async (done) => {
     expect(infos.messageId).toBeTruthy();
     expect(nodemailer.getTestMessageUrl(infos)).toBeTruthy();
     done();
-});
+}, 20000);
 
 afterAll(async (done) => {
     await appTester.close(done);

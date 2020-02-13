@@ -18,7 +18,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.2",
     "mongoose": "^5.8.9",
-    "nodemailer": "^6.4.2"
+    "nodemailer": "^6.4.2",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/accepts": "^1.3.5",
@@ -31,6 +32,7 @@
     "@types/mongoose": "^5.5.43",
     "@types/node": "^13.1.8",
     "@types/nodemailer": "^6.4.0",
+    "@types/winston": "^2.4.4",
     "coveralls": "^3.0.9",
     "express": "^4.17.1",
     "jest": "^24.9.0",
@@ -52,11 +54,11 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "watch": "tsc --watch --onSuccess=\"cp -r ./src/templates ./lib/templates\"",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags",
     "demo": "tsc && tsc demo\\app-private.ts && node demo\\app-private.js"
   },
   "repository": {

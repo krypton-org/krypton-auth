@@ -7,10 +7,11 @@ import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
 import { generateKeys } from './services/crypto/RSAKeysGeneration';
-import {Transport, TransportOptions} from 'nodemailer';
+import { Transport, TransportOptions } from 'nodemailer';
+import { createLogger, format, transports, Logger } from 'winston';
 
-const DEFAULT_PUBLIC_KEY_FILE = path.resolve(__dirname, '../public-key.txt');
-const DEFAULT_PRIVATE_KEY_FILE = path.resolve(__dirname, '../private-key.txt');
+const DEFAULT_PUBLIC_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../public-key.txt') : path.resolve(__dirname, '../public-key.txt');
+const DEFAULT_PRIVATE_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../private-key.txt') : path.resolve(__dirname, '../private-key.txt');
 
 /**
  * Mongo connection configuration
@@ -66,8 +67,8 @@ export class Config implements IConfigProperties {
         userDB: 'users',
     };
     public emailConfig: undefined;
-    public emailNotSentLogFile = path.resolve(__dirname, './email-not-sent.log');
-    public errorlogFile = path.resolve(__dirname, './errors.log');
+    public emailNotSentLogFile = path.resolve(__dirname, '../email-not-sent.log');
+    public errorlogFile = path.resolve(__dirname, '../errors.log');
     public extendedSchema = {};
     public graphiql = true;
     public hasUsername = true;
@@ -84,6 +85,7 @@ export class Config implements IConfigProperties {
     public resetPasswordEmailTemplate = path.resolve(__dirname, './templates/emails/ResetPassword.ejs');
     public resetPasswordFormTemplate = path.resolve(__dirname, './templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, './templates/emails/VerifyEmail.ejs');
+    public logger: any;
 
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.
@@ -134,7 +136,7 @@ export class Config implements IConfigProperties {
 
         //Merge taking place here
         Object.keys(options).map(
-            function(prop) {
+            function (prop) {
                 if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
                     this[prop] = {
                         ...this[prop],
@@ -145,6 +147,28 @@ export class Config implements IConfigProperties {
                 }
             }.bind(this),
         );
+
+        const levels = {
+            email: 0,
+            error: 1,
+        };
+
+        this.logger = createLogger({
+            levels,
+            format: format.combine(
+                format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }),
+                format.errors({ stack: true }),
+                format.splat(),
+                format.json()
+            ),
+            defaultMeta: { service: 'GraphAL-Auth-Service' },
+            transports: [
+                new transports.File({ filename: this.emailNotSentLogFile, level: 'email', maxsize: 1000000, maxFiles: 1, tailable: true }),
+                new transports.File({ filename: this.errorlogFile, level: 'error', maxsize: 1000000, maxFiles: 1, tailable: true  }),
+            ]
+        });
     }
 }
 

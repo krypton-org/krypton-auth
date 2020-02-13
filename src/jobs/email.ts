@@ -7,6 +7,7 @@ import Agenda from 'agenda';
 import fs from 'fs';
 import config from '../config';
 import Mailer, { Email } from '../services/mailer/Mailer';
+import nodemailer from 'nodemailer';
 
 /**
  * Define job type of sending an email in the Agenda process queue.
@@ -16,11 +17,15 @@ import Mailer, { Email } from '../services/mailer/Mailer';
 export default function(agenda: Agenda): void {
     agenda.define('email', async (job: Agenda.Job<Email>) => {
         try {
-            await Mailer.send(job.attrs.data);
+            const info = await Mailer.send(job.attrs.data);
+            if (!config.emailConfig) {
+                console.log('Message sent: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            }
         } catch (err) {
-            console.log(err);
+            config.logger.error(err);
             if (config.emailNotSentLogFile) {
-                fs.appendFileSync(config.emailNotSentLogFile, JSON.stringify(job.attrs.data) + '\n');
+                config.logger.email(JSON.stringify(job.attrs.data));
             }
         }
     });

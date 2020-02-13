@@ -61,10 +61,12 @@ router.use(
     }),
 );
 
+router.get('/', MiscellaneousController.getIndex);
+router.get('/user/email/confirmation', UserController.confirmEmail);
+router.get('/form/reset/password', UserController.resetPasswordForm);
+
 router.use(function(err, req, res, next) {
-    if (config.errorlogFile) {
-        fs.appendFile(config.errorlogFile, JSON.stringify(err) + '\n', () => {});
-    }
+    config.logger.error(err);
     const notifications = [];
     notifications.push({
         type: 'error',
@@ -73,8 +75,5 @@ router.use(function(err, req, res, next) {
     res.json({ notifications });
 });
 
-router.get('/', MiscellaneousController.getIndex);
-router.get('/user/email/confirmation', UserController.confirmEmail);
-router.get('/form/reset/password', UserController.resetPasswordForm);
 
 export default router;

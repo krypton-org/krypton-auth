@@ -116,7 +116,6 @@ export default class AppTester {
             ...options
         }
 
-        console.log("yoooo");
         const app = express();
         app.use(GraphQLAuthService(options));
         this.request = request(app);
