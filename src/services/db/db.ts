@@ -47,14 +47,6 @@ export default class MongooseConnection {
             });
         });
 
-        process.on('unhandledRejection', err => {
-            console.log('yoooo');
-        });
-
-        process.on('uncaughtException', err => {
-            console.log('yoooo');
-        });
-
         // Create the database connection
         await mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
     }
