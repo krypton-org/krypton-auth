@@ -41,6 +41,7 @@ router.use(ErrorHandler);
 if (config.graphiql) {
     router.use('/graphql', async (req, res, next) => {
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
+        params.query = defaultQuery() 
         if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.send(renderGraphiQL(params));
@@ -74,6 +75,47 @@ router.use(function(err, req, res, next) {
     });
     res.json({ notifications });
 });
+
+function defaultQuery(){ return `# Welcome to GraphiQL
+#
+# Welcome to GraphQL Auth Service
+#
+# You can use this GraphiQL IDE to test some GraphQL queries.
+#
+#
+# To register:
+#
+# mutation{
+#   register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
+#     notifications{
+#       type
+#       message
+#     }
+#   }
+# }
+#
+# To log-in:
+#
+# mutation{
+#   login(login: "your@mail.com", password:"yourpassword"){
+#     token
+#     expiryDate
+#   }   
+# }
+#
+# Keyboard shortcuts:
+#
+#  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
+#
+#     Merge Query:  Shift-Ctrl-M (or press the merge button above)
+#
+#       Run Query:  Ctrl-Enter (or press the play button above)
+#
+#   Auto Complete:  Ctrl-Space (or just start typing)
+#
+
+`;
+}
 
 
 export default router;
