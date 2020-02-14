@@ -18,6 +18,8 @@ import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
 import ErrorHandler from '../services/error/ErrorHandler';
 import { Router } from 'express';
+import EventEmitter from 'events';
+const eventEmitter = new EventEmitter();
 
 const router : Router = express.Router();
 
@@ -67,7 +69,7 @@ router.get('/user/email/confirmation', UserController.confirmEmail);
 router.get('/form/reset/password', UserController.resetPasswordForm);
 
 router.use(function(err, req, res, next) {
-    config.logger.error(err);
+    eventEmitter.emit('auth-error', err);
     const notifications = [];
     notifications.push({
         type: 'error',
@@ -82,8 +84,8 @@ function defaultQuery(){ return `# Welcome to GraphiQL
 #
 # You can use this GraphiQL IDE to test some GraphQL queries.
 #
-#
-# To register:
+# If 'extendedSchema' option is undefined and 'hasUsername' option is NOT set to false:
+# Use this query to register.
 #
 # mutation{
 #   register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
@@ -94,7 +96,7 @@ function defaultQuery(){ return `# Welcome to GraphiQL
 #   }
 # }
 #
-# To log-in:
+# Use this query to log-in.
 #
 # mutation{
 #   login(login: "your@mail.com", password:"yourpassword"){
@@ -116,6 +118,5 @@ function defaultQuery(){ return `# Welcome to GraphiQL
 
 `;
 }
-
 
 export default router;

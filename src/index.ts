@@ -1,6 +1,7 @@
 import config, { IConfigProperties } from './config';
 import MongooseConnection from './services/db/db';
 import { Router } from 'express';
+import EventEmitter from 'events';
 
 declare function require(moduleName: string): any;
 
@@ -20,14 +21,14 @@ declare global {
  * @api public
  */
 function GraphQLAuthService(properties: IConfigProperties): Router {
-    if (properties) {
-        config.merge(properties);
-    }
+    config.merge(properties);
     //Object.freeze(config);
     const db: typeof MongooseConnection = require('./services/db/db').default;
     const router: Router = require('./router/Router').default;
     db.init();
     return router;
 }
+
+export const eventBus : EventEmitter = config.eventBus;
 
 export default GraphQLAuthService;

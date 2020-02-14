@@ -1,6 +1,6 @@
 import AppTester from '../utils/AppTester';
-import fs from 'fs';
-import path from 'path';
+import { eventBus } from '../../src/index';
+
 let appTester;
 let request;
 
@@ -42,7 +42,7 @@ beforeAll((done) => {
 
 const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 
-test('Email Logger', async (done) => {
+test('Email Error - Event Emitting', async (done) => {
     const recoveryEmailQuery = {
         query: `query{
             sendPasswordRecorevyEmail(email: "${user.email}"){
@@ -53,13 +53,13 @@ test('Email Logger', async (done) => {
             }
           }`
     }
+    eventBus.on('email-error', (data) => {
+        expect(data.locals.user.username).toBe(user.username);
+        expect(data.recipient).toBe(user.email);
+        done();
+    })
     await wait(10000)
-    let res = await request.getGraphQL(recoveryEmailQuery);
-    fs.readFile(path.resolve(__dirname, '../../email-not-sent.log'), (err, data) => {
-        if (err) throw err;
-        expect(data.toString().includes("message")).toBeTruthy();
-        done()
-    });
+    await request.getGraphQL(recoveryEmailQuery);
 }, 20000);
 
 afterAll(async (done) => {

@@ -23,10 +23,7 @@ export default function(agenda: Agenda): void {
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             }
         } catch (err) {
-            config.logger.error(err);
-            if (config.emailNotSentLogFile) {
-                config.logger.email(JSON.stringify(job.attrs.data));
-            }
+            config.eventBus.emit('email-error', job.attrs.data)
         }
     });
 }
