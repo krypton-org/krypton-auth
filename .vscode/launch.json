@@ -6,7 +6,7 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "nodemon",
-            "program": "${workspaceFolder}\\demo\\app-private.js",
+            "program": "${workspaceFolder}\\demo\\app.js",
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

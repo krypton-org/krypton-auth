@@ -20,9 +20,8 @@ declare global {
  * @returns {Router}
  * @api public
  */
-function GraphQLAuthService(properties: IConfigProperties): Router {
-    config.merge(properties);
-    //Object.freeze(config);
+function GraphQLAuthService(properties?: IConfigProperties): Router {
+    if (properties) config.merge(properties);
     const db: typeof MongooseConnection = require('./services/db/db').default;
     const router: Router = require('./router/Router').default;
     db.init();
