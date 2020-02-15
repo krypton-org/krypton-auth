@@ -2,6 +2,5 @@ demo
 .vscode
 .gitignore
 coverage
-lib/public-key.txt
-lib/private-key.txt
-lib/email-not-sent.log
+public-key.txt
+private-key.txt
