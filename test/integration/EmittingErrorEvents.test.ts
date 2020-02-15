@@ -40,8 +40,6 @@ beforeAll((done) => {
     });
 }, 40000);
 
-const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
-
 test('Email Error - Event Emitting', async (done) => {
     const recoveryEmailQuery = {
         query: `query{
@@ -58,7 +56,6 @@ test('Email Error - Event Emitting', async (done) => {
         expect(data.recipient).toBe(user.email);
         done();
     })
-    await wait(10000)
     await request.getGraphQL(recoveryEmailQuery);
 }, 20000);
 

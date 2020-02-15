@@ -26,9 +26,10 @@ export interface DBConfig {
 /**
  * Internal, used in {@link Config#serviceReady}
  */
-interface DBReadyStatus {
+interface ReadyStatus {
     isAgendaReady?: boolean;
     isMongooseReady?: boolean;
+    isTestEmailReady?: boolean;
 }
 
 /**
@@ -55,7 +56,7 @@ export interface IConfigProperties {
     verifyEmailTemplate?: string;
 }
 
-export class Config implements IConfigProperties {
+export class Config implements IConfigProperties, ReadyStatus{
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbConfig = {
@@ -69,10 +70,11 @@ export class Config implements IConfigProperties {
     public graphiql = true;
     public hasUsername = true;
     public host = undefined;
-    private isAgendaReady: boolean = false;
-    private isMongooseReady: boolean = false;
+    public isAgendaReady: boolean = false;
+    public isMongooseReady: boolean = false;
+    public isTestEmailReady: boolean = false;
     public notificationPageTemplate = path.resolve(__dirname, './templates/pages/Notification.ejs');
-    public onReady = () => console.log('GraphQL-Auth-Service is ready!');
+    public onReady = () => {};
     public privateKey = undefined;
     public privateKeyFilePath = undefined;
     public publicKey = undefined;
@@ -86,20 +88,36 @@ export class Config implements IConfigProperties {
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.
      * When both calls has been made it calls {@link Config#onReady}
-     * @param  {DBReadyStatus} status
+     * @param  {ReadyStatus} status
      * @returns {void}
      */
-    public serviceReady = (status: DBReadyStatus): void => {
+    public serviceReady = (status: ReadyStatus): void => {
         if (status.isAgendaReady) {
             this.isAgendaReady = true;
         }
         if (status.isMongooseReady) {
             this.isMongooseReady = true;
         }
-        if (this.isAgendaReady && this.isMongooseReady) {
+        if (status.isTestEmailReady) {
+            this.isTestEmailReady = true;
+            console.log('Testing email credentials obtained \u2705');
+        }
+        if (this.isAgendaReady && this.isMongooseReady && (this.emailConfig || this.isTestEmailReady)) {
+            console.log('Connection to MongoDB established \u2705');
+            console.log('GraphQL Auth Service is ready \u2705');
             this.onReady();
         }
     };
+    
+    /**
+     * Called by Mongoose when connection with MongoDB failed.
+     * @param  {Error} err
+     * @returns {void}
+     */
+    public dbConnectionFailed = (err: Error): void => {
+        console.log('Connection to MongoDB failed \u274C')
+        this.eventBus.emit('error', err)
+    }
 
     /**
      * Merging user options and default properties

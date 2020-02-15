@@ -15,7 +15,7 @@ if (config.emailConfig) {
 } else {
     nodemailer.createTestAccount((err, account) => {
 
-        console.log('Testing email credentials obtained!');
+        config.serviceReady({isTestEmailReady: true});
         // create reusable transporter object using the default SMTP transport
         transporter = nodemailer.createTransport({
             host: 'smtp.ethereal.email',
