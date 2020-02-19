@@ -20,7 +20,7 @@ beforeAll((done) => {
         dbConfig: {
             userDB: "Logger",
         },
-        emailConfig: {
+        mailTransporter: {
             host: 'wrong',
             port: 587,
             auth: {

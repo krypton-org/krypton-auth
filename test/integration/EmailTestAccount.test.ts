@@ -8,7 +8,7 @@ beforeAll((done) => {
         dbConfig: {
             userDB: "TestFakeEMailAccount",
         },
-        emailConfig: undefined,
+        mailTransporter: undefined,
         onReady: async () => {
             done();
         }
@@ -20,7 +20,7 @@ const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 test('Update email of a verified user', async (done) => {
     const send = require('../../src/services/mailer/Mailer').default;
     const config = require('../../src/config').default;
-    await wait(10000)
+    await wait(10000);
     const infos = await send({
         locals: {
             link: test,

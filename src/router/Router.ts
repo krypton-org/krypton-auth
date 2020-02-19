@@ -69,7 +69,7 @@ router.get('/user/email/confirmation', UserController.confirmEmail);
 router.get('/form/reset/password', UserController.resetPasswordForm);
 
 router.use(function(err, req, res, next) {
-    eventEmitter.emit('auth-error', err);
+    eventEmitter.emit('error', err);
     const notifications = [];
     notifications.push({
         type: 'error',
