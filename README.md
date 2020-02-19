@@ -3,9 +3,9 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & Json Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
+An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
 
-*It is kind of a free & open source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
+*It is kind of a free & open-source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 
 ## Features
   * Registration
@@ -37,12 +37,12 @@ An authentication middleware for Express handling login, registration, password 
   * [algorithm](#algorithm)
   * [authTokenExpiryTime](#authtokenexpirytime)
   * [dbConfig](#dbconfig)
-  * [emailNotSentLogFile](#emailnotsentlogfile)
-  * [errorlogFile](#errorlogfile)
   * [extendedSchema](#extendedschema)
   * [graphiql](#graphiql)
   * [hasUsername](#hasusername)
   * [host](#host)
+  * [mailFrom](#mailfrom)
+  * [mailTransporter](#mailtransporter)
   * [notificationPageTemplate](#notificationpagetemplate)
   * [onReady](#onready)
   * [privateKey](#privatekey)
@@ -53,6 +53,7 @@ An authentication middleware for Express handling login, registration, password 
   * [resetPasswordEmailTemplate](#resetpasswordemailtemplate)
   * [resetPasswordFormTemplate](#resetpasswordformtemplate)
   * [verifyEmailTemplate](#verifyemailtemplate)
+- [Error handling](#error-handling)
 - [Decode auth tokens in other web servers](#decode-auth-tokens-in-other-web-servers)
   * [In JavaScript](#in-javascript)
   * [In Python](#in-python)
@@ -79,7 +80,7 @@ Below a possible system design you could use:
 
 ## Installation
 
-GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like a middleware itself.
+GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like middleware itself.
 
 It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/`.
 
@@ -123,7 +124,7 @@ This process is safe from [CSRF](https://www.owasp.org/index.php/Cross-Site_Requ
 
 The only risk left is that by an [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attack an authentication token gets stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password, email or username with the [`updateMe`](#update-user-information) mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targeted user account by modifying those fields.
 
-Anyway you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure a maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any html special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
+Anyway, you should learn on how to protect your application from [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) attacks to ensure maximum security to your users. Here is a [cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html) made by [OWASP](http://owasp.org). Note that GrahQL-Auth-Service is escaping any HTML special character like `<` `>` in the data provided by users (except for passwords which are hashed and never returned to the client).
 
 ## Performing a GraphQL query
 
@@ -184,7 +185,7 @@ Clicking on the link will lead you to a notification page. *This page is customi
 
 ### Login
 
-To log-in simply use the [`login`](#login) mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set a HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minutes). When outdated refresh it by calling the [`refreshToken`](#refresh-authentication-tokens) mutation.
+To log-in simply use the [`login`](#login) mutation. You will have to provide a `login` which can be the email or username of your account and your `password`. It will return your authentication token with its expiry date and set an HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS))). You will be able to access private mutations/queries by including it in the `Authorization` header of the request as a `Bearer token`. This token will be usable until its expiry date (by default 15 minutes). When outdated refresh it by calling the [`refreshToken`](#refresh-authentication-tokens) mutation.
 
 ```js
 mutation{
@@ -197,7 +198,7 @@ mutation{
 
 ### Refresh authentication tokens
 
-By default your authentication token is valid for 15 minutes. To refresh it, use the `refreshToken` mutation. It will send you back a new authentication token and expiry date. You don't need to pass your actual authentication token in the `Authorization` header, it only needs the cookie containing your refresh token **transmitted by default** by your browser. This refresh token will also be refreshed. Thus, unless you stay inactive during a long period of time (by default 7 days), you will never have to log-in again . 
+By default your authentication token is valid for 15 minutes. To refresh it, use the `refreshToken` mutation. It will send you back a new authentication token and expiry date. You don't need to pass your actual authentication token in the `Authorization` header, it only needs the cookie containing your refresh token **transmitted by default** by your browser. This refresh token will also be refreshed. Thus, unless you stay inactive during a long period of time (by default 7 days), you will never have to log-in again. 
 
 ```js
 mutation{
@@ -209,7 +210,7 @@ mutation{
 ```
 ### Get the Public Key
 
-Easily fetch the Public Key of the service with this query in order to [decode the authentication token on your other web servers / apps](#decode-auth-tokens-in-other-web-servers).
+Easily fetch the Public Key of the service with this query in order to [decode the authentication token on your other web servers/apps](#decode-auth-tokens-in-other-web-servers).
 
 ```js
 query{
@@ -344,7 +345,7 @@ To fetch one or many user public information from any of its public fields.
 
 * userCount
 
-To count users according to criterias based on any user public fields.
+To count users according to criteria based on any user public fields.
 
 * userPagination
 
@@ -353,7 +354,7 @@ To list users with pagination configuration.
 ## Properties
 
 ### algorithm
-`String` property - The algorithm of the JSON Web Token. Default value is `HS256`.
+`String` property - The algorithm of the JSON Web Token. The default value is `HS256`.
 
 ### authTokenExpiryTime
 
@@ -361,20 +362,20 @@ To list users with pagination configuration.
 
 ###  dbConfig
 Object property that can contain 4 properties:
-* address: `String` property - The adress of the MongoDB server. Example : `user:password@host.com`. Default value is `localhost`.
-* port: `String` property - The port of the MongoDB server. Default value is `27017`.
-* agendaDB: `String` property - The database name for the email processing queue. Default value is `agenda`.
-* userDB: `String` property - The user database name. Default value is `users`.
+* address: `String` property - The address of the MongoDB server. Example: `user:password@host.com`. The default value is `localhost`.
+* port: `String` property - The port of the MongoDB server. The default value is `27017`.
+* agendaDB: `String` property - The database name for the email processing queue. The default value is `agenda`.
+* userDB: `String` property - The user database name. The default value is `users`.
 
 ###  extendedSchema
 
-The real power of GraphQL Auth Service is the ability to customize the user model to your own need. 
+The real power of GraphQL Auth Service is the ability to customize the user model to your own needs. 
 
-To achieve that you simply need to pass the different [Mongoose Schema](https://mongoosejs.com/docs/guide.html) fields you want to add. Under the hood those extra fields will be converted in GraphQL types thanks to [graphql-compose-mongoose](https://github.com/graphql-compose/graphql-compose-mongoose), and added to the different queries and mutations automatically.
+To achieve that you simply need to pass the different [Mongoose Schema](https://mongoosejs.com/docs/guide.html) fields you want to add. Under the hood, those extra fields will be converted into GraphQL types thanks to [graphql-compose-mongoose](https://github.com/graphql-compose/graphql-compose-mongoose) and added to the different queries and mutations automatically.
 
 [Mongoose Schema](https://mongoosejs.com/docs/guide.html) is very powerful, you can define the field type, default value, [custom validators](https://mongoosejs.com/docs/validation.html#custom-validators) & error messages to display, if it is [required](https://mongoosejs.com/docs/validation.html#required-validators-on-nested-objects), if it should be [unique](https://mongoosejs.com/docs/validation.html#the-unique-option-is-not-a-validator)... Please refer to its [documentation](https://mongoosejs.com/docs/guide.html).
 
-**!! Note !!** In each schema field you can define the `isPrivate` attribute. It is a `Boolean` attribute telling whether or not this field can be accessible by public `queries` like [userById](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), [userByOne](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), etc.
+**!! Note !!** In each schema field, you can define the `isPrivate` attribute. It is a `Boolean` attribute telling whether or not this field can be accessible by public `queries` like [userById](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), [userByOne](https://github.com/JohannC/GraphQL-Auth-Service#fetch-public-user-data), etc.
 
 For example, you could pass the following `extendedSchema`:
 
@@ -424,14 +425,14 @@ app.use(GraphQLAuthService({ extendedSchema }));
 ```
 
 ###  graphiql
-`Boolean` property - Enable or disable GraphiQL IDE. Default value is `true`. In the page header, you will find an input field to include your auth token and be able to make authenticated requests.
+`Boolean` property - Enable or disable GraphiQL IDE. The default value is `true`. In the page header, you will find an input field to include your auth token and be able to make authenticated requests.
 **!! Note !!** Include your auth token directly, no need to precede it with 'Bearer '.
 
 ### hasUsername
 `Boolean` property - Enable or disable username. Default value is `true`.
 
 ### host
-`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. Default value is `null`. When `null`, GraphQL Auth Service use the address located in `req.headers.host` that can correspond the machine `localhost`.
+`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. The default value is `null`. When `null`, GraphQL Auth Service uses the address located in `req.headers.host` that can correspond to the machine `localhost`.
 
 ### mailFrom
 `String` or `Object` property - Define sender address for the emails that will be sent to users. Default value is `undefined`.
@@ -481,16 +482,16 @@ Preview URL: https://ethereal.email/message/Xklk07cTigz7mlaKXkllHsRk0gyz7kuxAAAA
 `Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL Auth Service is ready!");`.
 
 ###  privateKey
-`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  privateKeyFilePath
-`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The file path to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  publicKey
-`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  publicKeyFilePath
-`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The file path to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterward.
 
 ### refreshTokenExpiryTime
 
