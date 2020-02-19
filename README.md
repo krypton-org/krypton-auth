@@ -79,11 +79,11 @@ Below a possible system design you could use:
 
 ## Installation
 
-GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like a middleware itself, working with [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). 
+GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like a middleware itself.
 
-You need to [configure the connection to MongoDB](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/`.
+It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/`.
 
-In production, you need to [provide a Nodemailer configuration](#emailConfig) from where will be sent administration emails to users. In development, a nodemailer test account is set automatically. It will print links on the command line to preview emails that would have normally been sent. 
+In production, you also need to [provide a Nodemailer transporter](#emailConfig) from where will be sent emails to users. If you don't provide any, a nodemailer test account is set automatically. It will print links on the command line to preview the emails that would have normally been sent. 
 
 ```bash
 npm install graphql-auth-service --save
@@ -96,9 +96,9 @@ import express from 'express';
 
 const app = express();
 
-app.use('/auth', GraphQLAuthService());
+app.use('/auth', GraphQLAuthService()); //API entry point is localhost:5000/auth/graphql
 
-// You can use it directly as well : app.use(GraphQLAuthService());
+// To set the API entry point as localhost:5000/graphql, write: app.use(GraphQLAuthService());
 
 app.listen(process.env.PORT || 5000, () => {
     console.log(`server is listening on ${process.env.PORT || 5000}`)
@@ -138,7 +138,7 @@ fetch(yourServiceURL+'/graphql', {
 	'Authorization': 'Bearer '+ yourAuthToken
   },
   body: JSON.stringify({
-    //the GraphQL query
+    //GraphQL query
     query: `mutation{
       updateMe(fields:{username:"newusername"}){
         token
