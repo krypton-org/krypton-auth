@@ -18,10 +18,10 @@ beforeAll((done) => {
 const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 
 test('Update email of a verified user', async (done) => {
-    const Mailer = require('../../src/services/mailer/Mailer').default;
+    const send = require('../../src/services/mailer/Mailer').default;
     const config = require('../../src/config').default;
     await wait(10000)
-    const infos = await Mailer.send({
+    const infos = await send({
         locals: {
             link: test,
             user: { username: "username" },

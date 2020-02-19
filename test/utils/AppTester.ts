@@ -3,7 +3,7 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
 import GraphQLAuthService from '../../src/index';
-import { IConfigProperties } from '../../src/config';
+import mailer, { Transporter } from 'nodemailer';
 
 export default class AppTester {
     public request: any;
@@ -62,16 +62,19 @@ export default class AppTester {
     };
 
     constructor(options) {
+
+        const mailTransporter: Transporter = mailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: 'x6z5n5ywx7wbpgkb@ethereal.email',
+                pass: 'JAXPXSY9MQP3uHtFjB'
+            }
+        });
+
         options = {
             ...{
-                emailConfig: {
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    auth: {
-                        user: 'x6z5n5ywx7wbpgkb@ethereal.email',
-                        pass: 'JAXPXSY9MQP3uHtFjB'
-                    }
-                },
+                mailTransporter,
                 extendedSchema: {
                     firstName: {
                         type: String,

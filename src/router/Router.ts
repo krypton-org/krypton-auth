@@ -78,9 +78,7 @@ router.use(function(err, req, res, next) {
     res.json({ notifications });
 });
 
-function defaultQuery(){ return `# Welcome to GraphiQL
-#
-# Welcome to GraphQL Auth Service
+function defaultQuery(){ return `# Welcome to GraphQL Auth Service
 #
 # You can use this GraphiQL IDE to test some GraphQL queries.
 #

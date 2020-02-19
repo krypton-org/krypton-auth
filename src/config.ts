@@ -7,9 +7,8 @@ import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
 import { generateKeys } from './services/crypto/RSAKeysGeneration';
-import { Transport, TransportOptions } from 'nodemailer';
+import { Transporter } from 'nodemailer';
 import EventEmitter from 'events';
-
 const DEFAULT_PUBLIC_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../public-key.txt') : path.resolve(__dirname, '../public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../private-key.txt') : path.resolve(__dirname, '../private-key.txt');
 
@@ -33,17 +32,26 @@ interface ReadyStatus {
 }
 
 /**
+ * Email adress composed of its name and its email adress: '"Fred Foo" <foo@example.com>'.
+ */
+export interface Address {
+    name: string;
+    address: string;
+}
+
+/**
  * Properties to configure GraphQL Auth Service
  */
 export interface IConfigProperties {
     algorithm?: Algorithm;
     authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
-    emailConfig?: Transport | TransportOptions;
     extendedSchema?: Object;
     graphiql?: boolean;
     hasUsername?: boolean;
     host?: string;
+    mailFrom?: string | Address;
+    mailTransporter?: Transporter;
     notificationPageTemplate?: string;
     onReady?: () => any;
     privateKey?: string;
@@ -56,7 +64,7 @@ export interface IConfigProperties {
     verifyEmailTemplate?: string;
 }
 
-export class Config implements IConfigProperties, ReadyStatus{
+export class Config implements IConfigProperties, ReadyStatus {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbConfig = {
@@ -73,8 +81,10 @@ export class Config implements IConfigProperties, ReadyStatus{
     public isAgendaReady: boolean = false;
     public isMongooseReady: boolean = false;
     public isTestEmailReady: boolean = false;
+    public mailTransporter: undefined;
+    public mailFrom: undefined;
     public notificationPageTemplate = path.resolve(__dirname, './templates/pages/Notification.ejs');
-    public onReady = () => {};
+    public onReady = () => { };
     public privateKey = undefined;
     public privateKeyFilePath = undefined;
     public publicKey = undefined;
@@ -102,13 +112,13 @@ export class Config implements IConfigProperties, ReadyStatus{
             this.isTestEmailReady = true;
             console.log('Testing email credentials obtained \u2705');
         }
-        if (this.isAgendaReady && this.isMongooseReady && (this.emailConfig || this.isTestEmailReady)) {
+        if (this.isAgendaReady && this.isMongooseReady && (this.mailTransporter || this.isTestEmailReady)) {
             console.log('Connection to MongoDB established \u2705');
             console.log('GraphQL Auth Service is ready \u2705');
             this.onReady();
         }
     };
-    
+
     /**
      * Called by Mongoose when connection with MongoDB failed.
      * @param  {Error} err

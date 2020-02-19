@@ -6,7 +6,7 @@
 import Agenda from 'agenda';
 import fs from 'fs';
 import config from '../config';
-import Mailer, { Email } from '../services/mailer/Mailer';
+import send, { Email } from '../services/mailer/Mailer';
 import nodemailer from 'nodemailer';
 
 /**
@@ -17,8 +17,8 @@ import nodemailer from 'nodemailer';
 export default function(agenda: Agenda): void {
     agenda.define('email', async (job: Agenda.Job<Email>) => {
         try {
-            const info = await Mailer.send(job.attrs.data);
-            if (!config.emailConfig) {
+            const info = await send(job.attrs.data);
+            if (!config.mailTransporter) {
                 console.log('Message sent: %s', info.messageId);
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             }
