@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-A GraphQL API to handle login, registration, password recovery and account management with JSON Web Tokens. It features [a flexible user data model you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
+An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & Json Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
 
 *It is kind of a free & open source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 
@@ -36,7 +36,7 @@ A GraphQL API to handle login, registration, password recovery and account manag
 - [Properties](#properties)
   * [algorithm](#algorithm)
   * [authTokenExpiryTime](#authtokenexpirytime)
-  * [dbConfig:](#dbconfig-)
+  * [dbConfig](#dbconfig)
   * [emailNotSentLogFile](#emailnotsentlogfile)
   * [errorlogFile](#errorlogfile)
   * [extendedSchema](#extendedschema)
@@ -79,7 +79,11 @@ Below a possible system design you could use:
 
 ## Installation
 
-This is an [ExpressJS](https://expressjs.com/) app working with [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). You need to provide a [Nodemailer](https://nodemailer.com) configuration from where the system will send administration emails to users. You also need to configure the connection to [MongoDB](https://www.mongodb.com/). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/users`.
+GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like a middleware itself, working with [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). 
+
+You need to [configure the connection to MongoDB](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/`.
+
+In production, you need to [provide a Nodemailer configuration](#emailConfig) from where will be sent administration emails to users. In development, a nodemailer test account is set automatically. It will print links on the command line to preview emails that would have normally been sent. 
 
 ```bash
 npm install graphql-auth-service --save
@@ -87,38 +91,17 @@ npm install graphql-auth-service --save
 yarn add graphql-auth-service
 ```
 ```javascript
-const GraphQLAuthService = require('graphql-auth-service')
-const express = require('express');
+import GraphQLAuthService from 'graphql-auth-service';
+import express from 'express';
 
-const app = express(); // Create an express app
+const app = express();
 
-const options = {
-    //Mandatory
-    emailConfig: {
-       {
-        from: 'myemail@myhost.com', //email address
-        host: 'smtp.myhost.com', //hostname 
-        secureConnection: true, //use SSL 
-        port: 465, //port for secure SMTP 
-        auth: {
-            user: 'username', //email login
-            pass: 'mypassword' //email password
-        }
-    },
-    //Only if you have don't have a local MongoDB instance running on mongodb://localhost:27017
-    dbConfig: {
-        address: 'user:password@host.com', //Mongo adress, 'localhost' by default
-        port: '27017', //Mongo port, '27017' by default 
-        agendaDB: 'agenda', //DB name for the email processing queue, 'agenda' by default
-        userDB: 'users' //DB name where will be stored the users, 'users' by default
-    }
-};
+app.use('/auth', GraphQLAuthService());
 
-GraphQLAuthService(app, options); //Mount GraphQL Auth Service
+// You can use it directly as well : app.use(GraphQLAuthService());
 
-app.listen(process.env.PORT || 5000, (err) => {
-    if (err)  return console.log('Something bad happened')
-    console.log(`GraphQL Auth Service is listening on ${process.env.PORT || 5000}`)
+app.listen(process.env.PORT || 5000, () => {
+    console.log(`server is listening on ${process.env.PORT || 5000}`)
 })
 ```
 
@@ -376,19 +359,12 @@ To list users with pagination configuration.
 
 `Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minutes). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
 
-###  dbConfig: 
+###  dbConfig
 Object property that can contain 4 properties:
 * address: `String` property - The adress of the MongoDB server. Example : `user:password@host.com`. Default value is `localhost`.
 * port: `String` property - The port of the MongoDB server. Default value is `27017`.
 * agendaDB: `String` property - The database name for the email processing queue. Default value is `agenda`.
 * userDB: `String` property - The user database name. Default value is `users`.
-
-###  emailNotSentLogFile
-`String` property - The filepath to the file where will be logged the emails failed to be sent. It will create the file if it doesn't exist. If undefined, the file will be created in `./nodes_module/graphql-auth-service/lib/email-not-sent.log`.
-
-###  errorlogFile
-
-`String` property - The filepath to the file where will be logged the different errors. It will create the file if it doesn't exist. If undefined, the file will be created in `./nodes_module/graphql-auth-service/lib/errors.log`.
 
 ###  extendedSchema
 
@@ -403,7 +379,7 @@ To achieve that you simply need to pass the different [Mongoose Schema](https://
 For example, you could pass the following `extendedSchema`:
 
 ```js
-extendedSchema: {
+const extendedSchema = {
     firstName: {
         type: String,
         required: false,
@@ -442,8 +418,9 @@ extendedSchema: {
         default: false,
         isPublic: false
     }
-},
+};
 
+app.use(GraphQLAuthService({ extendedSchema }));
 ```
 
 ###  graphiql
@@ -456,6 +433,44 @@ extendedSchema: {
 ### host
 `String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. Default value is `null`. When `null`, GraphQL Auth Service use the address located in `req.headers.host` that can correspond the machine `localhost`.
 
+### mailFrom
+`String` or `Object` property - Define sender address for the emails that will be sent to users. Default value is `undefined`.
+```js
+app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
+// OR
+app.use(GraphQLAuthService({ 
+    mailFrom: {
+        name: "Fred Foo 👻";
+        address: "foo@example.com";
+    }
+}));
+```
+If left `undefined` only the adress provided in [mailTransporter](#mailTransporter) property will be shown.
+
+###  mailTransporter
+`Object` property - A [Nodemailer transporter](https://nodemailer.com/smtp/#examples) used to send administration emails to users. Create one by calling `createTransport` from the [Nodemailer API](https://nodemailer.com/smtp/#examples). Default value is `undefined`.
+
+```js
+const transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: credentials.user,
+      pass: credentials.pass
+    }
+});
+
+app.use('/auth', GraphQLAuthService({ transporter }));
+```
+
+If left `undefined` a Nodemailer test account is set automatically. It will print URL links on the command line to let you preview the emails that would have normally been sent.
+
+```bash
+Message sent: <365ea109-f645-e3a1-5e08-48e4c8a37bcb@JohannC>
+Preview URL: https://ethereal.email/message/Xklk07cTigz7mlaKXkllHsRk0gyz7kuxAAAAAWLgnFDcJwUFl8MZ-h1shKs
+```
+
 ###  notificationPageTemplate
 `String` property - The filepath to the [EJS](https://ejs.co/) template file of notification page. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
 * `notifications`: `Array` of `Object` notification. Each notification object contains two properties;
@@ -466,16 +481,16 @@ extendedSchema: {
 `Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL Auth Service is ready!");`.
 
 ###  privateKey
-`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  privateKeyFilePath
-`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The filepath to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  publicKey
-`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ###  publicKeyFilePath
-`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `./nodes_module/graphql-auth-service/lib/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
+`String` property - The filepath to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterwards.
 
 ### refreshTokenExpiryTime
 
@@ -513,6 +528,28 @@ xhr.send(JSON.stringify(mutation));
 `String` property - The filepath to the [EJS](https://ejs.co/) template file of the email to verify user account. This library include a simple one located in [`./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs`](https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs). You can create another, just gives the pass to the [EJS](https://ejs.co/) file you wish to send. Here are the locals you can use inside the template:
 * `user` - The current user: `<p>Hi <%= user.username %></p>`
 * `link` - The verification link: `Click here: <a href="<%= link %>"><%= link %>`
+
+## Error handling
+
+GraphQL Auth Service provide an event bus where you will be notified of eventual errors.
+
+```js
+
+import GraphQLAuthService, { eventBus } from 'graphql-auth-service';
+import express from 'express';
+
+const app = express();
+app.use('/auth', GraphQLAuthService());
+eventBus.on('email-error', (email) => {
+    console.log("Email not sent: "+email)
+});
+
+eventBus.on('email-error', (email) => {
+    console.log("Email not sent: "+email)
+});
+
+
+```
 
 ## Decode auth tokens in other web servers
 
