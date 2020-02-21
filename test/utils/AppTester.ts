@@ -6,7 +6,7 @@ import GraphQLAuthService from '../../src/index';
 import mailer, { Transporter } from 'nodemailer';
 
 export default class AppTester {
-    public request: any;
+    private request: any;
 
     register: (user: any) => Promise<any> = (user) => new Promise((resolve, reject) => {
         const registerQuery = {
@@ -62,7 +62,6 @@ export default class AppTester {
     };
 
     constructor(options) {
-
         const mailTransporter: Transporter = mailer.createTransport({
             host: 'smtp.ethereal.email',
             port: 587,
@@ -124,7 +123,7 @@ export default class AppTester {
         this.request = request(app);
 
         this.request.getGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
-            let request = this.request.get('/graphql')
+            let request = this.request.get('/')
                 .set('Accept', 'application/json')
                 .set("Content-Type", "application/json");
             if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);
@@ -136,7 +135,7 @@ export default class AppTester {
         });
 
         this.request.postGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
-            let request = this.request.post('/graphql')
+            let request = this.request.post('/')
                 .set('Accept', 'application/json')
                 .set("Content-Type", "application/json");
             if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);

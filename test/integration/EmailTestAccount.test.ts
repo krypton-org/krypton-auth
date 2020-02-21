@@ -23,7 +23,7 @@ test('Update email of a verified user', async (done) => {
     await wait(10000);
     const infos = await send({
         locals: {
-            link: test,
+            link: "test",
             user: { username: "username" },
         },
         recipient: "test@test.com",
@@ -35,6 +35,40 @@ test('Update email of a verified user', async (done) => {
     expect(nodemailer.getTestMessageUrl(infos)).toBeTruthy();
     done();
 }, 20000);
+
+test('Prints preview link on the command line', async (done) => {
+    const agenda = require('../../src/services/agenda/agenda').default;
+    const config = require('../../src/config').default;
+    await wait(10000);
+    let outputData = "";
+    const storeLog = inputs => (outputData += inputs);
+    const originalLoggerFct = console["log"]
+    console["log"] = jest.fn(storeLog);
+    agenda.now('email', {
+        locals: {
+            link: "test",
+            user: { username: "username" },
+        },
+        recipient: "test@test.com",
+        subject: 'Activate your account',
+        template: config.verifyEmailTemplate,
+    });
+    await wait(10000);
+    expect(outputData.includes("Preview URL")).toBeTruthy();
+    outputData = "";
+    agenda.now('email', {
+        locals: {
+        },
+        recipient: "test@test.com",
+        subject: 'Activate your account',
+        template: config.verifyEmailTemplate,
+    });
+    await wait(10000);
+    console["log"] = originalLoggerFct
+    expect(outputData.includes("Preview URL")).toBeFalsy();
+    done();
+}, 60000);
+
 
 afterAll(async (done) => {
     await appTester.close(done);

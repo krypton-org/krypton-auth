@@ -7,7 +7,7 @@ import { schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import config from '../config';
-import * as UserController from '../controllers/UserController';
+import * as UserController from '../controller/UserController';
 import UserModel from '../model/UserModel';
 import { internalFields, privateFields, uneditableFields, UserSchema } from '../model/UserSchema';
 import { WrongTokenError } from '../services/error/ErrorTypes';

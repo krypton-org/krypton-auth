@@ -23,7 +23,7 @@ export default function(agenda: Agenda): void {
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             }
         } catch (err) {
-            config.eventBus.emit('email-error', job.attrs.data)
+            if (config.eventEmitter) config.eventEmitter.emit('email-error', job.attrs.data)
         }
     });
 }

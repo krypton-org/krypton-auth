@@ -8,20 +8,15 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
-import fs from 'fs';
 import helmet from 'helmet';
 import config from '../config';
-import * as MiscellaneousController from '../controllers/MiscellaneousController';
-import * as UserController from '../controllers/UserController';
+import * as UserController from '../controller/UserController';
 import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
 import ErrorHandler from '../services/error/ErrorHandler';
 import { Router } from 'express';
-import EventEmitter from 'events';
-const eventEmitter = new EventEmitter();
-
-const router : Router = express.Router();
+const router: Router = express.Router();
 
 router.use(cookieParser());
 router.use(bodyParser.json());
@@ -35,15 +30,20 @@ router.use(async (req, res, next) => {
         try {
             const user = await UserModel.verify(bearerToken, config.publicKey);
             req.user = user;
-        } catch (err) {}
+        } catch (err) {
+            //do nothing user has to log-in or refresh his auth token.
+        }
     }
     next();
 });
-router.use(ErrorHandler);
+
+router.get('/user/email/confirmation', UserController.confirmEmail);
+router.get('/form/reset/password', UserController.resetPasswordForm);
+
 if (config.graphiql) {
-    router.use('/graphql', async (req, res, next) => {
+    router.use('/', async (req, res, next) => {
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
-        params.query = defaultQuery() 
+        params.query = defaultQuery();
         if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.send(renderGraphiQL(params));
@@ -53,32 +53,18 @@ if (config.graphiql) {
     });
 }
 
-router.use(
-    '/graphql',
-    graphqlHTTP(async (req, res) => {
-        return {
-            schema: graphqlSchema,
-            graphiql: false,
-            context: { req, res },
-        };
-    }),
-);
+router.use('/', graphqlHTTP(async (req, res) => {
+    return {
+        schema: graphqlSchema,
+        graphiql: false,
+        context: { req, res },
+    }
+}));
 
-router.get('/', MiscellaneousController.getIndex);
-router.get('/user/email/confirmation', UserController.confirmEmail);
-router.get('/form/reset/password', UserController.resetPasswordForm);
+router.use(ErrorHandler);
 
-router.use(function(err, req, res, next) {
-    eventEmitter.emit('error', err);
-    const notifications = [];
-    notifications.push({
-        type: 'error',
-        message: 'A mistake has happened. Sorry for the inconvenience, we are going to investigate it.',
-    });
-    res.json({ notifications });
-});
-
-function defaultQuery(){ return `# Welcome to GraphQL Auth Service
+function defaultQuery() {
+    return `# Welcome to GraphQL Auth Service
 #
 # You can use this GraphiQL IDE to test some GraphQL queries.
 #

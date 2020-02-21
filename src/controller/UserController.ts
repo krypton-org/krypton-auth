@@ -50,6 +50,15 @@ const generateToken = (tokenLength: number): string => {
 };
 
 /**
+ * Returns the adress of GraphQL Auth Service
+ * @param  {Request} req
+ * @returns The adress of the service
+ */
+const getHostAdress = (req: Request): string =>{
+    return config.host ? config.host + req.baseUrl : req.protocol + '://' + req.get('host') + req.baseUrl;
+}
+
+/**
  * Send confirmation email to `user`.
  * @param  {any} user - user
  * @param  {string} confirmationToken
@@ -59,7 +68,7 @@ const generateToken = (tokenLength: number): string => {
 const sendConfirmationEmail = (user: any, confirmationToken: string, host: string): void => {
     agenda.now('email', {
         locals: {
-            link: 'http://' + host + '/user/email/confirmation?token=' + confirmationToken,
+            link: host + '/user/email/confirmation?token=' + confirmationToken,
             user,
         },
         recipient: user.email,
@@ -105,7 +114,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
             throw new UserNotFound('This link is no longer valid.');
         }
         const user = await User.getUser({ verificationToken: token });
-        await User.update({ email: user.email }, { verificationToken: null, verified: true });
+        await User.updateUser({ email: user.email }, { verificationToken: null, verified: true });
         notifications.push({ type: 'success', message: 'You are now verified!' });
     } catch (err) {
         notifications.push({ type: 'error', message: 'This link is not valid!' });
@@ -144,7 +153,7 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
     try {
         await User.createUser(user);
         notifications.push({ type: 'success', message: 'User created!' });
-        sendConfirmationEmail(user, user.verificationToken, config.host ? config.host : req.headers.host);
+        sendConfirmationEmail(user, user.verificationToken, getHostAdress(req));
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'info',
@@ -177,7 +186,7 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
     if (user.verified) {
         throw new EmailAlreadyConfirmedError('Your email adress has already been confirmed.');
     } else {
-        sendConfirmationEmail(req.user, user.verificationToken, config.host ? config.host : req.headers.host);
+        sendConfirmationEmail(req.user, user.verificationToken, getHostAdress(req));
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'success',
@@ -277,7 +286,7 @@ export const updateUser = async (
             sendConfirmationEmail(
                 req.user,
                 userUpdates.verificationToken,
-                config.host ? config.host : req.headers.host,
+                getHostAdress(req)
             );
             notifications.push({
                 message: 'You will receive a confirmation link at your email address in a few minutes.',
@@ -347,7 +356,7 @@ export const login = async (login: string, password: string, res: Response): Pro
         refreshToken = generateToken(REFRESH_TOKEN_LENGTH);
         const refreshTokenExpiryDate = new Date();
         refreshTokenExpiryDate.setTime(refreshTokenExpiryDate.getTime() + config.refreshTokenExpiryTime);
-        await User.update({ _id: payload.user._id }, { refreshToken, refreshTokenExpiryDate });
+        await User.updateUser({ _id: payload.user._id }, { refreshToken, refreshTokenExpiryDate });
     }
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
@@ -381,12 +390,12 @@ export const sendPasswordRecoveryEmail = async (
     }
     const passwordRecoveryToken = generateToken(TOKEN_LENGTH);
     const passwordRecoveryRequestDate = new Date();
-    await User.update({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
+    await User.updateUser({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
     const user = await User.getUser({ email });
-    const host = config.host ? config.host : req.headers.host;
+    const host = getHostAdress(req);
     agenda.now('email', {
         locals: {
-            link: 'http://' + host + '/form/reset/password?token=' + passwordRecoveryToken,
+            link: host + '/form/reset/password?token=' + passwordRecoveryToken,
             user,
         },
         template: config.resetPasswordEmailTemplate,
@@ -410,9 +419,9 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
         res.json({ notifications });
         return;
     }
-    const host = config.host ? config.host : req.headers.host;
+    const host = getHostAdress(req)
     const locals = {
-        link: 'http://' + host + '/graphql',
+        link: host,
         token: req.query.token,
     };
     ejs.renderFile(config.resetPasswordFormTemplate, locals, {}, (err, html) => {
@@ -438,7 +447,7 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
         const refreshToken = generateToken(REFRESH_TOKEN_LENGTH);
         const refreshTokenExpiryDate = new Date();
         refreshTokenExpiryDate.setTime(refreshTokenExpiryDate.getTime() + config.refreshTokenExpiryTime);
-        await User.update({ _id: user._id }, { refreshToken, refreshTokenExpiryDate });
+        await User.updateUser({ _id: user._id }, { refreshToken, refreshTokenExpiryDate });
         res.cookie('refreshToken', refreshToken, { httpOnly: true });
         return payload;
     } else {

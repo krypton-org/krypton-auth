@@ -8,7 +8,7 @@ import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
 import { generateKeys } from './services/crypto/RSAKeysGeneration';
 import { Transporter } from 'nodemailer';
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 const DEFAULT_PUBLIC_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../public-key.txt') : path.resolve(__dirname, '../public-key.txt');
 const DEFAULT_PRIVATE_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../private-key.txt') : path.resolve(__dirname, '../private-key.txt');
 
@@ -17,7 +17,7 @@ const DEFAULT_PRIVATE_KEY_FILE = (__dirname.includes('node_modules')) ? path.res
  */
 export interface DBConfig {
     address?: string;
-    port?: string;
+    port?: string | number;
     agendaDB?: string;
     userDB?: string;
 }
@@ -46,6 +46,7 @@ export interface IConfigProperties {
     algorithm?: Algorithm;
     authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
+    eventEmitter?: EventEmitter;
     extendedSchema?: Object;
     graphiql?: boolean;
     hasUsername?: boolean;
@@ -83,17 +84,17 @@ export class Config implements IConfigProperties, ReadyStatus {
     public isTestEmailReady: boolean = false;
     public mailTransporter: undefined;
     public mailFrom: undefined;
-    public notificationPageTemplate = path.resolve(__dirname, './templates/pages/Notification.ejs');
+    public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
     public onReady = () => { };
     public privateKey = undefined;
     public privateKeyFilePath = undefined;
     public publicKey = undefined;
     public publicKeyFilePath = undefined;
     public refreshTokenExpiryTime = 7 * 24 * 60 * 60 * 1000;
-    public resetPasswordEmailTemplate = path.resolve(__dirname, './templates/emails/ResetPassword.ejs');
-    public resetPasswordFormTemplate = path.resolve(__dirname, './templates/forms/ResetPassword.ejs');
-    public verifyEmailTemplate = path.resolve(__dirname, './templates/emails/VerifyEmail.ejs');
-    public eventBus = new EventEmitter();
+    public resetPasswordEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/ResetPassword.ejs');
+    public resetPasswordFormTemplate = path.resolve(__dirname, '../lib/templates/forms/ResetPassword.ejs');
+    public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
+    public eventEmitter = undefined;
 
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.
@@ -126,7 +127,7 @@ export class Config implements IConfigProperties, ReadyStatus {
      */
     public dbConnectionFailed = (err: Error): void => {
         console.log('Connection to MongoDB failed \u274C')
-        this.eventBus.emit('error', err)
+        if (config.eventEmitter) config.eventEmitter.emit('error', err)
     }
 
     /**
@@ -179,6 +180,7 @@ export class Config implements IConfigProperties, ReadyStatus {
     }
 }
 
+/* Exporting an instance of Config that acts like singleton */
 const config = new Config();
 
 export default config;

@@ -18,8 +18,8 @@ An authentication middleware for Express handling login, registration, password 
   * [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and [CSRF](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) protection
 
 ## Table of contents
-- [How does it work?](#how-does-it-work)
 - [Installation](#installation)
+- [How does it work?](#how-does-it-work)
 - [Security](#security)
 - [Performing a GraphQL query](#performing-a-graphql-query)
 - [The GraphQL API](#the-graphql-api)
@@ -58,26 +58,6 @@ An authentication middleware for Express handling login, registration, password 
   * [In JavaScript](#in-javascript)
   * [In Python](#in-python)
 
-## How does it work?
-
-This authentication system works with a pair of Private and Public Keys:
-1. When a user logs-in, GraphQL Auth Service generates a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
-2. Then, the user is able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
-
-Below the corresponding sequence diagram:
-
-<p align="center">
-  <img src="https://nusid.net/img/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
-</p>
-
-This library aims to be replicated behind a load balancer. It is completely stateless (no session stored). All your replicas would have to be sharing the same pair of Private and Public Keys.
-
-Below a possible system design you could use:
-
-<p align="center">
-  <img src="https://nusid.net/img/system_design_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - System Design diagram"/>
-</p>
-
 ## Installation
 
 GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like middleware itself.
@@ -97,9 +77,7 @@ import express from 'express';
 
 const app = express();
 
-app.use('/auth', GraphQLAuthService()); //API entry point is localhost:5000/auth/graphql
-
-// To set the API entry point as localhost:5000/graphql, write: app.use(GraphQLAuthService());
+app.use('/auth', GraphQLAuthService()); //API entry point is localhost:5000/auth
 
 app.listen(process.env.PORT || 5000, () => {
     console.log(`server is listening on ${process.env.PORT || 5000}`)
@@ -107,6 +85,26 @@ app.listen(process.env.PORT || 5000, () => {
 ```
 
 You can [provide the pair of Public and Private Keys](https://github.com/JohannC/GraphQL-Auth-Service#publickey) or [the path to the files containing them](https://github.com/JohannC/GraphQL-Auth-Service#publickeyfilepath). If not, the system will generate a pair for you ([you can retrieve them after](https://github.com/JohannC/GraphQL-Auth-Service#publickeyfilepath)). There are plenty of other options that let you customize almost everything, from the [user model](https://github.com/JohannC/GraphQL-Auth-Service#extendedschema) to the [email templates](https://github.com/JohannC/GraphQL-Auth-Service#verifyemailtemplate). Please read the [property](https://github.com/JohannC/GraphQL-Auth-Service#properties) section.
+
+## How does it work?
+
+This authentication system works with a pair of Private and Public Keys:
+1. When a user logs-in, GraphQL Auth Service generates a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
+2. Then, the user is able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user's identity.
+
+Below the corresponding sequence diagram:
+
+<p align="center">
+  <img src="https://nusid.net/img/sequence_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - Sequence diagram" />
+</p>
+
+This library aims to be replicated behind a load balancer. It is completely stateless (no session stored). All your replicas would have to be sharing the same pair of Private and Public Keys.
+
+Below a possible system design you could use:
+
+<p align="center">
+  <img src="https://nusid.net/img/system_design_diagram-graphql_auth_service.svg" alt="GraphQL Auth Service - System Design diagram"/>
+</p>
 
 ## Security
 
@@ -131,7 +129,7 @@ Anyway, you should learn on how to protect your application from [XSS](https://w
 To use GraphQL Auth Service, you can use the `fetch` method or the `XMLHttpRequest` Object in JavaScript. To make an authenticated request, simply include your authentication token as `Bearer token` in the `Authorization` header of your request. Please refer to this example below:
 
 ```js
-fetch(yourServiceURL+'/graphql', {
+fetch(yourServiceURL, {
   method: 'post',
   headers: {
     'Content-Type': 'application/json',
@@ -152,7 +150,7 @@ fetch(yourServiceURL+'/graphql', {
 .then(res => console.log(res));
 ```
 
-You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) is not set to `false`). Just open a web browser to `https://your-service-URL.com/graphql` you will be able to type the graphql queries in the IDE.
+You also have access to the GraphiQL IDE (if the property [`graphiql`](https://github.com/JohannC/GraphQL-Auth-Service#graphiql) is not set to `false`). Just open a web browser to `http://api-entry-point/graphql` you will be able to type the graphql queries in the IDE.
 
 
 ## The GraphQL API
@@ -354,11 +352,11 @@ To list users with pagination configuration.
 ## Properties
 
 ### algorithm
-`String` property - The algorithm of the JSON Web Token. The default value is `HS256`.
+`String` property - The algorithm of the JSON Web Token. The default value is `RS256`.
 
 ### authTokenExpiryTime
 
-`Number` property - The time until the auth token expires in milliseconds. Default value is `15 * 60 * 1000` (15 minutes). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
+`Number` property - The time until the auth token expires in milliseconds. The default value is `15 * 60 * 1000` (15 minutes). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
 
 ###  dbConfig
 Object property that can contain 4 properties:
@@ -429,13 +427,13 @@ app.use(GraphQLAuthService({ extendedSchema }));
 **!! Note !!** Include your auth token directly, no need to precede it with 'Bearer '.
 
 ### hasUsername
-`Boolean` property - Enable or disable username. Default value is `true`.
+`Boolean` property - Enable or disable username. The default value is `true`.
 
 ### host
-`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their email, the links will be pointing to the `host` of the service. The default value is `null`. When `null`, GraphQL Auth Service uses the address located in `req.headers.host` that can correspond to the machine `localhost`.
+`String` property - Public address of the service. **!! Very important for use in production!!** When users receive emails to reset their password or to confirm their account, the links will be pointing to the `host` of the service. The default value is `null`. When `null`, GraphQL Auth Service uses the address located in `req.headers.host` that can correspond to the machine `localhost`.
 
 ### mailFrom
-`String` or `Object` property - Define sender address for the emails that will be sent to users. Default value is `undefined`.
+`String` or `Object` property - Sender address of emails sent to users. The default value is `undefined`.
 ```js
 app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
 // OR
@@ -449,11 +447,11 @@ app.use(GraphQLAuthService({
 If left `undefined` only the adress provided in [mailTransporter](#mailTransporter) property will be shown.
 
 ###  mailTransporter
-`Object` property - A [Nodemailer transporter](https://nodemailer.com/smtp/#examples) used to send administration emails to users. Create one by calling `createTransport` from the [Nodemailer API](https://nodemailer.com/smtp/#examples). Default value is `undefined`.
+`Object` property - A [Nodemailer transporter](https://nodemailer.com/smtp/#examples) used to send administration emails to users. Create one by calling `createTransport` from the [Nodemailer API](https://nodemailer.com/smtp/#examples). The default value is `undefined`.
 
 ```js
 const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
+    host: "smtp.example.email",
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
@@ -479,23 +477,23 @@ Preview URL: https://ethereal.email/message/Xklk07cTigz7mlaKXkllHsRk0gyz7kuxAAAA
     * `message`: `String` property containing the notificaiton message
 
 ###  onReady
-`Function` property - The callback that will be executed when service is launched and ready. Default value is: `() => console.log("GraphQL Auth Service is ready!");`.
+`Function` property - The callback that will be executed when service is launched and ready. The default value is: `() => console.log("GraphQL Auth Service is ready.");`.
 
 ###  privateKey
-`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterward.
+`String` property - The Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with the Public Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  privateKeyFilePath
-`String` property - The file path to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with its Public Key. You can retrieve the pair of keys created for re-use afterward.
+`String` property - The file path to the Private Key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under `your-app/private-key.txt` all along with the Public Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  publicKey
-`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterward.
+`String` property - The Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with the Private Key. You can retrieve the pair of keys created for re-use afterward.
 
 ###  publicKeyFilePath
-`String` property - The file path to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with its Private Key. You can retrieve the pair of keys created for re-use afterward.
+`String` property - The file path to the Public Key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under `your-app/public-key.txt` all along with the Private Key. You can retrieve the pair of keys created for re-use afterward.
 
 ### refreshTokenExpiryTime
 
-`Number` property - The time until the refresh token expires in milliseconds. If a user is inactive during this period he will have to login in order to get a new refresh token. Default value is `7 * 24 * 60 * 60 * 1000` (7 days).
+`Number` property - The time until the refresh token expires in milliseconds. If a user is inactive during this period he will have to login in order to get a new refresh token. The default value is `7 * 24 * 60 * 60 * 1000` (7 days).
 
 **Note:** before the refresh token has expired, you can call the [`refreshToken`](#refresh-authentication-tokens) mutation. Both the auth token and the refresh token will be renewed and your user won't face any service interruption.
 
@@ -532,7 +530,7 @@ xhr.send(JSON.stringify(mutation));
 
 ## Error handling
 
-GraphQL Auth Service provides an event bus notifying eventual errors. The `email-error` event is related to unsent emails. The `error` event is related to any other kind of errors.
+GraphQL Auth Service provides an `eventBus` to notify eventual errors. The `email-error` event is related to unsent emails. The `error` event is related to any other kind of errors.
 
 ```js
 import GraphQLAuthService, { eventBus } from 'graphql-auth-service';
@@ -548,6 +546,10 @@ eventBus.on('error', (err) => {
     console.log("An error occured: "+err)
 });
 ```
+
+## In production
+
+In production you should disable [`graphiql`](#graphiql) IDE by setting it to `false` and also fulfil the following properties: [`mailTransporter`](#mailtransporter), [`mailFrom`](#mailfrom), [`host`]((#host), [`dbConfig`](#dbconfig), [`privateKeyFilePath`](#privatekeyfilepath), [`publicKeyFilePath`](#publickeyfilepath). Find below an example.
 
 ## Decode auth tokens in other web servers
 

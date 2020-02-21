@@ -10,7 +10,8 @@
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
-            "protocol": "inspector"
+            "protocol": "inspector",
+            "preLaunchTask": "buildDemo"
         },
         {
             "type": "node",

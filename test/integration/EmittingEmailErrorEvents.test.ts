@@ -1,8 +1,8 @@
 import AppTester from '../utils/AppTester';
-import { eventBus } from '../../src/index';
-
+import EventEmitter from 'events'
 let appTester;
 let request;
+const eventEmitter = new EventEmitter();
 
 let user = {
     username: "username",
@@ -37,6 +37,7 @@ beforeAll((done) => {
                 done(err);
             }
         },
+        eventEmitter
     });
 }, 40000);
 
@@ -51,7 +52,7 @@ test('Email Error - Event Emitting', async (done) => {
             }
           }`
     }
-    eventBus.on('email-error', (data) => {
+    eventEmitter.on('email-error', (data) => {
         expect(data.locals.user.username).toBe(user.username);
         expect(data.recipient).toBe(user.email);
         done();

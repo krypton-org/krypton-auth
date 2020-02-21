@@ -17,7 +17,7 @@ beforeAll((done) => {
 }, 40000);
 
 test("Access GraphIQL IDE", async (done) => {
-    const res = await request.get("/graphql").set("Accept", "text/html");
+    const res = await request.get("/").set("Accept", "text/html");
     expect(res.statusCode).toBe(200);
     expect(res.text.includes("GraphiQLAuthToken")).toBeTruthy();
     done();

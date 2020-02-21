@@ -15,5 +15,6 @@
     "coveragePathIgnorePatterns": [
         "<rootDir>/test",
         "/node_modules/"
-    ]
+    ],
+    "setupFilesAfterEnv": ["./jest.setup.js"]
 }

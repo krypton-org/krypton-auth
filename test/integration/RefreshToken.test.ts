@@ -86,7 +86,7 @@ test("Refresh auth token", async (done) => {
     expect(new Date(resRefresh.data.refreshToken.expiryDate) > new Date(resLogin.data.login.expiryDate)).toBeTruthy();
     expect(resRefresh.data.refreshToken.token === resLogin.data.login.token).toBeFalsy();
     done();
-}, 20000);
+}, 40000);
 
 test("Refresh token expired - relog-in", async (done) => {
     const upLimit = new Date();
