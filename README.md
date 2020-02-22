@@ -54,6 +54,7 @@ An authentication middleware for Express handling login, registration, password 
   * [resetPasswordFormTemplate](#resetpasswordformtemplate)
   * [verifyEmailTemplate](#verifyemailtemplate)
 - [Error handling](#error-handling)
+- [In production](#in-production)
 - [Decode auth tokens in other web servers](#decode-auth-tokens-in-other-web-servers)
   * [In JavaScript](#in-javascript)
   * [In Python](#in-python)
