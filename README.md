@@ -3,7 +3,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/graphql). 
+An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/auth). 
 
 *It is kind of a free & open-source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 

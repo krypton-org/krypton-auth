@@ -17,7 +17,7 @@ beforeAll((done) => {
 
 const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 
-test('Update email of a verified user', async (done) => {
+test('Nodemailer send preview link with a test account', async (done) => {
     const send = require('../../src/services/mailer/Mailer').default;
     const config = require('../../src/config').default;
     await wait(10000);
