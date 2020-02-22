@@ -533,18 +533,20 @@ xhr.send(JSON.stringify(mutation));
 GraphQL Auth Service provides an `eventBus` to notify eventual errors. The `email-error` event is related to unsent emails. The `error` event is related to any other kind of errors.
 
 ```js
-import GraphQLAuthService, { eventBus } from 'graphql-auth-service';
+import { GraphQLAuthService } from 'graphql-auth-service';
+import { EventEmitter } from 'events';
 import express from 'express';
 
 const app = express();
-app.use('/auth', GraphQLAuthService());
-eventBus.on('email-error', (email) => {
+const eventEmitter = new EventEmitter();
+eventEmitter.on('email-error', (email) => {
     console.log("Email not sent: "+email)
 });
 
-eventBus.on('error', (err) => {
+eventEmitter.on('error', (err) => {
     console.log("An error occured: "+err)
 });
+app.use('/auth', GraphQLAuthService({ eventEmitter }));
 ```
 
 ## In production
