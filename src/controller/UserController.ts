@@ -2,13 +2,12 @@
  * Service logic for user management.
  * @module controllers/UserController
  */
-
 import crypto from 'crypto';
 import ejs from 'ejs';
+import { NextFunction, Request, Response } from 'express';
 import config from '../config';
 import User from '../model/UserModel';
 import agenda from '../services/agenda/agenda';
-import { Request, Response, NextFunction } from 'express';
 import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
@@ -21,6 +20,7 @@ import {
     WrongLoginError,
     WrongPasswordError,
 } from '../services/error/ErrorTypes';
+
 const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
 const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
@@ -28,7 +28,7 @@ const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
 /**
  * Notification type.
  */
-type Notification = {
+interface Notification {
     type: string;
     message: string;
 };
@@ -54,9 +54,9 @@ const generateToken = (tokenLength: number): string => {
  * @param  {Request} req
  * @returns The adress of the service
  */
-const getHostAdress = (req: Request): string =>{
+const getHostAdress = (req: Request): string => {
     return config.host ? config.host + req.baseUrl : req.protocol + '://' + req.get('host') + req.baseUrl;
-}
+};
 
 /**
  * Send confirmation email to `user`.
@@ -283,11 +283,7 @@ export const updateUser = async (
         notifications.push({ type: 'success', message: 'User information updated!' });
 
         if (!isEmailVerified) {
-            sendConfirmationEmail(
-                req.user,
-                userUpdates.verificationToken,
-                getHostAdress(req)
-            );
+            sendConfirmationEmail(req.user, userUpdates.verificationToken, getHostAdress(req));
             notifications.push({
                 message: 'You will receive a confirmation link at your email address in a few minutes.',
                 type: 'info',
@@ -332,19 +328,19 @@ export const deleteUser = async (password: string, req: Request): Promise<{ noti
 /**
  * User log-in.
  * @throws {WrongLoginError}
- * @param  {string} login
+ * @param  {string} loginStr
  * @param  {string} password
  * @param  {Response} res
  * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
  */
-export const login = async (login: string, password: string, res: Response): Promise<{ token: string; user: any }> => {
+export const login = async (loginStr: string, password: string, res: Response): Promise<{ token: string; user: any }> => {
     let payload: { token: string; user: any };
-    const emailExists = await User.userExists({ email: login });
-    const usernameExists = await User.userExists({ username: login });
+    const emailExists = await User.userExists({ email: loginStr });
+    const usernameExists = await User.userExists({ username: loginStr });
     if (emailExists) {
-        payload = await User.sign({ email: login }, password, config.privateKey);
+        payload = await User.sign({ email: loginStr }, password, config.privateKey);
     } else if (usernameExists) {
-        payload = await User.sign({ username: login }, password, config.privateKey);
+        payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
         res.status(401);
         throw new WrongLoginError('Wrong credentials!');
@@ -398,9 +394,9 @@ export const sendPasswordRecoveryEmail = async (
             link: host + '/form/reset/password?token=' + passwordRecoveryToken,
             user,
         },
-        template: config.resetPasswordEmailTemplate,
         recipient: email,
         subject: 'Password Recovery',
+        template: config.resetPasswordEmailTemplate,
     });
     return { notifications };
 };
@@ -419,7 +415,7 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
         res.json({ notifications });
         return;
     }
-    const host = getHostAdress(req)
+    const host = getHostAdress(req);
     const locals = {
         link: host,
         token: req.query.token,

@@ -36,11 +36,11 @@ async function init(cb?: () => any): Promise<void | never> {
 
     // Create the database connection
     try {
-        await mongoose.connect(connectionString, { 
-            useNewUrlParser: true, 
-            useUnifiedTopology: true, 
-            useFindAndModify: true, 
-            useCreateIndex: true 
+        await mongoose.connect(connectionString, {
+            useCreateIndex: true,
+            useFindAndModify: true,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
         });
     } catch (err) {
         config.dbConnectionFailed(err);
@@ -56,4 +56,3 @@ async function close(cb?: () => void): Promise<void | never> {
 }
 
 export default { init, close };
-

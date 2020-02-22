@@ -5,25 +5,8 @@
 
 import config from '../config';
 
-//Default Mongoose schema.
+// Default Mongoose schema.
 const basicSchema = {
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        maxlength: 128,
-        validate: {
-            validator: v => /^[a-zA-Z0-9\-_.]{4,}$/.test(v),
-            message: props => {
-                if (props.value.length < 4) {
-                    return 'The username must contains more than 4 characters!';
-                } else {
-                    return 'A username may only contain letters, numbers, dashes, dots and underscores !';
-                }
-            },
-        },
-        isPublic: true,
-    },
     email: {
         isPublic: false,
         lowercase: true,
@@ -32,11 +15,11 @@ const basicSchema = {
         type: String,
         unique: true,
         validate: {
+            message: () => 'This email address is not valid!',
             validator: v =>
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
                     v,
                 ),
-            message: () => 'This email address is not valid!',
         },
     },
     password: {
@@ -45,33 +28,21 @@ const basicSchema = {
         required: true,
         type: String,
     },
-    passwordSalt: {
+    passwordRecoveryRequestDate: {
         isInternal: true,
         isPublic: false,
-        required: true,
-        type: String,
-    },
-    verified: {
-        default: false,
-        isPublic: true,
-        isUneditable: true,
-        required: true,
-        type: Boolean,
-    },
-    verificationToken: {
-        isInternal: true,
-        isPublic: false,
-        type: String,
+        type: Date,
     },
     passwordRecoveryToken: {
         isInternal: true,
         isPublic: false,
         type: String,
     },
-    passwordRecoveryRequestDate: {
+    passwordSalt: {
         isInternal: true,
         isPublic: false,
-        type: Date,
+        required: true,
+        type: String,
     },
     refreshToken: {
         isInternal: true,
@@ -82,6 +53,35 @@ const basicSchema = {
         isInternal: true,
         isPublic: false,
         type: Date,
+    },
+    username: {
+        isPublic: true,
+        maxlength: 128,
+        required: true,
+        type: String,
+        unique: true,
+        validate: {
+            message: props => {
+                if (props.value.length < 4) {
+                    return 'The username must contains more than 4 characters!';
+                } else {
+                    return 'A username may only contain letters, numbers, dashes, dots and underscores !';
+                }
+            },
+            validator: v => /^[a-zA-Z0-9\-_.]{4,}$/.test(v),
+        },
+    },
+    verificationToken: {
+        isInternal: true,
+        isPublic: false,
+        type: String,
+    },
+    verified: {
+        default: false,
+        isPublic: true,
+        isUneditable: true,
+        required: true,
+        type: Boolean,
     },
 };
 

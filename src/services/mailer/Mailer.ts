@@ -4,7 +4,7 @@
  */
 
 import ejs from 'ejs';
-import nodemailer, { Transporter, SentMessageInfo } from 'nodemailer';
+import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
 import config from '../../config';
 import { EmailNotSentError } from '../error/ErrorTypes';
 
@@ -14,17 +14,16 @@ if (config.mailTransporter) {
     transporter = config.mailTransporter;
 } else {
     nodemailer.createTestAccount((err, account) => {
-
         config.serviceReady({ isTestEmailReady: true });
         // create reusable transporter object using the default SMTP transport
         transporter = nodemailer.createTransport({
+            auth: {
+                pass: account.pass, // generated ethereal password
+                user: account.user, // generated ethereal user
+            },
             host: 'smtp.ethereal.email',
             port: 587,
             secure: false, // true for 465, false for other ports
-            auth: {
-                user: account.user, // generated ethereal user
-                pass: account.pass  // generated ethereal password
-            }
         });
     });
 }
@@ -49,19 +48,19 @@ export default function send(email: Email): Promise<SentMessageInfo> {
         const locals = email.locals;
         const template = email.template;
 
-        ejs.renderFile(template, locals, {}, (err, html) => {
-            if (err) {
-                reject(err);
+        ejs.renderFile(template, locals, {}, (renderErr, html) => {
+            if (renderErr) {
+                reject(renderErr);
             } else {
                 const mailOptions = {
-                    to: recipient,
-                    subject,
+                    from: config.mailFrom,
                     html,
-                    from: config.mailFrom
+                    subject,
+                    to: recipient,
                 };
-                transporter.sendMail(mailOptions, (err, info) => {
-                    if (err) {
-                        reject(new EmailNotSentError(err.message));
+                transporter.sendMail(mailOptions, (sendEmailErr, info) => {
+                    if (sendEmailErr) {
+                        reject(new EmailNotSentError(sendEmailErr.message));
                     } else {
                         resolve(info);
                     }

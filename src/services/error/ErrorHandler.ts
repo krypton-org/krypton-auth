@@ -2,9 +2,9 @@
  * Express middleware to handle {@link module:services/error/ErrorTypes.OperationalError} in production when not catched by express-graphql.
  * @module services/error/ErrorHandler
  */
-
+import { NextFunction, Request, Response } from 'express';
 import OperationalError from './ErrorTypes';
-import { Request, Response, NextFunction } from 'express';
+
 /**
  * Express middleware rendering {@link module:services/error/ErrorTypes.OperationalError} error message to client, avoiding server crash for those king of error.
  * @param  {Error} err

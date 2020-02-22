@@ -3,14 +3,18 @@
  * @module config
  */
 
+import { EventEmitter } from 'events';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
+import { Transporter } from 'nodemailer';
 import path from 'path';
 import { generateKeys } from './services/crypto/RSAKeysGeneration';
-import { Transporter } from 'nodemailer';
-import { EventEmitter } from 'events';
-const DEFAULT_PUBLIC_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../public-key.txt') : path.resolve(__dirname, '../public-key.txt');
-const DEFAULT_PRIVATE_KEY_FILE = (__dirname.includes('node_modules')) ? path.resolve(__dirname, '../../../private-key.txt') : path.resolve(__dirname, '../private-key.txt');
+const DEFAULT_PUBLIC_KEY_FILE = __dirname.includes('node_modules')
+    ? path.resolve(__dirname, '../../../public-key.txt')
+    : path.resolve(__dirname, '../public-key.txt');
+const DEFAULT_PRIVATE_KEY_FILE = __dirname.includes('node_modules')
+    ? path.resolve(__dirname, '../../../private-key.txt')
+    : path.resolve(__dirname, '../private-key.txt');
 
 /**
  * Mongo connection configuration
@@ -47,7 +51,7 @@ export interface Config {
     authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
     eventEmitter?: EventEmitter;
-    extendedSchema?: Object;
+    extendedSchema?: object;
     graphiql?: boolean;
     hasUsername?: boolean;
     host?: string;
@@ -85,7 +89,6 @@ export class DefaultConfig implements Config, ReadyStatus {
     public mailTransporter: undefined;
     public mailFrom: undefined;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
-    public onReady = () => { };
     public privateKey = undefined;
     public privateKeyFilePath = undefined;
     public publicKey = undefined;
@@ -95,6 +98,13 @@ export class DefaultConfig implements Config, ReadyStatus {
     public resetPasswordFormTemplate = path.resolve(__dirname, '../lib/templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
     public eventEmitter = undefined;
+
+    /**
+     * Called by GraphQL Auth Service once it is launched
+     */
+    public onReady = () => {
+        // Something to do
+    };
 
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.
@@ -126,9 +136,11 @@ export class DefaultConfig implements Config, ReadyStatus {
      * @returns {void}
      */
     public dbConnectionFailed = (err: Error): void => {
-        console.log('Connection to MongoDB failed \u274C')
-        if (config.eventEmitter) config.eventEmitter.emit('error', err)
-    }
+        console.log('Connection to MongoDB failed \u274C');
+        if (config.eventEmitter) {
+            config.eventEmitter.emit('error', err);
+        }
+    };
 
     /**
      * Merging user options and default properties
@@ -159,9 +171,9 @@ export class DefaultConfig implements Config, ReadyStatus {
             }
         }
 
-        //Merge taking place here
+        // Merge taking place here
         Object.keys(options).map(
-            function (prop) {
+            function(prop) {
                 if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
                     this[prop] = {
                         ...this[prop],

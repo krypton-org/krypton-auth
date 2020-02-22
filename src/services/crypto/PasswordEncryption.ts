@@ -29,14 +29,14 @@ export const hash = (password: string, salt: Buffer): Promise<{ salt: string; ha
         salt = new Buffer(salt, 'base64');
     }
     return new Promise((resolve, reject) => {
-        crypto.pbkdf2(password, salt, HASH_ITERATIONS, HASH_LENGTH, 'sha512', function(err, hash) {
+        crypto.pbkdf2(password, salt, HASH_ITERATIONS, HASH_LENGTH, 'sha512', function(err, hashStr) {
             if (err) {
                 reject(err);
                 return;
             }
             resolve({
+                hash: hashStr.toString('base64'),
                 salt: salt.toString('base64'),
-                hash: hash.toString('base64'),
             });
         });
     });

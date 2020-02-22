@@ -6,7 +6,7 @@
 import accepts from 'accepts';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { Router } from 'express';
 import graphqlHTTP from 'express-graphql';
 import helmet from 'helmet';
 import config from '../config';
@@ -15,7 +15,6 @@ import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
 import ErrorHandler from '../services/error/ErrorHandler';
-import { Router } from 'express';
 const router: Router = express.Router();
 
 router.use(cookieParser());
@@ -31,7 +30,7 @@ router.use(async (req, res, next) => {
             const user = await UserModel.verify(bearerToken, config.publicKey);
             req.user = user;
         } catch (err) {
-            //do nothing user has to log-in or refresh his auth token.
+            // Do nothing user has to log-in or refresh his auth token.
         }
     }
     next();
@@ -53,13 +52,16 @@ if (config.graphiql) {
     });
 }
 
-router.use('/', graphqlHTTP(async (req, res) => {
-    return {
-        schema: graphqlSchema,
-        graphiql: false,
-        context: { req, res },
-    }
-}));
+router.use(
+    '/',
+    graphqlHTTP(async (req, res) => {
+        return {
+            context: { req, res },
+            graphiql: false,
+            schema: graphqlSchema,
+        };
+    }),
+);
 
 router.use(ErrorHandler);
 

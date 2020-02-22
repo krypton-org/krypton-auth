@@ -14,7 +14,7 @@ import { WrongTokenError } from '../services/error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
 
-//Getting converted GraphQL public user fields from Mongoose schema
+// Getting converted GraphQL public user fields from Mongoose schema
 const UserPublicInfoTC = composeWithMongoose(UserModel, {
     fields: {
         remove: [...internalFields, ...privateFields],
@@ -22,7 +22,7 @@ const UserPublicInfoTC = composeWithMongoose(UserModel, {
     name: 'UserPublicInfo',
 });
 
-//Adding public queries - accessible publicly
+// Adding public queries - accessible publicly
 schemaComposer.Query.addFields({
     userById: UserPublicInfoTC.getResolver('findById'),
     userByIds: UserPublicInfoTC.getResolver('findByIds'),
@@ -32,14 +32,14 @@ schemaComposer.Query.addFields({
     userPagination: UserPublicInfoTC.getResolver('pagination'),
 });
 
-//Getting converted GraphQL public user fields without the internal ones from Mongoose schema
+// Getting converted GraphQL public user fields without the internal ones from Mongoose schema
 const convertedPrivateFields = composeWithMongoose(mongoose.model('mock', new MongooseSchema(UserSchema)), {
     fields: {
         remove: [...internalFields],
     },
 }).getFields();
 
-//User GraphQL Type with public and private fields - accessible by logged in user.
+// User GraphQL Type with public and private fields - accessible by logged in user.
 const UserTC = UserPublicInfoTC.clone('User');
 UserTC.addFields(convertedPrivateFields);
 
@@ -124,7 +124,7 @@ const UserAndNotifications = schemaComposer.createObjectTC({
     name: 'UserAndNotifications',
 });
 
-//Composing GraphQL Schema
+// Composing GraphQL Schema
 schemaComposer.Query.addFields({
     emailAvailable: {
         args: {

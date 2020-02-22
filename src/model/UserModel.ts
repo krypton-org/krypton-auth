@@ -2,11 +2,10 @@
  * Module returning the Mongoose model built with the UserSchema importer from {@link module:Model/UserSchema}
  * @module model/UserModel
  */
-
-import * as PasswordEncryption from '../services/crypto/PasswordEncryption';
-import config from '../config';
 import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
+import config from '../config';
+import * as PasswordEncryption from '../services/crypto/PasswordEncryption';
 import { EncryptionFailedError, UserNotFound, WrongPasswordError, WrongTokenError } from '../services/error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
 
@@ -151,10 +150,10 @@ User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
 
 /** @see {@link IUserModel#createUser} */
 User.statics.createUser = function(data: any): Promise<void> {
-    const UserModel = model('user', User);
+    const UserInstance = model('user', User);
     return PasswordEncryption.hashAndSalt(data.password).then(
         results => {
-            const user: any = new UserModel();
+            const user: any = new UserInstance();
             Object.keys(data).map(prop => {
                 if (prop !== 'password') {
                     if (internalFieldsMap.has(prop)) {
