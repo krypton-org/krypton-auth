@@ -552,7 +552,11 @@ app.use('/auth', GraphQLAuthService({ eventEmitter }));
 
 ## In production
 
+<<<<<<< HEAD
 In production you should provide certain properties:
+=======
+In production you provide certain properties
+>>>>>>> b317b92... Readme improvements
 
 * [`graphiql`](#graphiql): desactivate the development IDE by setting this property to `false`.
 * [`mailTransporter`](#mailtransporter): provide an email configuration to send real emails to your users.
