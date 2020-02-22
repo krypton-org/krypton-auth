@@ -42,7 +42,7 @@ export interface Address {
 /**
  * Properties to configure GraphQL Auth Service
  */
-export interface IConfigProperties {
+export interface Config {
     algorithm?: Algorithm;
     authTokenExpiryTime?: number;
     dbConfig?: DBConfig;
@@ -65,7 +65,7 @@ export interface IConfigProperties {
     verifyEmailTemplate?: string;
 }
 
-export class Config implements IConfigProperties, ReadyStatus {
+export class DefaultConfig implements Config, ReadyStatus {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbConfig = {
@@ -132,10 +132,10 @@ export class Config implements IConfigProperties, ReadyStatus {
 
     /**
      * Merging user options and default properties
-     * @param  {IConfigProperties} options?
+     * @param  {Config} options?
      * @returns {void}
      */
-    public merge(options?: IConfigProperties): void {
+    public merge(options?: Config): void {
         if (options.publicKey === undefined || options.privateKey === undefined) {
             if (options.publicKeyFilePath !== undefined || options.privateKeyFilePath !== undefined) {
                 options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();
@@ -181,6 +181,6 @@ export class Config implements IConfigProperties, ReadyStatus {
 }
 
 /* Exporting an instance of Config that acts like singleton */
-const config = new Config();
+const config = new DefaultConfig();
 
 export default config;

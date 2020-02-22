@@ -57,6 +57,7 @@ export default function send(email: Email): Promise<SentMessageInfo> {
                     to: recipient,
                     subject,
                     html,
+                    from: config.mailFrom
                 };
                 transporter.sendMail(mailOptions, (err, info) => {
                     if (err) {

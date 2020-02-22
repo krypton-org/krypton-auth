@@ -1,5 +1,5 @@
 import AppTester from '../utils/AppTester';
-import EventEmitter from 'events'
+import EventEmitter from 'events';
 let appTester;
 let request;
 const eventEmitter = new EventEmitter();

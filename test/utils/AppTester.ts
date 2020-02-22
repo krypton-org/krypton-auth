@@ -2,7 +2,7 @@ import MongooseConnection from '../../src/services/db/db';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
-import GraphQLAuthService from '../../src/index';
+import { GraphQLAuthService } from '../../src/index';
 import mailer, { Transporter } from 'nodemailer';
 
 export default class AppTester {

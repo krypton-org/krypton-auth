@@ -66,7 +66,7 @@ router.use(ErrorHandler);
 function defaultQuery() {
     return `# Welcome to GraphQL Auth Service
 #
-# You can use this GraphiQL IDE to test some GraphQL queries.
+# You can use GraphiQL IDE to test GraphQL queries.
 #
 # If 'extendedSchema' option is undefined and 'hasUsername' option is NOT set to false:
 # Use this query to register.

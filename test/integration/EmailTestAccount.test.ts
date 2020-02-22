@@ -53,7 +53,7 @@ test('Prints preview link on the command line', async (done) => {
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
     });
-    await wait(10000);
+    await wait(15000);
     expect(outputData.includes("Preview URL")).toBeTruthy();
     outputData = "";
     agenda.now('email', {
@@ -63,11 +63,11 @@ test('Prints preview link on the command line', async (done) => {
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
     });
-    await wait(10000);
+    await wait(15000);
     console["log"] = originalLoggerFct
     expect(outputData.includes("Preview URL")).toBeFalsy();
     done();
-}, 60000);
+}, 70000);
 
 
 afterAll(async (done) => {

@@ -9,6 +9,7 @@ test('Catch operationnal errors', async (done) => {
     app.get('/', (req, res, next) => { throw new OperationalError(msg) });
     app.use(ErrorHandler);
     const request = supertest(app);
+    //@ts-ignore
     let res = await request.get('/');
     const errors = JSON.parse(res.text).notifications;
     expect(errors[0].message).toBe(msg);
