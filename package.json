@@ -63,7 +63,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JohannC/GraphQL-Auth-Service"
+    "url": "git+https://github.com/jrebecchi/GraphQL-Auth-Service"
   },
   "keywords": [
     "NodeJS",
@@ -90,7 +90,7 @@
   "author": "Johann Corcuff <johann.corcuff@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JohannC/GraphQL-Auth-Service/issues"
+    "url": "https://github.com/jrebecchi/GraphQL-Auth-Service/issues"
   },
-  "homepage": "https://github.com/JohannC/GraphQL-Auth-Service#readme"
+  "homepage": "https://github.com/jrebecchi/GraphQL-Auth-Service#readme"
 }
