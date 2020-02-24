@@ -47,9 +47,7 @@ const buildEmailAvailableQuery = (email) => {
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "AvailableTest"
-        },
+        dbAddress: "localhost:27017/AvailableTest",
         onReady: async () => {
             try {
                 request = appTester.getRequestSender();

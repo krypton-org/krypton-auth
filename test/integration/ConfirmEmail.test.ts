@@ -29,9 +29,7 @@ let user2 = {
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "ConfirmEmailTest"
-        },
+        dbAddress: "mongodb://localhost:27017/ConfirmEmailTest",
         onReady: async () => {
             try{
                 request = appTester.getRequestSender();

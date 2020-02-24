@@ -7,9 +7,7 @@ let request;
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "IndexTest"
-        },
+        dbAddress: "mongodb://localhost:27017/IndexTest",
         graphiql: true,
         onReady: done
     });

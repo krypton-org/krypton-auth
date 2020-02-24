@@ -7,9 +7,6 @@ import mongoose from 'mongoose';
 import config from '../../config';
 
 async function init(cb?: () => any): Promise<void | never> {
-    const connectionString =
-        'mongodb://' + config.dbConfig.address + ':' + config.dbConfig.port + '/' + config.dbConfig.userDB;
-
     // Get Mongoose to use the global promise library
     mongoose.Promise = global.Promise;
 
@@ -36,7 +33,7 @@ async function init(cb?: () => any): Promise<void | never> {
 
     // Create the database connection
     try {
-        await mongoose.connect(connectionString, {
+        await mongoose.connect(config.dbAddress, {
             useCreateIndex: true,
             useFindAndModify: true,
             useNewUrlParser: true,

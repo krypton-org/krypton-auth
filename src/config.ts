@@ -17,16 +17,6 @@ const DEFAULT_PRIVATE_KEY_FILE = __dirname.includes('node_modules')
     : path.resolve(__dirname, '../private-key.txt');
 
 /**
- * Mongo connection configuration
- */
-export interface DBConfig {
-    address?: string;
-    port?: string | number;
-    agendaDB?: string;
-    userDB?: string;
-}
-
-/**
  * Internal, used in {@link Config#serviceReady}
  */
 interface ReadyStatus {
@@ -49,7 +39,7 @@ export interface Address {
 export interface Config {
     algorithm?: Algorithm;
     authTokenExpiryTime?: number;
-    dbConfig?: DBConfig;
+    dbAddress?: string;
     eventEmitter?: EventEmitter;
     extendedSchema?: object;
     graphiql?: boolean;
@@ -72,12 +62,7 @@ export interface Config {
 export class DefaultConfig implements Config, ReadyStatus {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
-    public dbConfig = {
-        address: 'localhost',
-        agendaDB: 'agenda',
-        port: '27017',
-        userDB: 'users',
-    };
+    public dbAddress = 'mongodb://localhost:27017/users';
     public emailConfig: undefined;
     public extendedSchema = {};
     public graphiql = true;
@@ -185,10 +170,18 @@ export class DefaultConfig implements Config, ReadyStatus {
             }.bind(this),
         );
 
+        if (!this.hasMongoProtocol(this.dbAddress)) {
+            this.dbAddress = 'mongodb://' + this.dbAddress;
+        }
+
         const levels = {
             email: 0,
             error: 1,
         };
+    }
+
+    private hasMongoProtocol(url: string): boolean {
+        return url.match(/mongodb(?:\+srv)?:\/\/.*/) !== null;
     }
 }
 

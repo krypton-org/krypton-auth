@@ -31,7 +31,7 @@ const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
 interface Notification {
     type: string;
     message: string;
-};
+}
 
 /**
  * Return true if user issuing the request is logged in.
@@ -333,7 +333,11 @@ export const deleteUser = async (password: string, req: Request): Promise<{ noti
  * @param  {Response} res
  * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
  */
-export const login = async (loginStr: string, password: string, res: Response): Promise<{ token: string; user: any }> => {
+export const login = async (
+    loginStr: string,
+    password: string,
+    res: Response,
+): Promise<{ token: string; user: any }> => {
     let payload: { token: string; user: any };
     const emailExists = await User.userExists({ email: loginStr });
     const usernameExists = await User.userExists({ username: loginStr });

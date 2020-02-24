@@ -36,7 +36,7 @@ An authentication middleware for Express handling login, registration, password 
 - [Properties](#properties)
   * [algorithm](#algorithm)
   * [authTokenExpiryTime](#authtokenexpirytime)
-  * [dbConfig](#dbconfig)
+  * [dbAddress](#dbaddress)
   * [extendedSchema](#extendedschema)
   * [graphiql](#graphiql)
   * [hasUsername](#hasusername)
@@ -63,7 +63,7 @@ An authentication middleware for Express handling login, registration, password 
 
 GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like middleware itself.
 
-It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/`.
+It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/users`.
 
 In production, you also need to [provide a Nodemailer transporter](#emailConfig) from where will be sent emails to users. If you don't provide any, a nodemailer test account is set automatically. It will print links on the command line to preview the emails that would have normally been sent. 
 
@@ -359,12 +359,8 @@ To list users with pagination configuration.
 
 `Number` property - The time until the auth token expires in milliseconds. The default value is `15 * 60 * 1000` (15 minutes). Call the [`refreshToken`](#refresh-authentication-tokens) mutation to renew it.
 
-###  dbConfig
-Object property that can contain 4 properties:
-* address: `String` property - The address of the MongoDB server. Example: `user:password@host.com`. The default value is `localhost`.
-* port: `String` property - The port of the MongoDB server. The default value is `27017`.
-* agendaDB: `String` property - The database name for the email processing queue. The default value is `agenda`.
-* userDB: `String` property - The user database name. The default value is `users`.
+###  dbAddress
+`String` property - The address of the MongoDB server. Example: `mongodb://user:password@host.com:27017/DBname`. The default value is `mongodb://localhost:27017/users`.
 
 ###  extendedSchema
 
@@ -558,7 +554,7 @@ In production you should provide certain properties:
 * [`mailTransporter`](#mailtransporter): provide an email configuration to send real emails to your users.
 * [`mailFrom`](#mailfrom): Define the sender address displayed in emails sent to users.
 * [`host`](#host): Public URL of the service. It will be used in emails sent to users to define for instance valid confirmation link.
-* [`dbConfig`](#dbconfig): Define the connection to a MongoDB database.
+* [`dbAddress`](#dbaddress): Define the connection to a MongoDB database.
 * [`privateKeyFilePath`](#privatekeyfilepath): Provide the file path to the Private Key that will be used.
 * [`publicKeyFilePath`](#publickeyfilepath): Provide the file path to the Public Key that will be used.
 
@@ -595,12 +591,7 @@ const options = {
         pass: "F@@8aR"
         }
     }),
-    dbConfig: {
-        address: 'login:password@something.mlab.com',
-        port: '19150',
-        agendaDB: 'emails',
-        userDB: 'users'
-    },
+    dbAddress: "mongodb://login:password@something.mlab.com:19150/dbName",
     eventEmitter,
     privateKeyFilePath: './private-key.txt',
     publicKeyFilePath: './public-key.txt'

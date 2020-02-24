@@ -60,9 +60,7 @@ let updates = {
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "UpdateMeTest"
-        },
+        dbAddress: "mongodb://localhost:27017/UpdateMeTest",
         onReady: async () => {
             try {
                 request = appTester.getRequestSender();

@@ -17,9 +17,7 @@ let user = {
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "Logger",
-        },
+        dbAddress: "mongodb://localhost:27017/Logger",
         mailTransporter: {
             host: 'wrong',
             port: 587,

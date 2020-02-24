@@ -54,9 +54,7 @@ const wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "RefreshToken"
-        },
+        dbAddress: "mongodb://localhost:27017/RefreshToken",
         onReady: async () => {
             try {
                 request = appTester.getRequestSender();

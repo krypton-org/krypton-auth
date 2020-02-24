@@ -5,9 +5,7 @@ let appTester;
 
 beforeAll((done) => {
     appTester = new AppTester({
-        dbConfig: {
-            userDB: "TestFakeEMailAccount",
-        },
+        dbAddress: "mongodb://localhost:27017/TestFakeEMailAccount",
         mailTransporter: undefined,
         onReady: async () => {
             done();
