@@ -63,7 +63,7 @@ An authentication middleware for Express handling login, registration, password 
 
 GraphQL Auth Service is an [ExpressJS Router](https://expressjs.com/en/api.html#router) behaving like middleware itself.
 
-It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbconfig). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/users`.
+It works with [MongoDB](https://www.mongodb.com/) and you need to [configure its connection](#dbaddress). If you don't provide any, it will try to connect to your local [MongoDB](https://www.mongodb.com/) instance on `mongodb://localhost:27017/users`.
 
 In production, you also need to [provide a Nodemailer transporter](#emailConfig) from where will be sent emails to users. If you don't provide any, a nodemailer test account is set automatically. It will print links on the command line to preview the emails that would have normally been sent. 
 

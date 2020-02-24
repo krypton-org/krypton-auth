@@ -22,4 +22,4 @@ export function GraphQLAuthService(properties?: Config): Router {
     return router;
 }
 
-export { Config, Address, DBConfig } from './config';
+export { Config, Address } from './config';
