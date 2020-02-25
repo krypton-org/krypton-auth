@@ -643,4 +643,4 @@ user = jwt.decode(token, public_key, algorithms=['RS256'])
 print(user)
 ```
 
-**!! Note !!** You can easily fetch the Public Key by invoking [this query](https://github.com/JohannC/GraphQL-Auth-Service#get-the-public-key).
+**!! Note !!** You can easily fetch the Public Key by invoking [this query](#get-the-public-key).
