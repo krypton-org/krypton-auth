@@ -1,5 +1,5 @@
 /**
- * DISCLAIMER: you need to run a local instance of MongoDB for this to work
+ * NOTE: You need to run a local instance of MongoDB for this to work!
  */
 const { GraphQLAuthService } = require('graphql-auth-service');
 const express = require('express');
