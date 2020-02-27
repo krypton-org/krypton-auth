@@ -4,3 +4,4 @@ coverage
 *private-key.txt
 *public-key.txt
 demo/*.js
+jam/*.js
