@@ -4,7 +4,7 @@
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
 
-An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://graphql-auth-service.herokuapp.com/auth). 
+An authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens. It features [a flexible user data model that you can customize](#extendedschema). [Try the live demo](https://nusid.net/graphql-auth-service). 
 
 *It is kind of a free & open-source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).*
 
@@ -74,8 +74,8 @@ npm install graphql-auth-service --save
 yarn add graphql-auth-service
 ```
 ```javascript
-import { GraphQLAuthService } from 'graphql-auth-service';
-import express from 'express';
+const { GraphQLAuthService } = require('graphql-auth-service');
+const express = require('express');
 
 const app = express();
 
@@ -531,9 +531,9 @@ xhr.send(JSON.stringify(mutation));
 GraphQL Auth Service provides an `eventBus` to notify eventual errors. The `email-error` event is related to unsent emails. The `error` event is related to any other kind of errors.
 
 ```js
-import { GraphQLAuthService } from 'graphql-auth-service';
-import { EventEmitter } from 'events';
-import express from 'express';
+const { GraphQLAuthService } = require('graphql-auth-service');
+const express = require('express');
+const EventEmitter = require('events');
 
 const app = express();
 const eventEmitter = new EventEmitter();
@@ -565,13 +565,14 @@ In production you should provide certain properties:
 Find below an example:
 
 ```javascript
-import express from 'express';
-import nodemailer from 'nodemailer';
-import { GraphQLAuthService, Config } from 'graphql-auth-service';
-import { EventEmitter } from 'events';
+const { GraphQLAuthService } = require('graphql-auth-service');
+const express = require('express');
+const EventEmitter = require('events');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const eventEmitter = new EventEmitter();
+
 eventEmitter.on('email-error', (email) => {
     //Log email to be able to resend it again.
 });
