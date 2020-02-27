@@ -1,5 +1,5 @@
-[![Actions Status](https://github.com/JohannC/GraphQL-Auth-Service/workflows/Node%20CI/badge.svg)](https://github.com/JohannC/GraphQL-Auth-Service/actions)
-[![Coverage Status](https://coveralls.io/repos/github/JohannC/GraphQL-Auth-Service/badge.svg?branch=master)](https://coveralls.io/github/JohannC/GraphQL-Auth-Service?branch=master)
+[![Actions Status](https://github.com/jrebecchi/GraphQL-Auth-Service/workflows/Node%20CI/badge.svg)](https://github.com/JohannC/GraphQL-Auth-Service/actions)
+[![Coverage Status](https://coveralls.io/repos/github/jrebecchi/GraphQL-Auth-Service/badge.svg?branch=master)](https://coveralls.io/github/jrebecchi/GraphQL-Auth-Service?branch=master)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jrebecchi/GraphQL-Auth-Service-Heroku)
 
 [![GraphQL Auth Service - Banner](https://nusid.net/img/graphql-auth-service-banner.svg)](#)
