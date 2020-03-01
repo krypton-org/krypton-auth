@@ -72,7 +72,7 @@ beforeAll((done) => {
 test("Can't get recovery pawwsord when logged in", async (done) => {
     const query = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user.email}"){
+            sendPasswordRecoveryEmail(email: "${user.email}"){
               notifications{
                 type
                 message
@@ -88,7 +88,7 @@ test("Can't get recovery pawwsord when logged in", async (done) => {
 test("Ask password recovery for unknown email address", async (done) => {
     const query = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "unknown@email.com"){
+            sendPasswordRecoveryEmail(email: "unknown@email.com"){
               notifications{
                 type
                 message
@@ -97,14 +97,14 @@ test("Ask password recovery for unknown email address", async (done) => {
           }`
     }
     let res = await request.getGraphQL(query);
-    expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     done();
 });
 
-test("Change password with recorevy token", async (done) => {
+test("Change password with recovery token", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user.email}"){
+            sendPasswordRecoveryEmail(email: "${user.email}"){
               notifications{
                 type
                 message
@@ -113,7 +113,7 @@ test("Change password with recorevy token", async (done) => {
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user.username }, { verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
@@ -144,7 +144,7 @@ test("Change password with recorevy token", async (done) => {
 test("Wrong token", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user2.email}"){
+            sendPasswordRecoveryEmail(email: "${user2.email}"){
               notifications{
                 type
                 message
@@ -153,7 +153,7 @@ test("Wrong token", async (done) => {
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
 
     let newPassword = "newPassword";
     const updatePasswordQuery = {
@@ -177,7 +177,7 @@ test("Wrong token", async (done) => {
 test("Password too short", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user3.email}"){
+            sendPasswordRecoveryEmail(email: "${user3.email}"){
               notifications{
                 type
                 message
@@ -186,7 +186,7 @@ test("Password too short", async (done) => {
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user3.username });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
@@ -209,7 +209,7 @@ test("Password too short", async (done) => {
 test("Token too old", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user4.email}"){
+            sendPasswordRecoveryEmail(email: "${user4.email}"){
               notifications{
                 type
                 message
@@ -218,7 +218,7 @@ test("Token too old", async (done) => {
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecorevyEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user4.username });
     let oldDate = new Date()

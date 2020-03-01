@@ -149,7 +149,7 @@ schemaComposer.Query.addFields({
         },
         type: 'String!',
     },
-    sendPasswordRecorevyEmail: {
+    sendPasswordRecoveryEmail: {
         args: {
             email: 'String!',
         },
