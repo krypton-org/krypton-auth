@@ -1,0 +1,50 @@
+{%- extends "alabaster/layout.html" %}
+
+{%- block footer %}
+  {{ super() }}
+
+<!-- GraphiQL -->
+<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql/graphiql.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/graphiql/graphiql.min.css" />
+
+<script type="text/javascript">
+function graphQLFetcher(graphQLParams) {
+    var fetchURL = "{{ graphiql_endpoint }}";
+    return fetch(fetchURL, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(graphQLParams),
+    }).then(function(response) {
+        return response.json();
+    });
+}
+
+function setupGraphiQL() {
+    if (typeof(React) === 'undefined' || typeof(ReactDOM) === 'undefined' || typeof(GraphiQL) === 'undefined') {
+        return;
+    }
+
+    const targets = document.getElementsByClassName('graphiql');
+    for (let i = 0; i < targets.length; i++) {
+        const target = targets[i];
+        const query = target.getElementsByClassName("query")[0].innerHTML.trim();
+        const response = target.getElementsByClassName("response")[0].innerHTML.trim();
+        const graphiQLElement = React.createElement(GraphiQL, {
+            fetcher: graphQLFetcher,
+            query: query,
+            response: response
+        });
+        ReactDOM.render(graphiQLElement, target);
+    }
+};
+
+if (document.getElementsByClassName('graphiql').length > 0) {
+    setupGraphiQL();
+}
+</script>
+
+{% endblock %}
