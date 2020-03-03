@@ -267,11 +267,11 @@ query{
 
 ### Reset forgotten password
 
-To reset your forgotten password, use the `sendPasswordRecorevyEmail` query passing the `email` address of your account.
+To reset your forgotten password, use the `sendPasswordRecoveryEmail` query passing the `email` address of your account.
 
 ```js
 query{
-    sendPasswordRecorevyEmail(email:"your@mail.com"){
+    sendPasswordRecoveryEmail(email:"your@mail.com"){
         notifications{
             message
         }

@@ -42,7 +42,7 @@ beforeAll((done) => {
 test('Email Error - Event Emitting', async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecorevyEmail(email: "${user.email}"){
+            sendPasswordRecoveryEmail(email: "${user.email}"){
               notifications{
                 type
                 message
