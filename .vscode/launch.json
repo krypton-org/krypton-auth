@@ -6,7 +6,7 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "nodemon",
-            "program": "${workspaceFolder}\\demo\\app.js",
+            "program": "${workspaceFolder}\\jam\\bon.js",
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

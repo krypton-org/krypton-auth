@@ -4,8 +4,9 @@
  */
 
 import ejs from 'ejs';
+import socketIo from "socket.io";
 import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
-import config from '../../config';
+import config from '../config';
 import { EmailNotSentError } from '../error/ErrorTypes';
 
 let transporter: Transporter;
@@ -34,6 +35,7 @@ export interface Email {
     locals?: any;
     template: string;
     from: string;
+    clientId: string;
 }
 
 /**

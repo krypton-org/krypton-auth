@@ -5,7 +5,7 @@
 import Agenda from 'agenda';
 import nodemailer from 'nodemailer';
 import config from '../config';
-import send, { Email } from '../services/mailer/Mailer';
+import send, { Email } from '../mailer/Mailer';
 
 /**
  * Define job type of sending an email in the Agenda process queue.
@@ -19,6 +19,14 @@ export default function(agenda: Agenda): void {
             if (!config.mailTransporter) {
                 console.log('Message sent: %s', info.messageId);
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            }
+            const clientId = job.attrs.data.clientId;
+            if (clientId && config.clientIdToSocket.has(clientId)){
+                config.clientIdToSocket.get(clientId).emit("notification", {
+                    title: "Mock email sent!",
+                    message: 'To open the preview click <a style="color: #007bff; text-decoration: none; background-color: transparent;" href="'+nodemailer.getTestMessageUrl(info)+'" target="_blank"/>here</a>.',
+                    type: "info"
+                });
             }
         } catch (err) {
             if (config.eventEmitter) {

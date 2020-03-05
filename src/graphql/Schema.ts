@@ -10,7 +10,7 @@ import config from '../config';
 import * as UserController from '../controller/UserController';
 import UserModel from '../model/UserModel';
 import { internalFields, privateFields, uneditableFields, UserSchema } from '../model/UserSchema';
-import { WrongTokenError } from '../services/error/ErrorTypes';
+import { WrongTokenError } from '../error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
 

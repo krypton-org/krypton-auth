@@ -38,13 +38,14 @@ export default function renderGraphiQL(data: GraphiQLData): string {
         width: 100vh;
       }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.0.1/umd/graphiql-auth-token.css"> 
+    <link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.1.2/umd/graphiql-auth-token.css"> 
     <script src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
     <script src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
     <script src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/graphiql-auth-token@1.0.1/umd/graphiql-auth-token.min.js"></script>
-  </head>
+    <script src="https://unpkg.com/graphiql-auth-token@1.1.2/umd/graphiql-auth-token.min.js"></script>
+    <script src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+    </head>
   <body>
     <div id="graphiql">Loading...</div>
     <script>
@@ -130,6 +131,25 @@ export default function renderGraphiQL(data: GraphiQLData): string {
         }),
         document.getElementById('graphiql')
       );
+
+      var socket = io(fetchURL);
+      socket.on("notification", data => {
+        console.log(data);
+        ReactDOM.render(
+          React.createElement(GraphiQLAuthToken, {
+            fetcher: graphQLFetcher,
+            onTokenUpdate: onTokenUpdate,
+            onEditQuery: onEditQuery,
+            onEditVariables: onEditVariables,
+            onEditOperationName: onEditOperationName,
+            query: ${safeSerialize(queryString)},
+            variables: ${safeSerialize(variablesString)},
+            operationName: ${safeSerialize(operationName)},
+            notification: data
+          }),
+          document.getElementById('graphiql')
+        );
+      });
     </script>
   </body>
   </html>`;

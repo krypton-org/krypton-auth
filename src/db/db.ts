@@ -4,7 +4,7 @@
  */
 
 import mongoose from 'mongoose';
-import config from '../../config';
+import config from '../config';
 
 async function init(cb?: () => any): Promise<void | never> {
     // Get Mongoose to use the global promise library

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import config, { Config } from './config';
-import MongooseConnection from './services/db/db';
+import MongooseConnection from './db/db';
 
 declare function require(moduleName: string): any;
 
