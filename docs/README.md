@@ -20,7 +20,3 @@ python build.py
 - [mozilla/sphinx-js](https://github.com/mozilla/sphinx-js): sphinx_js
 - [maxmouchet/sphinx-plugins](https://github.com/maxmouchet/sphinx-plugins): sphinx_graphiql, sphinx_md2html
 
-### TODO
-
-- [ ] Document properties usage (app.config(...))
-- [ ] Finish quick start
