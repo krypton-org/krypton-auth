@@ -19,6 +19,12 @@ def create_env(path):
     builder.create(path)
 
 
+def upgrade_pip(path):
+    print(f"Upgrading pip...")
+    pip = path.joinpath("bin", "pip")
+    run([pip, "install", "--upgrade", "pip"], check=True)
+
+
 def install_deps(path, packages):
     print(f"Installing dependencies...")
     pip = path.joinpath("bin", "pip")
@@ -37,6 +43,7 @@ def main():
 
     if not VENV_PATH.exists():
         create_env(VENV_PATH)
+        upgrade_pip(VENV_PATH)
         install_deps(VENV_PATH, PACKAGES)
 
     build_docs(VENV_PATH, DOCS_PATH)
