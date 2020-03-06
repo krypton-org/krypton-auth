@@ -12,9 +12,9 @@ Database Setup
 Service Setup
 -------------
 
- .. code-block:: bash
+.. code-block:: bash
 
-   npm install graphql-auth-service --save
+    npm install graphql-auth-service --save
 
 .. code-block:: js
 
@@ -23,11 +23,16 @@ Service Setup
     
     const app = express();
     
-    app.use('/auth', GraphQLAuthService()); //API entry point is localhost:5000/auth
+    app.use('/auth', GraphQLAuthService());
     
     app.listen(process.env.PORT || 5000, () => {
         console.log(`server is listening on ${process.env.PORT || 5000}`)
     })
+
+.. code-block:: bash
+
+    curl -X POST -H "Content-Type: application/json" -d '{"query":"{ publicKey }"}' \
+        localhost:5000/auth
     
 .. _graphql-queries:
 
@@ -38,23 +43,26 @@ To use GraphQL Auth Service, you can use the ``fetch`` method or the ``XMLHttpRe
 
 .. code-block:: js
    
+    // GraphQL query
+    let query =
+        `mutation {
+            updateMe(fields: {username:"newusername"}) {
+                token
+                notifications{
+                    message
+                }
+            }
+        }`;
+
     fetch(yourServiceURL, {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json',
-                //Include in the Authorization header your authentication token to make an authenticated request
+                // Authentication token to make an authenticated request
                 'Authorization': 'Bearer ' + yourAuthToken
             },
             body: JSON.stringify({
-                //GraphQL query
-                query: `mutation{
-                updateMe(fields:{username:"newusername"}){
-                        token
-                        notifications{
-                          message
-                        }
-                      }
-                }`
+                query: query
             }),
         })
         .then(res => res.json())
