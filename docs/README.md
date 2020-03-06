@@ -3,6 +3,7 @@ Online documentation is at https://jrebecchi.github.io/GraphQL-Auth-Service.
 ## Instructions for building the documentation
 
 ```bash
+npm install -g typedoc
 python build.py
 ```
 

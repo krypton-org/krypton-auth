@@ -18,7 +18,9 @@ jobs:
         python-version: '3.6'
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install
+        npm install -g typedoc
 
     - name: Build documentation
       run: python docs/build.py
