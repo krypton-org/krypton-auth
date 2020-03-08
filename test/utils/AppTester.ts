@@ -1,4 +1,4 @@
-import MongooseConnection from '../../src/services/db/db';
+import MongooseConnection from '../../src/db/db';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
@@ -51,7 +51,7 @@ export default class AppTester {
     });
 
     close: (done: () => void) => Promise<any> = async (done) => {
-        const agenda = require('../../src/services/agenda/agenda').default;
+        const agenda = require('../../src/agenda/agenda').default;
         await agenda.stop();
         await mongoose.connection.db.dropDatabase();
         await MongooseConnection.close(done);

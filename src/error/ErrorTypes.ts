@@ -1,6 +1,6 @@
 /**
  * Module defining common error that can be raised by normal service usage. Like trying to log-in with a wrong password. Those errors have to be handle within the application logic code.
- * @module services/error/ErrorTypes;'
+ * @module error/ErrorTypes;'
  */
 
 /**

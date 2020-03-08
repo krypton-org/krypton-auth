@@ -6,7 +6,7 @@
         { 
             "label": "buildDemo",
             "type": "shell",
-            "command": "tsc --esModuleInterop ${workspaceFolder}\\demo\\app.ts"
+            "command": "tsc --esModuleInterop ${workspaceFolder}\\jam\\bon.ts"
         }
     ]
 }

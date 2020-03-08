@@ -38,13 +38,14 @@ export default function renderGraphiQL(data: GraphiQLData): string {
         width: 100vh;
       }
     </style>
-    <link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.0.1/umd/graphiql-auth-token.css"> 
+    <link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.1.2/umd/graphiql-auth-token.css"> 
     <script src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
     <script src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
-    <script src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/graphiql-auth-token@1.0.1/umd/graphiql-auth-token.min.js"></script>
-  </head>
+    <script src="https://unpkg.com/react@16.12.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/graphiql-auth-token@1.1.2/umd/graphiql-auth-token.min.js"></script>
+    <script src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+    </head>
   <body>
     <div id="graphiql">Loading...</div>
     <script>
@@ -116,20 +117,45 @@ export default function renderGraphiQL(data: GraphiQLData): string {
       function updateURL() {
         history.replaceState(null, null, locationQuery(parameters));
       }
-      // Render <GraphiQL /> into the body.
-      ReactDOM.render(
-        React.createElement(GraphiQLAuthToken, {
-          fetcher: graphQLFetcher,
-          onTokenUpdate: onTokenUpdate,
-          onEditQuery: onEditQuery,
-          onEditVariables: onEditVariables,
-          onEditOperationName: onEditOperationName,
-          query: ${safeSerialize(queryString)},
-          variables: ${safeSerialize(variablesString)},
-          operationName: ${safeSerialize(operationName)},
-        }),
-        document.getElementById('graphiql')
-      );
+
+      class GraphiQLIDE extends React.Component {
+        
+        constructor() {
+            super();
+            this.state = {
+                notification: null,
+                query: ${safeSerialize(queryString)},
+            }
+        }
+        
+        componentDidMount() {
+          this.socket = io(fetchURL);
+          this.socket.on("notification", data => {
+              this.setState({ notification: data, query: parameters.query });
+          });
+        }
+
+        componentWillUnmount() {
+            this.socket.close();
+        }
+
+        render() {
+          return React.createElement(GraphiQLAuthToken, {
+            fetcher: graphQLFetcher,
+            onTokenUpdate: onTokenUpdate,
+            onEditQuery: onEditQuery,
+            onEditVariables: onEditVariables,
+            onEditOperationName: onEditOperationName,
+            query: this.state.query,
+            variables: ${safeSerialize(variablesString)},
+            operationName: ${safeSerialize(operationName)},
+            notification: this.state.notification
+          });
+        }
+      }
+
+      // Render <GraphiQLIDE /> into the body.
+      ReactDOM.render(React.createElement(GraphiQLIDE), document.getElementById('graphiql'));
     </script>
   </body>
   </html>`;

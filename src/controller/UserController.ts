@@ -2,12 +2,12 @@
  * Service logic for user management.
  * @module controllers/UserController
  */
-import crypto from 'crypto';
 import ejs from 'ejs';
 import { NextFunction, Request, Response } from 'express';
 import config from '../config';
+import generateToken from '../crypto/TokenGenerator';
 import User from '../model/UserModel';
-import agenda from '../services/agenda/agenda';
+import agenda from '../agenda/agenda';
 import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
@@ -19,7 +19,7 @@ import {
     UserValidationError,
     WrongLoginError,
     WrongPasswordError,
-} from '../services/error/ErrorTypes';
+} from '../error/ErrorTypes';
 
 const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
@@ -41,15 +41,6 @@ interface Notification {
 const isUserLoggedIn = (req: Request): boolean => req.user !== undefined;
 
 /**
- * Return a token of size `tokenLength`.
- * @param  {number} tokenLength
- * @returns {string} token generated
- */
-const generateToken = (tokenLength: number): string => {
-    return crypto.randomBytes(tokenLength).toString('hex');
-};
-
-/**
  * Returns the adress of GraphQL Auth Service
  * @param  {Request} req
  * @returns The adress of the service
@@ -57,6 +48,15 @@ const generateToken = (tokenLength: number): string => {
 const getHostAdress = (req: Request): string => {
     return config.host ? config.host + req.baseUrl : req.protocol + '://' + req.get('host') + req.baseUrl;
 };
+/**
+ * Returns true if a notificaiton should be sent to client with the preview link in case of a mock email.
+ * @param  {Request} req
+ * @returns {boolean} true if a notificaiton should be sent to client with the preview link in case of a mock email
+ */
+const isMockEmailAndClientCanReceivePreview = (req: Request): boolean => {
+    return !config.mailTransporter && config.graphiql && req.cookies.clientId;
+}
+
 
 /**
  * Send confirmation email to `user`.
@@ -65,7 +65,7 @@ const getHostAdress = (req: Request): string => {
  * @param  {string} host - Service public address
  * @returns {void}
  */
-const sendConfirmationEmail = (user: any, confirmationToken: string, host: string): void => {
+const sendConfirmationEmail = (user: any, confirmationToken: string, host: string, clientId?: string): void => {
     agenda.now('email', {
         locals: {
             link: host + '/user/email/confirmation?token=' + confirmationToken,
@@ -74,6 +74,7 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
         recipient: user.email,
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
+        clientId
     });
 };
 
@@ -153,7 +154,11 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
     try {
         await User.createUser(user);
         notifications.push({ type: 'success', message: 'User created!' });
-        sendConfirmationEmail(user, user.verificationToken, getHostAdress(req));
+        let clientId;
+        if (isMockEmailAndClientCanReceivePreview(req)) {
+            clientId = req.cookies.clientId
+        }
+        sendConfirmationEmail(user, user.verificationToken, getHostAdress(req), clientId);
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'info',
@@ -186,7 +191,11 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
     if (user.verified) {
         throw new EmailAlreadyConfirmedError('Your email adress has already been confirmed.');
     } else {
-        sendConfirmationEmail(req.user, user.verificationToken, getHostAdress(req));
+        let clientId;
+        if (isMockEmailAndClientCanReceivePreview(req)) {
+            clientId = req.cookies.clientId
+        }
+        sendConfirmationEmail(req.user, user.verificationToken, getHostAdress(req), clientId);
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'success',
@@ -283,7 +292,11 @@ export const updateUser = async (
         notifications.push({ type: 'success', message: 'User information updated!' });
 
         if (!isEmailVerified) {
-            sendConfirmationEmail(req.user, userUpdates.verificationToken, getHostAdress(req));
+            let clientId;
+            if (isMockEmailAndClientCanReceivePreview(req)) {
+                clientId = req.cookies.clientId
+            }
+            sendConfirmationEmail(req.user, userUpdates.verificationToken, getHostAdress(req), clientId);
             notifications.push({
                 message: 'You will receive a confirmation link at your email address in a few minutes.',
                 type: 'info',
@@ -393,6 +406,12 @@ export const sendPasswordRecoveryEmail = async (
     await User.updateUser({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
     const user = await User.getUser({ email });
     const host = getHostAdress(req);
+    
+    let clientId;
+    if (isMockEmailAndClientCanReceivePreview(req)) {
+        clientId = req.cookies.clientId
+    }
+    
     agenda.now('email', {
         locals: {
             link: host + '/form/reset/password?token=' + passwordRecoveryToken,
@@ -401,6 +420,7 @@ export const sendPasswordRecoveryEmail = async (
         recipient: email,
         subject: 'Password Recovery',
         template: config.resetPasswordEmailTemplate,
+        clientId
     });
     return { notifications };
 };

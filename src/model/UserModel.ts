@@ -5,8 +5,8 @@
 import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
 import config from '../config';
-import * as PasswordEncryption from '../services/crypto/PasswordEncryption';
-import { EncryptionFailedError, UserNotFound, WrongPasswordError, WrongTokenError } from '../services/error/ErrorTypes';
+import * as PasswordEncryption from '../crypto/PasswordEncryption';
+import { EncryptionFailedError, UserNotFound, WrongPasswordError, WrongTokenError } from '../error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
 
 export interface IUserModel extends Model<any> {

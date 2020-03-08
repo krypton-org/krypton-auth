@@ -8,7 +8,8 @@ import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import { Transporter } from 'nodemailer';
 import path from 'path';
-import { generateKeys } from './services/crypto/RSAKeysGeneration';
+import SocketIO from 'socket.io';
+import { generateKeys } from './crypto/RSAKeysGeneration';
 const DEFAULT_PUBLIC_KEY_FILE = __dirname.includes('node_modules')
     ? path.resolve(__dirname, '../../../public-key.txt')
     : path.resolve(__dirname, '../public-key.txt');
@@ -212,6 +213,8 @@ export class DefaultConfig implements Config, ReadyStatus {
     public resetPasswordFormTemplate = path.resolve(__dirname, '../lib/templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
     public eventEmitter = undefined;
+    public io: SocketIO.Server;
+    public clientIdToSocket: Map<string, SocketIO.Socket>
 
     /**
      * Called by GraphQL Auth Service once it is launched
@@ -219,6 +222,15 @@ export class DefaultConfig implements Config, ReadyStatus {
     public onReady = () => {
         // Something to do
     };
+
+    /**
+     * Setting SocketIO server to push email notifications to GraphiQL IDE
+     * @param  {SocketIO.Server} io
+     * @returns {void}
+     */
+    public setSocketIO = (io: SocketIO.Server): void => {
+        this.io = io;
+    }
 
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.

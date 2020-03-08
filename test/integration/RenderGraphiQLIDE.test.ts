@@ -21,6 +21,14 @@ test("Access GraphIQL IDE", async (done) => {
     done();
 });
 
+test('No IO Server set as mailTransporter provided', async (done) => {
+    const config = require('../../src/config').default;
+    let res = await request.get("/").set("Accept", "text/html");
+    expect(res.statusCode).toBe(200);
+    expect(config.io).toBeFalsy();
+    done();
+});
+
 afterAll(async (done) => {
     await appTester.close(done);
 }, 40000);
