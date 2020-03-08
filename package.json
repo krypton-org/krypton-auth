@@ -34,7 +34,6 @@
     "@types/node": "^13.1.8",
     "@types/nodemailer": "^6.4.0",
     "@types/socket.io": "^2.1.4",
-    "@types/winston": "^2.4.4",
     "coveralls": "^3.0.9",
     "express": "^4.17.1",
     "jest": "^24.9.0",
@@ -46,6 +45,8 @@
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
     "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
