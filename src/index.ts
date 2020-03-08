@@ -13,9 +13,11 @@ declare global {
 }
 
 export function GraphQLAuthService(properties?: Config): Router {
-    if (properties) {
-        config.merge(properties);
+    if (!properties) {
+        properties = {};
     }
+    config.merge(properties);
+
     const db: typeof MongooseConnection = require('./services/db/db').default;
     const router: Router = require('./router/Router').default;
     db.init();

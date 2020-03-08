@@ -16,7 +16,7 @@ beforeAll((done) => {
 const wait = (time) => new Promise<void>((resolve) => setTimeout(resolve, time))
 
 test('Nodemailer send preview link with a test account', async (done) => {
-    const send = require('../../src/services/mailer/Mailer').default;
+    const send = require('../../src/mailer/Mailer').default;
     const config = require('../../src/config').default;
     await wait(10000);
     const infos = await send({
@@ -35,7 +35,7 @@ test('Nodemailer send preview link with a test account', async (done) => {
 }, 20000);
 
 test('Prints preview link on the command line', async (done) => {
-    const agenda = require('../../src/services/agenda/agenda').default;
+    const agenda = require('../../src/agenda/agenda').default;
     const config = require('../../src/config').default;
     await wait(10000);
     let outputData = "";

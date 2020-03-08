@@ -1,6 +1,6 @@
 import express from 'express';
-import OperationalError from '../../src/services/error/ErrorTypes';
-import ErrorHandler from '../../src/services/error/ErrorHandler';
+import OperationalError from '../../src/error/ErrorTypes';
+import ErrorHandler from '../../src/error/ErrorHandler';
 import supertest from 'supertest';
 
 test('Catch operationnal errors', async (done) => {

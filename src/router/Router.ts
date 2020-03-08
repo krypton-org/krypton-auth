@@ -20,9 +20,8 @@ import ErrorHandler from '../error/ErrorHandler';
 import socketIo from 'socket.io';
 import { NextFunction, Request, Response } from 'express';
 
-let io;
 const router: Router = express.Router();
-
+  
 router.use(cookieParser());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
