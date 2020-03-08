@@ -20,7 +20,12 @@ It is a free & open-source alternative to [Firebase Authentication](https://fire
 
 ## Features
 
-**TODO**
+- Authentication based on JSON Web Tokens
+- XSS and CSRF protection
+- Easy to customize the user data model
+- Easy to integrate into web apps & mobile apps
+- Easy to scale
+- Test IDE included for development
 
 ## Installation
 
@@ -31,7 +36,6 @@ yarn add graphql-auth-service
 ```
 
 Assuming that you have a [MongoDB](https://www.mongodb.com/) instance running on `mongodb://localhost:27017/users`, you can run the following simple example.
-See the [documentation](https://jrebecchi.github.io/GraphQL-Auth-Service) for more details.
 
 ```javascript
 const { GraphQLAuthService } = require('graphql-auth-service');
@@ -39,9 +43,12 @@ const express = require('express');
 
 const app = express();
 
-app.use('/auth', GraphQLAuthService()); //API entry point is localhost:5000/auth
+// API entry point is localhost:5000/auth
+app.use('/auth', GraphQLAuthService());
 
 app.listen(process.env.PORT || 5000, () => {
     console.log(`server is listening on ${process.env.PORT || 5000}`)
 })
 ```
+
+See the [documentation](https://jrebecchi.github.io/GraphQL-Auth-Service) for more details.
