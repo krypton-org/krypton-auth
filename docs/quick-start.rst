@@ -26,14 +26,10 @@ Service Setup
     app.use('/auth', GraphQLAuthService());
     
     app.listen(process.env.PORT || 5000, () => {
+        // The service will be accessible on http://localhost:5000/auth
         console.log(`server is listening on ${process.env.PORT || 5000}`)
     })
 
-.. code-block:: bash
-
-    curl -X POST -H "Content-Type: application/json" -d '{"query":"{ publicKey }"}' \
-        localhost:5000/auth
-    
 .. _graphql-queries:
 
 GraphQL Queries
@@ -42,31 +38,28 @@ GraphQL Queries
 To use GraphQL Auth Service, you can use the ``fetch`` method or the ``XMLHttpRequest`` Object in JavaScript. To make an authenticated request, simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request. Please refer to this example below:
 
 .. code-block:: js
-   
-    // GraphQL query
+
+    let headers = {
+        'Content-Type': 'application/json',
+        // To make an authenticated request
+        'Authorization': 'Bearer ' + yourAuthToken
+    };
+
     let query =
         `mutation {
             updateMe(fields: {username:"newusername"}) {
-                token
-                notifications{
+                notifications {
                     message
                 }
             }
         }`;
 
-    fetch(yourServiceURL, {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-                // Authentication token to make an authenticated request
-                'Authorization': 'Bearer ' + yourAuthToken
-            },
-            body: JSON.stringify({
-                query: query
-            }),
-        })
+    let body = JSON.stringify({ query });
+
+    fetch('http://localhost:5000', { method: 'post', headers, body })
         .then(res => res.json())
         .then(res => console.log(res));
+
 
 You also have access to the GraphiQL IDE (if the property :any:`Config.graphiql` is set to ``false``). Just open a web browser to http://api-entry-point/graphql you will be able to type the graphql queries in the IDE.
 
