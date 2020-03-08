@@ -62,7 +62,7 @@ if (config.graphiql) {
             });
         }
         if (!req.cookies.clientId) {
-            res.cookie('clientId', generateToken(64), { httpOnly: true });
+            res.cookie('clientId', generateToken(32), { httpOnly: true });
         }
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
         params.query = defaultQuery();
