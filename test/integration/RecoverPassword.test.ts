@@ -101,7 +101,7 @@ test("Ask password recovery for unknown email address", async (done) => {
     done();
 });
 
-test("Change password with recorevy token", async (done) => {
+test("Change password with recovery token", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
             sendPasswordRecoveryEmail(email: "${user.email}"){
