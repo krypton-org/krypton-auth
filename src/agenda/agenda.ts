@@ -1,6 +1,6 @@
 /**
  * Configuring Agenda, the job processing queue to send emails.
- * @module services/agenda/Agenda
+ * @module agenda/Agenda
  */
 
 import Agenda from 'agenda';

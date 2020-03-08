@@ -1,6 +1,6 @@
 /**
  * Module defining the send email function according to the configuration passed by package users in `emailConfig`.
- * @module services/mailer/Mailer;'
+ * @module mailer/Mailer;'
  */
 
 import ejs from 'ejs';

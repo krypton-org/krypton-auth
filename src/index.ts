@@ -18,7 +18,7 @@ export function GraphQLAuthService(properties?: Config): Router {
     }
     config.merge(properties);
 
-    const db: typeof MongooseConnection = require('./services/db/db').default;
+    const db: typeof MongooseConnection = require('./db/db').default;
     const router: Router = require('./router/Router').default;
     db.init();
     return router;
