@@ -5,3 +5,7 @@ coverage
 *public-key.txt
 demo/*.js
 jam/*.js
+docs/_build
+docs/venv
+__pycache__/
+

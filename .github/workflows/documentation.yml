@@ -1,0 +1,35 @@
+name: Documentation
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.6'
+
+    - name: Install dependencies
+      run: |
+        npm install
+        npm install -g typedoc
+
+    - name: Build documentation
+      run: python docs/build.py
+
+    - name: Deploy to GitHub pages
+      if: success() && (github.ref == 'master')
+      uses: crazy-max/ghaction-github-pages@63bd035
+      with:
+        target_branch: gh-pages
+        build_dir: docs/_build
+      env:
+        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
