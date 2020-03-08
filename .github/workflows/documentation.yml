@@ -1,6 +1,11 @@
 name: Documentation
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -26,7 +31,7 @@ jobs:
       run: python docs/build.py
 
     - name: Deploy to GitHub pages
-      if: success() && (github.ref == 'master')
+      if: success()
       uses: crazy-max/ghaction-github-pages@63bd035
       with:
         target_branch: gh-pages
