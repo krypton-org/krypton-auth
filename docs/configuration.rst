@@ -4,9 +4,14 @@ Configuration
 Properties
 ----------
 
+Properties are set when the service is instantiated, for example:
+
+.. code-block:: js
+
+    app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
+
 .. autoclass:: Config
     :members:
-
 
 Error Handling
 --------------

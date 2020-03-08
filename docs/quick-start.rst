@@ -61,7 +61,7 @@ To use GraphQL Auth Service, you can use the ``fetch`` method or the ``XMLHttpRe
         .then(res => console.log(res));
 
 
-You also have access to the GraphiQL IDE (if the property :any:`Config.graphiql` is set to ``false``). Just open a web browser to http://api-entry-point/graphql you will be able to type the graphql queries in the IDE.
+You also have access to the GraphiQL IDE (if the property :any:`Config.graphiql` is set to ``false``). Just open a web browser to http://localhost:5000/graphql you will be able to type the graphql queries in the IDE.
 
 
 .. _decode-tokens:
