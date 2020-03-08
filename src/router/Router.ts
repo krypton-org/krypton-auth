@@ -46,7 +46,7 @@ router.get('/form/reset/password', UserController.resetPasswordForm);
 
 if (config.graphiql) {
     router.use('/', async (req: Request, res: Response, next: NextFunction) => {
-        if (!config.io) {
+        if (!config.io && !config.mailTransporter) {
             // @ts-ignore
             config.io = socketIo(req.socket.server);
             config.clientIdToSocket = new Map<string, SocketIO.Socket>();

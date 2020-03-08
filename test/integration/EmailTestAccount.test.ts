@@ -1,13 +1,16 @@
 import AppTester from '../utils/AppTester';
 import nodemailer from 'nodemailer';
+import { parse } from 'cookie';
 
 let appTester;
+let request;
 
 beforeAll((done) => {
     appTester = new AppTester({
         dbAddress: "mongodb://localhost:27017/TestFakeEMailAccount",
         mailTransporter: undefined,
         onReady: async () => {
+            request = appTester.getRequestSender();
             done();
         }
     });
@@ -33,6 +36,17 @@ test('Nodemailer send preview link with a test account', async (done) => {
     expect(nodemailer.getTestMessageUrl(infos)).toBeTruthy();
     done();
 }, 20000);
+
+test('Start IO Server to send mock email notification', async (done) => {
+    const config = require('../../src/config').default;
+    let res = await request.get("/").set("Accept", "text/html");
+    expect(res.statusCode).toBe(200);
+    expect(res.text.includes("GraphiQLAuthToken")).toBeTruthy();
+    expect(config.io).toBeTruthy();
+    const cookies = parse(res.headers['set-cookie'][0])
+    expect(cookies.clientId).toBeTruthy();
+    done();
+});
 
 test('Prints preview link on the command line', async (done) => {
     const agenda = require('../../src/agenda/agenda').default;
