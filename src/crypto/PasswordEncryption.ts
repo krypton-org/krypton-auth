@@ -1,6 +1,6 @@
 /**
  * Module defining functions for password encryption.
- * @module services/crypto/PasswordEncryption
+ * @module crypto/PasswordEncryption
  */
 
 import crypto from 'crypto';

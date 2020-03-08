@@ -1,11 +1,11 @@
 /**
  * Configuring Agenda, the job processing queue to send emails.
- * @module services/agenda/Agenda
+ * @module agenda/Agenda
  */
 
 import Agenda from 'agenda';
-import config from '../../config';
-import email from '../../jobs/email';
+import config from '../config';
+import email from '../jobs/email';
 
 const collection = 'emailJobs';
 const connectionOpts = { db: { address: config.dbAddress, collection } };

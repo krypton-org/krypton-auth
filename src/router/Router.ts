@@ -5,18 +5,23 @@
 
 import accepts from 'accepts';
 import bodyParser from 'body-parser';
+import { parse } from 'cookie';
 import cookieParser from 'cookie-parser';
 import express, { Router } from 'express';
 import graphqlHTTP from 'express-graphql';
+import generateToken from '../crypto/TokenGenerator';
 import helmet from 'helmet';
 import config from '../config';
 import * as UserController from '../controller/UserController';
 import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
-import ErrorHandler from '../services/error/ErrorHandler';
-const router: Router = express.Router();
+import ErrorHandler from '../error/ErrorHandler';
+import socketIo from 'socket.io';
+import { NextFunction, Request, Response } from 'express';
 
+const router: Router = express.Router();
+  
 router.use(cookieParser());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -40,7 +45,25 @@ router.get('/user/email/confirmation', UserController.confirmEmail);
 router.get('/form/reset/password', UserController.resetPasswordForm);
 
 if (config.graphiql) {
-    router.use('/', async (req, res, next) => {
+    router.use('/', async (req: Request, res: Response, next: NextFunction) => {
+        if (!config.io) {
+            // @ts-ignore
+            config.io = socketIo(req.socket.server);
+            config.clientIdToSocket = new Map<string, SocketIO.Socket>();
+            config.io.on('connection', socket => {
+                const cookies = parse(socket.handshake.headers.cookie);
+                const clientId = cookies.clientId;
+                config.clientIdToSocket.set(clientId, socket);
+                socket.on('disconnect', () => {
+                    if (config.clientIdToSocket.has(clientId)){
+                        config.clientIdToSocket.delete(clientId);
+                    }
+                });
+            });
+        }
+        if (!req.cookies.clientId) {
+            res.cookie('clientId', generateToken(64), { httpOnly: true });
+        }
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
         params.query = defaultQuery();
         if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {

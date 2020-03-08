@@ -1,6 +1,6 @@
 /**
  * Module defining functions for Public & Private keys generation.
- * @module services/crypto/RSAKeysGeneration
+ * @module crypto/RSAKeysGeneration
  */
 
 import { generateKeyPairSync } from 'crypto';

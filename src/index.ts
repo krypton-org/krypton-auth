@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import config, { Config } from './config';
-import MongooseConnection from './services/db/db';
+import MongooseConnection from './db/db';
 
 declare function require(moduleName: string): any;
 
@@ -13,10 +13,12 @@ declare global {
 }
 
 export function GraphQLAuthService(properties?: Config): Router {
-    if (properties) {
-        config.merge(properties);
+    if (!properties) {
+        properties = {};
     }
-    const db: typeof MongooseConnection = require('./services/db/db').default;
+    config.merge(properties);
+
+    const db: typeof MongooseConnection = require('./db/db').default;
     const router: Router = require('./router/Router').default;
     db.init();
     return router;
