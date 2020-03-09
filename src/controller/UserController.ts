@@ -7,6 +7,7 @@ import { NextFunction, Request, Response } from 'express';
 import config from '../config';
 import generateToken from '../crypto/TokenGenerator';
 import User from '../model/UserModel';
+import Session from '../model/SessionModel';
 import agenda from '../agenda/agenda';
 import {
     AlreadyLoggedInError,
@@ -48,6 +49,7 @@ const isUserLoggedIn = (req: Request): boolean => req.user !== undefined;
 const getHostAdress = (req: Request): string => {
     return config.host ? config.host + req.baseUrl : req.protocol + '://' + req.get('host') + req.baseUrl;
 };
+
 /**
  * Returns true if a notificaiton should be sent to client with the preview link in case of a mock email.
  * @param  {Request} req
@@ -56,7 +58,6 @@ const getHostAdress = (req: Request): string => {
 const isMockEmailAndClientCanReceivePreview = (req: Request): boolean => {
     return !config.mailTransporter && config.graphiql && req.cookies.clientId;
 }
-
 
 /**
  * Send confirmation email to `user`.
@@ -257,16 +258,11 @@ export const updateUser = async (
     req: Request,
     res: Response,
 ): Promise<{ user: any; notifications: Notification[] }> => {
-    if (!isUserLoggedIn(req)) {
+    if (!isUserLoggedIn(req) && await Session.isValid(req.user._id, req.cookies.refreshToken)) {
+        res.status(401);
         throw new UnknownUser('Please login!');
     }
     const notifications = [];
-
-    const { refreshToken } = await User.getUser({ _id: req.user._id });
-    if (req.cookies.refreshToken !== refreshToken) {
-        res.status(401);
-        throw new Error('Unauthorized access!');
-    }
 
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
@@ -363,14 +359,7 @@ export const login = async (
         throw new WrongLoginError('Wrong credentials!');
     }
 
-    const user = await User.getUser({ _id: payload.user._id });
-    let refreshToken = user.refreshToken;
-    if (!refreshToken || !user.refreshTokenExpiryDate || user.refreshTokenExpiryDate < new Date()) {
-        refreshToken = generateToken(REFRESH_TOKEN_LENGTH);
-        const refreshTokenExpiryDate = new Date();
-        refreshTokenExpiryDate.setTime(refreshTokenExpiryDate.getTime() + config.refreshTokenExpiryTime);
-        await User.updateUser({ _id: payload.user._id }, { refreshToken, refreshTokenExpiryDate });
-    }
+    const { refreshToken } = await Session.createSession(payload.user._id)
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
     return payload;
@@ -453,14 +442,16 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
     });
 };
 /**
- * Refresh user authentication token and user refresh token set in httpOnly cookie.
+ * Refresh the auth token and the refresh token. This last one is set in an httpOnly cookie.
  * @throws {UnknownUser}
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
  */
 export const refreshTokens = async (req: Request, res: Response): Promise<{ token: string; expiryDate: Date }> => {
-    const user = await User.getUser({ refreshToken: req.cookies.refreshToken });
+    const user = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken)
+    //         res.status(401);
+
     const now = new Date();
     if (user && user.refreshTokenExpiryDate && now.getTime() < user.refreshTokenExpiryDate.getTime()) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);

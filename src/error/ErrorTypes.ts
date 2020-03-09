@@ -29,3 +29,4 @@ export class EmailAlreadyConfirmedError extends OperationalError {}
 export class UserValidationError extends OperationalError {}
 export class AlreadyLoggedInError extends OperationalError {}
 export class EncryptionFailedError extends OperationalError {}
+export class InvalidSession extends OperationalError {}
