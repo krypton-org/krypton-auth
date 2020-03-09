@@ -9,9 +9,13 @@
  * @classdesc This is a description of the MyClass class.
  */
 export default class OperationalError extends Error {
+    public message: string;
+    public type: string;
+
     constructor(message) {
         super();
         this.message = message;
+        this.type = this.constructor.name;
     }
 }
 
