@@ -12,25 +12,80 @@ export default class OperationalError extends Error {
     public message: string;
     public type: string;
 
-    constructor(message) {
+    constructor(message: string, type? : string) {
         super();
         this.message = message;
-        this.type = this.constructor.name;
+        this.type = (type) ? type : this.constructor.name;
     }
 }
 
-export class EmailAlreadyExistsError extends OperationalError {}
-export class UsernameAlreadyExistsError extends OperationalError {}
-export class WrongPasswordError extends OperationalError {}
-export class WrongLoginError extends OperationalError {}
-export class UpdatePasswordTooLateError extends OperationalError {}
-export class EmailNotSentError extends OperationalError {}
-export class UserNotFound extends OperationalError {}
-export class WrongTokenError extends OperationalError {}
-export class UnknownUser extends OperationalError {}
-export class OutdatedTokenError extends OperationalError {}
-export class EmailAlreadyConfirmedError extends OperationalError {}
-export class UserValidationError extends OperationalError {}
-export class AlreadyLoggedInError extends OperationalError {}
-export class EncryptionFailedError extends OperationalError {}
-export class InvalidSession extends OperationalError {}
+export class EmailAlreadyExistsError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class UsernameAlreadyExistsError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class WrongPasswordError extends OperationalError {
+    constructor(message) {
+        super(message, 'UserNotFound');
+    }
+}
+export class WrongLoginError extends OperationalError {
+    constructor(message) {
+        super(message, 'UserNotFound');
+    }
+}
+export class UpdatePasswordTooLateError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class EmailNotSentError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class UserNotFound extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class WrongTokenError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class UnknownUser extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class OutdatedTokenError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class EmailAlreadyConfirmedError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class UserValidationError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class AlreadyLoggedInError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}
+export class EncryptionFailedError extends OperationalError {
+    constructor(message) {
+        super(message);
+    }
+}

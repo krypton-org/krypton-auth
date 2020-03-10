@@ -19,6 +19,7 @@ import UserModel from '../model/UserModel';
 import ErrorHandler from '../error/ErrorHandler';
 import socketIo from 'socket.io';
 import { NextFunction, Request, Response } from 'express';
+import OperationalError from '../error/ErrorTypes';
 
 const router: Router = express.Router();
   
@@ -82,6 +83,15 @@ router.use(
             context: { req, res },
             graphiql: false,
             schema: graphqlSchema,
+            customFormatErrorFn: (err: Error) => {
+                // @ts-ignore
+                let operationalError = err.originalError;
+                if(operationalError instanceof OperationalError){
+                    return ({message: operationalError.message, type: operationalError.type});
+                } else {
+                    return err;
+                }
+            },
         };
     }),
 );
