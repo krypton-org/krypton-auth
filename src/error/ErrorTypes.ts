@@ -6,7 +6,7 @@
 /**
  * Common errors raised by service functions under certain conditions. Should be handled within the application.
  * @class
- * @classdesc This is a description of the MyClass class.
+ * @classdesc Common errors raised by system.
  */
 export default class OperationalError extends Error {
     public message: string;
