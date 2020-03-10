@@ -89,6 +89,8 @@ router.use(
                 if(operationalError instanceof OperationalError){
                     return ({message: operationalError.message, type: operationalError.type});
                 } else {
+                    // @ts-ignore
+                    err.type = err.constructor.name;
                     return err;
                 }
             },

@@ -111,6 +111,8 @@ test('Update usersname - email - password', async (done) => {
 
     res = await appTester.login(user1.email, user1.password)
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
+
 
     res = await appTester.login(updates.email, updates.password);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -151,7 +153,7 @@ test('Wrong previous password', async (done) => {
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     let res = await request.postGraphQL(query, token2, refreshToken);
     expect(res.errors[0].message.includes("Your previous password is wrong!")).toBeTruthy();
-
+    expect(res.errors[0].type).toBe('WrongPasswordError');
 
     let loginQuery = {
         query: `mutation{
@@ -161,6 +163,7 @@ test('Wrong previous password', async (done) => {
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
     done();
 });
 
@@ -181,7 +184,7 @@ test('Password too short', async (done) => {
     const { refreshToken } = await UserModel.getUser({ username: user2.username });
     let res = await request.postGraphQL(query, token2, refreshToken);
     expect(res.errors[0].message.includes("The password must contain at least 8 characters")).toBeTruthy();
-
+    expect(res.errors[0].type).toBe('UserValidationError');
 
     let loginQuery = {
         query: `mutation{
@@ -191,6 +194,7 @@ test('Password too short', async (done) => {
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
     done();
 });
 
@@ -211,6 +215,7 @@ test('Username too short', async (done) => {
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
 
@@ -231,6 +236,7 @@ test('Username already exists', async (done) => {
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("Username already exists")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
     done();
 });
 
@@ -251,6 +257,7 @@ test('Email already exists', async (done) => {
     const { refreshToken } = await UserModel.getUser({ username: user4.username });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("Email already exists")).toBeTruthy();
+    expect(res.errors[0].type).toBe('EmailAlreadyExistsError');
     done();
 });
 
@@ -270,6 +277,7 @@ test('Wrong gender', async (done) => {
     const { refreshToken } = await UserModel.getUser({ email: user4.email });
     let res = await request.postGraphQL(query, token4, refreshToken);
     expect(res.errors[0].message.includes("found Mutant")).toBeTruthy();
+    expect(res.errors[0].type).toBe('GraphQLError');
     done();
 });
 

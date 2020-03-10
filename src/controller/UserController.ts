@@ -16,7 +16,6 @@ import {
     UsernameAlreadyExistsError,
     UserNotFound,
     UserValidationError,
-    WrongLoginError,
     WrongPasswordError,
 } from '../error/ErrorTypes';
 
@@ -131,7 +130,6 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
 
 /**
  * Create a new user.
- * @throws {WrongPasswordError}
  * @throws {UsernameAlreadyExistsError}
  * @throws {EmailAlreadyExistsError}
  * @throws {UserValidationError}
@@ -144,11 +142,11 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
     if (!user.password) {
-        throw new WrongPasswordError('Please provide a password!');
+        throw new UserValidationError('Please provide a password!');
     }
 
     if (user.password.length < 8) {
-        throw new WrongPasswordError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters!');
     }
     try {
         await User.createUser(user);
@@ -205,7 +203,6 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
 
 /**
  * Updating user password from the password recovery form.
- * @throws {WrongPasswordError}
  * @throws {UserNotFound}
  * @throws {UpdatePasswordTooLateError}
  * @param  {string} password - new password
@@ -218,7 +215,7 @@ export const recoverPassword = async (
 ): Promise<{ notifications: Notification[] }> => {
     const notifications = [];
     if (password.length < 8) {
-        throw new WrongPasswordError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters!');
     }
     const userExists = await User.userExists({ passwordRecoveryToken });
     if (!userExists) {
@@ -273,7 +270,7 @@ export const updateUser = async (
             throw new WrongPasswordError('Your previous password is wrong!');
         }
         if (userUpdates.password.length < 8) {
-            throw new WrongPasswordError('The password must contain at least 8 characters!');
+            throw new UserValidationError('The password must contain at least 8 characters!');
         }
         delete userUpdates.previousPassword;
     }
@@ -339,7 +336,7 @@ export const deleteUser = async (password: string, req: Request): Promise<{ noti
 
 /**
  * User log-in.
- * @throws {WrongLoginError}
+ * @throws {UserNotFound}
  * @param  {string} loginStr
  * @param  {string} password
  * @param  {Response} res
@@ -359,7 +356,7 @@ export const login = async (
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
         res.status(401);
-        throw new WrongLoginError('Wrong credentials!');
+        throw new UserNotFound('Wrong credentials!');
     }
 
     const user = await User.getUser({ _id: payload.user._id });
