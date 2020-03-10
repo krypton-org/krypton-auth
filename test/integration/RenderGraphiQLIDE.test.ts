@@ -1,5 +1,4 @@
 import AppTester from '../utils/AppTester';
-const pkg = require('../../package.json');
 
 
 let appTester;
