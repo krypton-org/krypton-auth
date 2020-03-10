@@ -51,7 +51,7 @@ export interface IUserModel extends Model<any> {
 
     /**
      * Sign-in user selected by `filter`.
-     * @throws {WrongPasswordError}
+     * @throws {UserNotFound}
      * @param  {any} filter
      * @param  {string} password
      * @param  {string} privateKey
@@ -193,7 +193,7 @@ User.statics.sign = async function(
 ): Promise<{ user: any; token: string; expiryDate: Date }> {
     const isPasswordValid = await this.isPasswordValid(filter, password);
     if (!isPasswordValid) {
-        throw new WrongPasswordError('Wrong credentials!');
+        throw new UserNotFound('Wrong credentials!');
     }
     const user = await this.getUserNonInternalFields(filter);
     const expiryDate = new Date();

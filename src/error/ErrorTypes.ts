@@ -26,9 +26,7 @@ export default class OperationalError extends Error {
  * @extends {OperationalError}
  */
 export class EmailAlreadyExistsError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -38,9 +36,7 @@ export class EmailAlreadyExistsError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UsernameAlreadyExistsError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -50,9 +46,7 @@ export class UsernameAlreadyExistsError extends OperationalError {
  * @extends {OperationalError}
  */
 export class WrongPasswordError extends OperationalError {
-    constructor(message) {
-        super(message, 'UserNotFound');
-    }
+
 }
 
 /**
@@ -62,9 +56,7 @@ export class WrongPasswordError extends OperationalError {
  * @extends {OperationalError}
  */
 export class WrongLoginError extends OperationalError {
-    constructor(message) {
-        super(message, 'UserNotFound');
-    }
+
 }
 
 /**
@@ -74,9 +66,7 @@ export class WrongLoginError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UpdatePasswordTooLateError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -86,9 +76,7 @@ export class UpdatePasswordTooLateError extends OperationalError {
  * @extends {OperationalError}
  */
 export class EmailNotSentError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -98,9 +86,7 @@ export class EmailNotSentError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UserNotFound extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -110,9 +96,7 @@ export class UserNotFound extends OperationalError {
  * @extends {OperationalError}
  */
 export class WrongTokenError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -122,9 +106,7 @@ export class WrongTokenError extends OperationalError {
  * @extends {OperationalError}
  */
 export class EmailAlreadyConfirmedError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -134,9 +116,7 @@ export class EmailAlreadyConfirmedError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UserValidationError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -146,9 +126,7 @@ export class UserValidationError extends OperationalError {
  * @extends {OperationalError}
  */
 export class AlreadyLoggedInError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }
 
 /**
@@ -158,7 +136,5 @@ export class AlreadyLoggedInError extends OperationalError {
  * @extends {OperationalError}
  */
 export class EncryptionFailedError extends OperationalError {
-    constructor(message) {
-        super(message);
-    }
+
 }

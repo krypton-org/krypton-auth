@@ -80,6 +80,8 @@ test('Can\'t record username', async (done) => {
     }
     res = await request.postGraphQL(queryLogin);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
+
 
     queryLogin = {
         query: `mutation{
@@ -101,6 +103,7 @@ test('Can\'t record username', async (done) => {
     }
     res = await request.postGraphQL(queryMe, token);
     expect(res.errors[0].message).toBe("Cannot query field \"username\" on type \"User\". Did you mean \"lastName\"?");
+    expect(res.errors[0].type).toBe('GraphQLError');
 
     queryMe = {
         query: `query{
