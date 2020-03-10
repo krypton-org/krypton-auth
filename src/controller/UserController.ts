@@ -13,7 +13,6 @@ import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
     EmailAlreadyExistsError,
-    UnknownUser,
     UpdatePasswordTooLateError,
     UsernameAlreadyExistsError,
     UserNotFound,
@@ -178,14 +177,14 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
 
 /**
  * Resend an account verification email to logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {EmailAlreadyConfirmedError}
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
  */
 export const resendConfirmationEmail = async (req: Request): Promise<{ notifications: Notification[] }> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications: Notification[] = [];
     const user = await User.getUser({ _id: req.user._id });
@@ -243,7 +242,7 @@ export const recoverPassword = async (
 };
 /**
  * Update the different user fields of logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {WrongPasswordError}
  * @throws {UsernameAlreadyExistsError}
  * @throws {EmailAlreadyExistsError}
@@ -261,7 +260,7 @@ export const updateUser = async (
     const isSessionValid = await Session.isValid(req.user._id, req.cookies.refreshToken)
     if (!isUserLoggedIn(req) && isSessionValid) {
         res.status(401);
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications = [];
 
@@ -315,7 +314,7 @@ export const updateUser = async (
 };
 /**
  * Delete logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {WrongPasswordError}
  * @param  {string} password
  * @param  {Request} req
@@ -323,7 +322,7 @@ export const updateUser = async (
  */
 export const deleteUser = async (password: string, req: Request): Promise<{ notifications: Notification[] }> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications: Notification[] = [];
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
