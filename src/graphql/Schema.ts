@@ -176,7 +176,7 @@ schemaComposer.Mutation.addFields({
             login: 'String!', // email or username
             password: 'String!',
         },
-        resolve: async (_, { login, password }, { res }) => await UserController.login(login, password, res),
+        resolve: async (_, { login, password }, { req, res }) => await UserController.login(login, password, req, res),
         type: UserAndTokenTC,
     },
     refreshToken: {

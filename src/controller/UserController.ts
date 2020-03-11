@@ -77,7 +77,6 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
     });
 };
 
-
 /**
  * Returns the user data of the logged in user.
  * @throws {UserNotFound} User does not exist
@@ -360,12 +359,14 @@ export const deleteUser = async (password: string, req: Request): Promise<{ noti
  * @throws {UserNotFound}
  * @param  {string} loginStr
  * @param  {string} password
+ * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
  */
 export const login = async (
     loginStr: string,
     password: string,
+    req: Request,
     res: Response,
 ): Promise<{ token: string; user: any }> => {
     let payload: { token: string; user: any };
@@ -377,6 +378,10 @@ export const login = async (
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
         throw new UserNotFound('Wrong credentials!');
+    }
+
+    if (req.cookies.refreshToken){
+        await Session.removeSession(payload.user._id, req.cookies.refreshToken)
     }
 
     const { refreshToken } = await Session.createSession(payload.user._id)

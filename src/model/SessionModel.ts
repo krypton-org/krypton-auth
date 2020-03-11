@@ -101,7 +101,7 @@ SessionSchema.statics.createSession = async function (userId: string): Promise<{
 
 /** @see {@link ISessionModel#removeSession} */
 SessionSchema.statics.removeSession = async function (userId: string, refreshToken: string): Promise<void> {
-    return this.deleteOne({ userId, refreshToken });
+    return await this.deleteOne({ userId, refreshToken });
 };
 
 /** @see {@link ISessionModel#removeSession} */

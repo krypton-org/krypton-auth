@@ -83,6 +83,7 @@ test("Can't get recovery pawwsord when logged in", async (done) => {
     let res = await request.getGraphQL(query, token);
     expect(res.errors[0].message.includes("Oups, you are already logged in")).toBeTruthy();
     expect(res.errors[0].type).toBe('AlreadyLoggedInError');
+    expect(res.errors[0].statusCode).toBe(400);
     done();
 });
 
@@ -135,6 +136,7 @@ test("Change password with recovery token", async (done) => {
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].statusCode).toBe(401);
 
     res = await appTester.login(user.email, newPassword);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -170,10 +172,12 @@ test("Wrong token", async (done) => {
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("Unvalid token!")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].statusCode).toBe(401);
 
     res = await appTester.login(user2.email, newPassword);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].statusCode).toBe(401);
 
     done();
 });
@@ -207,6 +211,7 @@ test("Password too short", async (done) => {
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("The password must contain at least 8 characters")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
+    expect(res.errors[0].statusCode).toBe(400);
     done();
 });
 
@@ -245,6 +250,7 @@ test("Token too old", async (done) => {
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("This link has expired, please ask a new one.")).toBeTruthy();
     expect(res.errors[0].type).toBe('UpdatePasswordTooLateError');
+    expect(res.errors[0].statusCode).toBe(401);
     done();
 });
 
