@@ -13,5 +13,6 @@ test('Catch operationnal errors', async (done) => {
     let res = await request.get('/');
     const errors = JSON.parse(res.text).notifications;
     expect(errors[0].message).toBe(msg);
+    expect(errors[0].type).toBe('OperationalError');
     done();
 });

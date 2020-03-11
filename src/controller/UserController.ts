@@ -12,12 +12,10 @@ import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
     EmailAlreadyExistsError,
-    UnknownUser,
     UpdatePasswordTooLateError,
     UsernameAlreadyExistsError,
     UserNotFound,
     UserValidationError,
-    WrongLoginError,
     WrongPasswordError,
 } from '../error/ErrorTypes';
 
@@ -78,6 +76,22 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
     });
 };
 
+
+/**
+ * Returns the user data of the logged in user.
+ * @throws {UserNotFound} User does not exist
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<{ user: any }>} Promise to the user data 
+ */
+export const getUser = async (req: Request, res: Response): Promise<{ user: any }> =>{
+    try {
+        return await User.findById(req.user._id);
+    } catch (err) {
+        throw new UserNotFound('User not found, please log in!');
+    }
+};
+
 /**
  * Returns true email address not already taken by another user.
  * @param  {string} email
@@ -132,7 +146,6 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
 
 /**
  * Create a new user.
- * @throws {WrongPasswordError}
  * @throws {UsernameAlreadyExistsError}
  * @throws {EmailAlreadyExistsError}
  * @throws {UserValidationError}
@@ -145,11 +158,11 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
     if (!user.password) {
-        throw new WrongPasswordError('Please provide a password!');
+        throw new UserValidationError('Please provide a password!');
     }
 
     if (user.password.length < 8) {
-        throw new WrongPasswordError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters!');
     }
     try {
         await User.createUser(user);
@@ -177,14 +190,14 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
 
 /**
  * Resend an account verification email to logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {EmailAlreadyConfirmedError}
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
  */
 export const resendConfirmationEmail = async (req: Request): Promise<{ notifications: Notification[] }> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications: Notification[] = [];
     const user = await User.getUser({ _id: req.user._id });
@@ -206,7 +219,6 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
 
 /**
  * Updating user password from the password recovery form.
- * @throws {WrongPasswordError}
  * @throws {UserNotFound}
  * @throws {UpdatePasswordTooLateError}
  * @param  {string} password - new password
@@ -219,7 +231,7 @@ export const recoverPassword = async (
 ): Promise<{ notifications: Notification[] }> => {
     const notifications = [];
     if (password.length < 8) {
-        throw new WrongPasswordError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters!');
     }
     const userExists = await User.userExists({ passwordRecoveryToken });
     if (!userExists) {
@@ -242,7 +254,7 @@ export const recoverPassword = async (
 };
 /**
  * Update the different user fields of logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {WrongPasswordError}
  * @throws {UsernameAlreadyExistsError}
  * @throws {EmailAlreadyExistsError}
@@ -258,14 +270,13 @@ export const updateUser = async (
     res: Response,
 ): Promise<{ user: any; notifications: Notification[] }> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications = [];
 
     const { refreshToken } = await User.getUser({ _id: req.user._id });
     if (req.cookies.refreshToken !== refreshToken) {
-        res.status(401);
-        throw new Error('Unauthorized access!');
+        throw new UserNotFound('Unauthorized access!');
     }
 
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
@@ -274,7 +285,7 @@ export const updateUser = async (
             throw new WrongPasswordError('Your previous password is wrong!');
         }
         if (userUpdates.password.length < 8) {
-            throw new WrongPasswordError('The password must contain at least 8 characters!');
+            throw new UserValidationError('The password must contain at least 8 characters!');
         }
         delete userUpdates.previousPassword;
     }
@@ -318,7 +329,7 @@ export const updateUser = async (
 };
 /**
  * Delete logged in user.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @throws {WrongPasswordError}
  * @param  {string} password
  * @param  {Request} req
@@ -326,7 +337,7 @@ export const updateUser = async (
  */
 export const deleteUser = async (password: string, req: Request): Promise<{ notifications: Notification[] }> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
     const notifications: Notification[] = [];
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
@@ -340,7 +351,7 @@ export const deleteUser = async (password: string, req: Request): Promise<{ noti
 
 /**
  * User log-in.
- * @throws {WrongLoginError}
+ * @throws {UserNotFound}
  * @param  {string} loginStr
  * @param  {string} password
  * @param  {Response} res
@@ -359,8 +370,7 @@ export const login = async (
     } else if (usernameExists) {
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
-        res.status(401);
-        throw new WrongLoginError('Wrong credentials!');
+        throw new UserNotFound('Wrong credentials!');
     }
 
     const user = await User.getUser({ _id: payload.user._id });
@@ -454,7 +464,7 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
 };
 /**
  * Refresh user authentication token and user refresh token set in httpOnly cookie.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
@@ -471,7 +481,6 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
         res.cookie('refreshToken', refreshToken, { httpOnly: true });
         return payload;
     } else {
-        res.status(401);
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
 };

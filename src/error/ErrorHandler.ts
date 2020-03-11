@@ -16,7 +16,7 @@ import OperationalError from './ErrorTypes';
 export default (err: Error, req: Request, res: Response, next: NextFunction): void => {
     const notifications = [];
     if (err instanceof OperationalError) {
-        notifications.push({ type: 'error', message: err.message });
+        notifications.push({ type: err.type, message: err.message });
         res.json({ notifications });
     } else {
         next(err);

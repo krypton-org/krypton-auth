@@ -82,6 +82,8 @@ test('Password to small', async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message).toBe("The password must contain at least 8 characters!");
+    expect(res.errors[0].type).toBe("UserValidationError");
+    expect(res.errors[0].statusCode).toBe(400);
     done();
 });
 
@@ -106,6 +108,8 @@ test('Email invalid', async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("This email address is not valid!")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
+    expect(res.errors[0].statusCode).toBe(400);
     done();
 });
 
@@ -130,6 +134,9 @@ test('Username contains unauthorized characters', async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("A username may only contain letters, numbers, dashes, dots and underscores")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
+    expect(res.errors[0].statusCode).toBe(400);
+
     done();
 });
 
@@ -154,6 +161,8 @@ test('Username to small', async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
+    expect(res.errors[0].statusCode).toBe(400);
     done();
 });
 
@@ -221,6 +230,8 @@ test('Username already exists', async (done) => {
     }
     res = await request.postGraphQL(query2);
     expect(res.errors[0].message).toBe("Username already exists");
+    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
+    expect(res.errors[0].statusCode).toBe(403);
     done();
 });
 
@@ -263,6 +274,9 @@ test('Email already exists', async (done) => {
     }
     res = await request.postGraphQL(query2);
     expect(res.errors[0].message).toBe("Email already exists");
+    expect(res.errors[0].type).toBe('EmailAlreadyExistsError');
+    expect(res.errors[0].statusCode).toBe(403);
+
     done();
 });
 

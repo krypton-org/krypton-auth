@@ -143,6 +143,8 @@ test("Wrong login", async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].statusCode).toBe(401);
     done();
 });
 
@@ -156,6 +158,8 @@ test("Wrong password", async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].statusCode).toBe(401);
     done();
 });
 afterAll(async (done) => {
