@@ -76,6 +76,22 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
     });
 };
 
+
+/**
+ * Returns the user data of the logged in user.
+ * @throws {UserNotFound} User does not exist
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<{ user: any }>} Promise to the user data 
+ */
+export const getUser = async (req: Request, res: Response): Promise<{ user: any }> =>{
+    try {
+        return await User.findById(req.user._id);
+    } catch (err) {
+        throw new UserNotFound('User not found, please log in!');
+    }
+};
+
 /**
  * Returns true email address not already taken by another user.
  * @param  {string} email
@@ -260,8 +276,7 @@ export const updateUser = async (
 
     const { refreshToken } = await User.getUser({ _id: req.user._id });
     if (req.cookies.refreshToken !== refreshToken) {
-        res.status(401);
-        throw new Error('Unauthorized access!');
+        throw new UserNotFound('Unauthorized access!');
     }
 
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
@@ -355,7 +370,6 @@ export const login = async (
     } else if (usernameExists) {
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
-        res.status(401);
         throw new UserNotFound('Wrong credentials!');
     }
 
@@ -467,7 +481,6 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
         res.cookie('refreshToken', refreshToken, { httpOnly: true });
         return payload;
     } else {
-        res.status(401);
         throw new UserNotFound('Please login!');
     }
 };
