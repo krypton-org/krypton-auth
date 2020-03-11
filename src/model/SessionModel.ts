@@ -5,7 +5,8 @@
 import { Document, model, Model, Schema } from 'mongoose';
 import generateToken from '../crypto/TokenGenerator'
 import config from '../config';
-import { UnknownUser } from '../error/ErrorTypes';
+import { UserNotFound } from '../error/ErrorTypes';
+import UserModel from './UserModel';
 
 const REFRESH_TOKEN_LENGTH = 256;
 
@@ -44,6 +45,7 @@ export interface ISessionModel extends Model<any, {}> {
 
     /**
      * Returns the user and session corresponding to the refresh token.
+     * @throws {UserNotFound}
      * @param  {string} userId
      * @returns {Promise<any>} Returns the user and session corresponding to the refresh token.
      */
@@ -88,7 +90,8 @@ SessionSchema.statics.isValid = async function (userId: string, refreshToken: st
 
 /** @see {@link ISessionModel#createToken} */
 SessionSchema.statics.createSession = async function (userId: string): Promise<{ refreshToken: string, expiryDate: Date }> {
-    const session: any = model<Document, ISessionModel>('Session', SessionSchema);
+    const Session = model<Document, ISessionModel>('Session', SessionSchema);
+    const session = new Session();
     session.refreshToken = generateToken(REFRESH_TOKEN_LENGTH);
     session.expiryDate = getExpiryDate();
     session.userId = userId;
@@ -102,29 +105,36 @@ SessionSchema.statics.removeSession = async function (userId: string, refreshTok
 };
 
 /** @see {@link ISessionModel#removeSession} */
-SessionSchema.statics.updateSession = async function (refreshToken: string): Promise<{ refreshToken: string, expiryDate: Date }> {
+SessionSchema.statics.updateSession = async function (userId: string, refreshToken: string): Promise<{ refreshToken: string, expiryDate: Date }> {
     const data = {
         refreshToken: generateToken(REFRESH_TOKEN_LENGTH),
         expiryDate: getExpiryDate()
     }
-    await this.updateOne({ refreshToken }, data, { runValidators: true });
+    await this.updateOne({ userId, refreshToken }, data, { runValidators: true });
     return data;
 };
 
 /** @see {@link ISessionModel#getUserAndSessionFromRefreshToken} */
-SessionSchema.statics.getUserAndSessionFromRefreshToken =  async function (refreshToken: string): Promise<any>{
-    const aggregate = await this.aggregate([{
-        $lookup: {
-            from: "users",
-            localField: "userId",
-            foreignField: "_id",
-            as: "user"
+SessionSchema.statics.getUserAndSessionFromRefreshToken =  async function (refreshToken: string): Promise<{session: any, user: any}>{
+    const aggregate = await this.aggregate([
+        { $match: {refreshToken} }, 
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }
         }
-    }]);
-    if (aggregate && aggregate.user && aggregate.user[0]){
-        return aggregate.user[0];
+    ]);
+    if (aggregate 
+        && aggregate.length > 0 
+        && aggregate[0].user 
+        && aggregate[0].user.length > 0  
+        && aggregate[0].user[0]){
+        return {user: aggregate[0].user[0], session: aggregate[0]}
     } else {
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
 }
 

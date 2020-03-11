@@ -258,7 +258,8 @@ export const updateUser = async (
     req: Request,
     res: Response,
 ): Promise<{ user: any; notifications: Notification[] }> => {
-    if (!isUserLoggedIn(req) && await Session.isValid(req.user._id, req.cookies.refreshToken)) {
+    const isSessionValid = await Session.isValid(req.user._id, req.cookies.refreshToken)
+    if (!isUserLoggedIn(req) && isSessionValid) {
         res.status(401);
         throw new UnknownUser('Please login!');
     }
@@ -443,26 +444,20 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
 };
 /**
  * Refresh the auth token and the refresh token. This last one is set in an httpOnly cookie.
- * @throws {UnknownUser}
+ * @throws {UserNotFound}
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
  */
 export const refreshTokens = async (req: Request, res: Response): Promise<{ token: string; expiryDate: Date }> => {
-    const user = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken)
-    //         res.status(401);
-
+    const { user, session } = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken)
     const now = new Date();
-    if (user && user.refreshTokenExpiryDate && now.getTime() < user.refreshTokenExpiryDate.getTime()) {
+    if (user && session && now.getTime() < session.expiryDate) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);
-        const refreshToken = generateToken(REFRESH_TOKEN_LENGTH);
-        const refreshTokenExpiryDate = new Date();
-        refreshTokenExpiryDate.setTime(refreshTokenExpiryDate.getTime() + config.refreshTokenExpiryTime);
-        await User.updateUser({ _id: user._id }, { refreshToken, refreshTokenExpiryDate });
+        const { refreshToken } = await Session.updateSession(user._id, session.refreshToken);
         res.cookie('refreshToken', refreshToken, { httpOnly: true });
         return payload;
     } else {
-        res.status(401);
-        throw new UnknownUser('Please login!');
+        throw new UserNotFound('Please login!');
     }
 };
