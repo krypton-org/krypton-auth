@@ -10,7 +10,7 @@ import config from '../config';
 import * as UserController from '../controller/UserController';
 import UserModel from '../model/UserModel';
 import { internalFields, privateFields, uneditableFields, UserSchema } from '../model/UserSchema';
-import { WrongTokenError } from '../error/ErrorTypes';
+import { UserNotFound } from '../error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
 
@@ -134,13 +134,7 @@ schemaComposer.Query.addFields({
         type: 'IsAvailable',
     },
     me: {
-        resolve: async (_, {}, context) => {
-            try {
-                return await UserModel.findById(context.req.user._id);
-            } catch (err) {
-                throw new WrongTokenError('User not found, please log in!');
-            }
-        },
+        resolve: async (_, {}, { req, res } ) => await UserController.getUser(req, res),
         type: UserTC,
     },
     publicKey: {

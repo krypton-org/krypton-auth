@@ -77,6 +77,22 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
     });
 };
 
+
+/**
+ * Returns the user data of the logged in user.
+ * @throws {UserNotFound} User does not exist
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<{ user: any }>} Promise to the user data 
+ */
+export const getUser = async (req: Request, res: Response): Promise<{ user: any }> =>{
+    try {
+        return await User.findById(req.user._id);
+    } catch (err) {
+        throw new UserNotFound('User not found, please log in!');
+    }
+};
+
 /**
  * Returns true email address not already taken by another user.
  * @param  {string} email
@@ -261,6 +277,14 @@ export const updateUser = async (
     }
     const notifications = [];
 
+<<<<<<< HEAD
+=======
+    const { refreshToken } = await User.getUser({ _id: req.user._id });
+    if (req.cookies.refreshToken !== refreshToken) {
+        throw new UserNotFound('Unauthorized access!');
+    }
+
+>>>>>>> bffc899... Adding status code
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
         if (!isValid) {
@@ -352,7 +376,6 @@ export const login = async (
     } else if (usernameExists) {
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
-        res.status(401);
         throw new UserNotFound('Wrong credentials!');
     }
 
