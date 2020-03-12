@@ -269,8 +269,7 @@ export const updateUser = async (
     req: Request,
     res: Response,
 ): Promise<{ user: any; notifications: Notification[] }> => {
-    const isSessionValid = await Session.isValid(req.user._id, req.cookies.refreshToken)
-    if (!isUserLoggedIn(req) && isSessionValid) {
+    if (!isUserLoggedIn(req) || !(await Session.isValid(req.user._id, req.cookies.refreshToken))) {
         res.status(401);
         throw new UserNotFound('Please login!');
     }

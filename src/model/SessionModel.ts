@@ -82,7 +82,7 @@ function getExpiryDate(): Date {
 SessionSchema.statics.isValid = async function (userId: string, refreshToken: string): Promise<boolean> {
     if (userId && refreshToken){
         const session = await this.findOne({ userId, refreshToken });
-        return !!session && session.expiryDate < new Date();
+        return !!session && session.expiryDate > new Date();
     } else {
         return false;
     }   

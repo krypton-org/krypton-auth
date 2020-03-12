@@ -8,6 +8,10 @@ let token1;
 let token2;
 let token3;
 let token4;
+let refreshToken1;
+let refreshToken2;
+let refreshToken3;
+let refreshToken4;
 let user1 = {
     username: "username",
     email: "test@test.com",
@@ -70,10 +74,15 @@ beforeAll((done) => {
                 res = await appTester.register(user4);
                 res = await appTester.login(user1.email, user1.password);
                 token1 = res.data.login.token;
+                refreshToken1 = res.cookies.refreshToken;
                 res = await appTester.login(user2.email, user2.password);
                 token2 = res.data.login.token;
+                refreshToken2 = res.cookies.refreshToken;
+
                 res = await appTester.login(user4.email, user4.password);
                 token4 = res.data.login.token;
+                refreshToken4 = res.cookies.refreshToken;
+
                 done();
             } catch (err) {
                 done(err);
@@ -101,9 +110,7 @@ test('Update usersname - email - password', async (done) => {
           }`
     }
 
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ username: user1.username });
-    let res = await request.postGraphQL(query, token1, refreshToken);
+    let res = await request.postGraphQL(query, token1, refreshToken1);
 
     expect(res.data.updateMe.notifications[0].type).toBe("SUCCESS");
     expect(res.data.updateMe.user.email).toBe("otheremail@mail.com");
@@ -149,9 +156,7 @@ test('Wrong previous password', async (done) => {
             }
           }`
     }
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ username: user2.username });
-    let res = await request.postGraphQL(query, token2, refreshToken);
+    let res = await request.postGraphQL(query, token2, refreshToken2);
     expect(res.errors[0].message.includes("Your previous password is wrong!")).toBeTruthy();
     expect(res.errors[0].type).toBe('WrongPasswordError');
     expect(res.errors[0].statusCode).toBe(401);
@@ -182,9 +187,7 @@ test('Password too short', async (done) => {
           }`
     }
 
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ username: user2.username });
-    let res = await request.postGraphQL(query, token2, refreshToken);
+    let res = await request.postGraphQL(query, token2, refreshToken2);
     expect(res.errors[0].message.includes("The password must contain at least 8 characters")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
     expect(res.errors[0].statusCode).toBe(400);
@@ -215,9 +218,7 @@ test('Username too short', async (done) => {
           }`
     }
 
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ email: user4.email });
-    let res = await request.postGraphQL(query, token4, refreshToken);
+    let res = await request.postGraphQL(query, token4, refreshToken4);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
     expect(res.errors[0].statusCode).toBe(400);
@@ -237,9 +238,7 @@ test('Username already exists', async (done) => {
           }`
     }
 
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ email: user4.email });
-    let res = await request.postGraphQL(query, token4, refreshToken);
+    let res = await request.postGraphQL(query, token4, refreshToken4);
     expect(res.errors[0].message.includes("Username already exists")).toBeTruthy();
     expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
     expect(res.errors[0].statusCode).toBe(403);
@@ -259,9 +258,7 @@ test('Email already exists', async (done) => {
           }`
     }
 
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ username: user4.username });
-    let res = await request.postGraphQL(query, token4, refreshToken);
+    let res = await request.postGraphQL(query, token4, refreshToken4);
     expect(res.errors[0].message.includes("Email already exists")).toBeTruthy();
     expect(res.errors[0].type).toBe('EmailAlreadyExistsError');
     expect(res.errors[0].statusCode).toBe(403);
@@ -280,9 +277,7 @@ test('Wrong gender', async (done) => {
             }
           }`
     }
-    const UserModel = require('../../src/model/UserModel').default;
-    const { refreshToken } = await UserModel.getUser({ email: user4.email });
-    let res = await request.postGraphQL(query, token4, refreshToken);
+    let res = await request.postGraphQL(query, token4, refreshToken4);
     expect(res.errors[0].message.includes("found Mutant")).toBeTruthy();
     expect(res.errors[0].type).toBe('GraphQLError');
     done();
@@ -291,8 +286,9 @@ test('Wrong gender', async (done) => {
 test('Update email of a verified user', async (done) => {
     const UserModel = require('../../src/model/UserModel').default;
     await UserModel.updateUser({ username: user3.username }, { verified: true });
-    let res = await appTester.login(user3.email, user3.password);
-    token3 = res.data.login.token;
+    let loginRes = await appTester.login(user3.email, user3.password);
+    token3 = loginRes.data.login.token;
+    refreshToken3 = loginRes.cookies.refreshToken;
     const newEmail = "yoyo@whatever.com";
     const query = {
         query: `mutation{
@@ -305,9 +301,8 @@ test('Update email of a verified user', async (done) => {
           }`
     }
 
-    const { refreshToken } = await UserModel.getUser({ email: user3.email });
-    res = await request.postGraphQL(query, token3, refreshToken);
-    expect(res.data.updateMe.notifications.filter(notif => notif.message.includes("You will receive a confirmation link at your email address in a few minutes")).length).toBe(1);
+    let updateRes = await request.postGraphQL(query, token3, refreshToken3);
+    expect(updateRes.data.updateMe.notifications.filter(notif => notif.message.includes("You will receive a confirmation link at your email address in a few minutes")).length).toBe(1);
     done();
 });
 
