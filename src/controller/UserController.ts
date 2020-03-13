@@ -20,7 +20,6 @@ import {
 import Session from '../model/SessionModel';
 import User from '../model/UserModel';
 
-
 const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
 const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
@@ -76,22 +75,6 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
     });
-};
-
-
-/**
- * Returns the user data of the logged in user.
- * @throws {UserNotFound} User does not exist
- * @param  {Request} req
- * @param  {Response} res
- * @returns {Promise<{ user: any }>} Promise to the user data 
- */
-export const getUser = async (req: Request, res: Response): Promise<{ user: any }> =>{
-    try {
-        return await User.findById(req.user._id);
-    } catch (err) {
-        throw new UserNotFound('User not found, please log in!');
-    }
 };
 
 /**
