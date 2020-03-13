@@ -10,4 +10,4 @@ import crypto from 'crypto';
  */
 export default function generateToken(tokenLength: number): string {
     return crypto.randomBytes(tokenLength).toString('hex');
-};
+}

@@ -134,7 +134,7 @@ schemaComposer.Query.addFields({
         type: 'IsAvailable',
     },
     me: {
-        resolve: async (_, {}, { req, res } ) => await UserController.getUser(req, res),
+        resolve: async (_, {}, { req, res }) => await UserController.getUser(req, res),
         type: UserTC,
     },
     publicKey: {

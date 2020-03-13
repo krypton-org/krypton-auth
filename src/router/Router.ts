@@ -22,7 +22,7 @@ import { NextFunction, Request, Response } from 'express';
 import OperationalError from '../error/ErrorTypes';
 
 const router: Router = express.Router();
-  
+
 router.use(cookieParser());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -56,7 +56,7 @@ if (config.graphiql) {
                 const clientId = cookies.clientId;
                 config.clientIdToSocket.set(clientId, socket);
                 socket.on('disconnect', () => {
-                    if (config.clientIdToSocket.has(clientId)){
+                    if (config.clientIdToSocket.has(clientId)) {
                         config.clientIdToSocket.delete(clientId);
                     }
                 });
@@ -86,8 +86,12 @@ router.use(
             customFormatErrorFn: (err: Error) => {
                 // @ts-ignore
                 let operationalError = err.originalError;
-                if(operationalError instanceof OperationalError){
-                    return ({message: operationalError.message, type: operationalError.type, statusCode: operationalError.statusCode});
+                if (operationalError instanceof OperationalError) {
+                    return {
+                        message: operationalError.message,
+                        type: operationalError.type,
+                        statusCode: operationalError.statusCode,
+                    };
                 } else {
                     // @ts-ignore
                     err.type = err.constructor.name;

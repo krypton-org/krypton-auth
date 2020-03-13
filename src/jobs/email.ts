@@ -12,7 +12,7 @@ import send, { Email } from '../mailer/Mailer';
  * @param  {Agenda} agenda
  * @returns {void}
  */
-export default function (agenda: Agenda): void {
+export default function(agenda: Agenda): void {
     agenda.define('email', async (job: Agenda.Job<Email>) => {
         try {
             const info = await send(job.attrs.data);
@@ -21,10 +21,13 @@ export default function (agenda: Agenda): void {
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 const clientId = job.attrs.data.clientId;
                 if (clientId && config.clientIdToSocket.has(clientId)) {
-                    config.clientIdToSocket.get(clientId).emit("notification", {
-                        title: "Mock email sent!",
-                        message: 'To open the preview click <a style="color: #007bff; text-decoration: none; background-color: transparent;" href="' + nodemailer.getTestMessageUrl(info) + '" target="_blank"/>here</a>.',
-                        type: "info"
+                    config.clientIdToSocket.get(clientId).emit('notification', {
+                        title: 'Mock email sent!',
+                        message:
+                            'To open the preview click <a style="color: #007bff; text-decoration: none; background-color: transparent;" href="' +
+                            nodemailer.getTestMessageUrl(info) +
+                            '" target="_blank"/>here</a>.',
+                        type: 'info',
                     });
                 }
             }

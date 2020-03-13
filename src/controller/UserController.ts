@@ -55,7 +55,7 @@ const getHostAdress = (req: Request): string => {
  */
 const isMockEmailAndClientCanReceivePreview = (req: Request): boolean => {
     return !config.mailTransporter && config.graphiql && req.cookies.clientId;
-}
+};
 
 /**
  * Send confirmation email to `user`.
@@ -73,7 +73,7 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
         recipient: user.email,
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
-        clientId
+        clientId,
     });
 };
 
@@ -82,9 +82,9 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
  * @throws {UserNotFound} User does not exist
  * @param  {Request} req
  * @param  {Response} res
- * @returns {Promise<{ user: any }>} Promise to the user data 
+ * @returns {Promise<{ user: any }>} Promise to the user data
  */
-export const getUser = async (req: Request, res: Response): Promise<{ user: any }> =>{
+export const getUser = async (req: Request, res: Response): Promise<{ user: any }> => {
     try {
         return await User.findById(req.user._id);
     } catch (err) {
@@ -169,7 +169,7 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
         notifications.push({ type: 'success', message: 'User created!' });
         let clientId;
         if (isMockEmailAndClientCanReceivePreview(req)) {
-            clientId = req.cookies.clientId
+            clientId = req.cookies.clientId;
         }
         sendConfirmationEmail(user, user.verificationToken, getHostAdress(req), clientId);
         notifications.push({
@@ -206,7 +206,7 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
     } else {
         let clientId;
         if (isMockEmailAndClientCanReceivePreview(req)) {
-            clientId = req.cookies.clientId
+            clientId = req.cookies.clientId;
         }
         sendConfirmationEmail(req.user, user.verificationToken, getHostAdress(req), clientId);
         notifications.push({
@@ -275,14 +275,6 @@ export const updateUser = async (
     }
     const notifications = [];
 
-<<<<<<< HEAD
-=======
-    const { refreshToken } = await User.getUser({ _id: req.user._id });
-    if (req.cookies.refreshToken !== refreshToken) {
-        throw new UserNotFound('Unauthorized access!');
-    }
-
->>>>>>> bffc899... Adding status code
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
         if (!isValid) {
@@ -309,7 +301,7 @@ export const updateUser = async (
         if (!isEmailVerified) {
             let clientId;
             if (isMockEmailAndClientCanReceivePreview(req)) {
-                clientId = req.cookies.clientId
+                clientId = req.cookies.clientId;
             }
             sendConfirmationEmail(req.user, userUpdates.verificationToken, getHostAdress(req), clientId);
             notifications.push({
@@ -379,13 +371,13 @@ export const login = async (
         throw new UserNotFound('Wrong credentials!');
     }
 
-    if (req.cookies.refreshToken){
-        await Session.removeSession(payload.user._id, req.cookies.refreshToken)
+    if (req.cookies.refreshToken) {
+        await Session.removeSession(payload.user._id, req.cookies.refreshToken);
     }
 
-    await Session.removeOutdatedSessions(payload.user._id)
+    await Session.removeOutdatedSessions(payload.user._id);
 
-    const { refreshToken } = await Session.createSession(payload.user._id)
+    const { refreshToken } = await Session.createSession(payload.user._id);
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
     return payload;
@@ -421,12 +413,12 @@ export const sendPasswordRecoveryEmail = async (
     await User.updateUser({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
     const user = await User.getUser({ email });
     const host = getHostAdress(req);
-    
+
     let clientId;
     if (isMockEmailAndClientCanReceivePreview(req)) {
-        clientId = req.cookies.clientId
+        clientId = req.cookies.clientId;
     }
-    
+
     agenda.now('email', {
         locals: {
             link: host + '/form/reset/password?token=' + passwordRecoveryToken,
@@ -435,7 +427,7 @@ export const sendPasswordRecoveryEmail = async (
         recipient: email,
         subject: 'Password Recovery',
         template: config.resetPasswordEmailTemplate,
-        clientId
+        clientId,
     });
     return { notifications };
 };
@@ -475,7 +467,7 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
  * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
  */
 export const refreshTokens = async (req: Request, res: Response): Promise<{ token: string; expiryDate: Date }> => {
-    const { user, session } = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken)
+    const { user, session } = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken);
     const now = new Date();
     if (user && session && now.getTime() < session.expiryDate) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);

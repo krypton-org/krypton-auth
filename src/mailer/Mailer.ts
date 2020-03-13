@@ -4,7 +4,7 @@
  */
 
 import ejs from 'ejs';
-import socketIo from "socket.io";
+import socketIo from 'socket.io';
 import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
 import config from '../config';
 import { EmailNotSentError } from '../error/ErrorTypes';
