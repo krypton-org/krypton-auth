@@ -10,7 +10,6 @@ import config from '../config';
 import * as UserController from '../controller/UserController';
 import UserModel from '../model/UserModel';
 import { internalFields, privateFields, uneditableFields, UserSchema } from '../model/UserSchema';
-import { UserNotFound } from '../error/ErrorTypes';
 
 const MongooseSchema = mongoose.Schema;
 
@@ -134,7 +133,7 @@ schemaComposer.Query.addFields({
         type: 'IsAvailable',
     },
     me: {
-        resolve: async (_, {}, { req, res } ) => await UserController.getUser(req, res),
+        resolve: async (_, {}, { req, res }) => await UserController.getUser(req, res),
         type: UserTC,
     },
     publicKey: {
@@ -176,7 +175,7 @@ schemaComposer.Mutation.addFields({
             login: 'String!', // email or username
             password: 'String!',
         },
-        resolve: async (_, { login, password }, { res }) => await UserController.login(login, password, res),
+        resolve: async (_, { login, password }, { req, res }) => await UserController.login(login, password, req, res),
         type: UserAndTokenTC,
     },
     refreshToken: {

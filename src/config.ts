@@ -77,7 +77,7 @@ export interface Config {
      * ::
      *     app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
      *     // or
-     *     app.use(GraphQLAuthService({ 
+     *     app.use(GraphQLAuthService({
      *         mailFrom: {
      *              name: "Fred Foo 👻";
      *              address: "foo@example.com";
@@ -114,7 +114,7 @@ export interface Config {
      * * ``notifications``: ``Array`` of ``Object`` notification. Each notification object contains two properties:
      *     * ``type``: ``String Enum`` either equal to ``success`` - ``warning`` - ``error`` - ``info``
      *     * ``message``: ``String`` property containing the notificaiton message
-    */
+     */
     notificationPageTemplate?: string;
     /**
      * The callback that will be executed when service is launched and ready. The default value is: ``() => console.log("GraphQL Auth Service is ready.");``.
@@ -214,7 +214,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
     public eventEmitter = undefined;
     public io: SocketIO.Server;
-    public clientIdToSocket: Map<string, SocketIO.Socket>
+    public clientIdToSocket: Map<string, SocketIO.Socket>;
 
     /**
      * Called by GraphQL Auth Service once it is launched
@@ -230,7 +230,7 @@ export class DefaultConfig implements Config, ReadyStatus {
      */
     public setSocketIO = (io: SocketIO.Server): void => {
         this.io = io;
-    }
+    };
 
     /**
      * Called by Mongoose and Agenda when connection established with MongoDB.

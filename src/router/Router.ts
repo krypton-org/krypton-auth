@@ -7,22 +7,21 @@ import accepts from 'accepts';
 import bodyParser from 'body-parser';
 import { parse } from 'cookie';
 import cookieParser from 'cookie-parser';
-import express, { Router } from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import graphqlHTTP from 'express-graphql';
-import generateToken from '../crypto/TokenGenerator';
 import helmet from 'helmet';
+import socketIo from 'socket.io';
 import config from '../config';
 import * as UserController from '../controller/UserController';
+import generateToken from '../crypto/TokenGenerator';
+import ErrorHandler from '../error/ErrorHandler';
+import OperationalError from '../error/ErrorTypes';
 import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
-import ErrorHandler from '../error/ErrorHandler';
-import socketIo from 'socket.io';
-import { NextFunction, Request, Response } from 'express';
-import OperationalError from '../error/ErrorTypes';
 
 const router: Router = express.Router();
-  
+
 router.use(cookieParser());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -56,7 +55,7 @@ if (config.graphiql) {
                 const clientId = cookies.clientId;
                 config.clientIdToSocket.set(clientId, socket);
                 socket.on('disconnect', () => {
-                    if (config.clientIdToSocket.has(clientId)){
+                    if (config.clientIdToSocket.has(clientId)) {
                         config.clientIdToSocket.delete(clientId);
                     }
                 });
@@ -81,6 +80,21 @@ router.use(
     graphqlHTTP(async (req, res) => {
         return {
             context: { req, res },
+            customFormatErrorFn: (err: Error) => {
+                // @ts-ignore
+                const operationalError = err.originalError;
+                if (operationalError instanceof OperationalError) {
+                    return {
+                        message: operationalError.message,
+                        statusCode: operationalError.statusCode,
+                        type: operationalError.type,
+                    };
+                } else {
+                    // @ts-ignore
+                    err.type = err.constructor.name;
+                    return err;
+                }
+            },
             graphiql: false,
             schema: graphqlSchema,
             customFormatErrorFn: (err: Error) => {

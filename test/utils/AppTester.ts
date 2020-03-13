@@ -4,11 +4,13 @@ import mongoose from 'mongoose';
 import express from 'express';
 import { GraphQLAuthService } from '../../src/index';
 import mailer, { Transporter } from 'nodemailer';
+import { parse } from 'cookie';
+
 
 export default class AppTester {
     private request: any;
 
-    register: (user: any) => Promise<any> = (user) => new Promise((resolve, reject) => {
+    public register = async function (user: any): Promise<any> {
         const registerQuery = {
             query: `mutation{
             register(fields: {
@@ -26,10 +28,8 @@ export default class AppTester {
             }
             }}`
         }
-        this.request.postGraphQL(registerQuery)
-            .then(res => resolve(res))
-            .catch(err => reject(err));
-    });
+        return await this.request.postGraphQL(registerQuery);
+    };
 
     /**
         Log user in and return token
@@ -37,7 +37,7 @@ export default class AppTester {
         @param String password
         @return String token
     */
-    login: (login: string, password: string) => Promise<any> = (login, password) => new Promise((resolve, reject) => {
+    public login = async function (login: string, password: string): Promise<any> {
         let loginQuery = {
             query: `mutation{
             login(login:"${login}" password:"${password}"){
@@ -45,12 +45,10 @@ export default class AppTester {
             expiryDate
         }}`
         }
-        this.request.postGraphQL(loginQuery)
-            .then(res => resolve(res))
-            .catch(err => reject(err));
-    });
+        return await this.request.postGraphQL(loginQuery)
+    };
 
-    close: (done: () => void) => Promise<any> = async (done) => {
+    public close: (done: () => void) => Promise<any> = async (done) => {
         const agenda = require('../../src/agenda/agenda').default;
         await agenda.stop();
         await mongoose.connection.db.dropDatabase();
@@ -122,30 +120,38 @@ export default class AppTester {
         app.use(GraphQLAuthService(options));
         this.request = request(app);
 
-        this.request.getGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
-            let request = this.request.get('/')
+        this.request.getGraphQL = async function (query, bearerToken, refreshToken): Promise<any> {
+            let request = this.get('/')
                 .set('Accept', 'application/json')
                 .set("Content-Type", "application/json");
             if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);
             if (refreshToken) request.set('Cookie', ['refreshToken=' + refreshToken])
 
-            request.send(JSON.stringify(query))
-                .then(res => resolve(JSON.parse(res.text)))
-                .catch(err => reject(err));
-        });
+            const res = await request.send(JSON.stringify(query))
+            return {
+                ...JSON.parse(res.text),
+                cookies: res.headers['set-cookie'].reduce((acc, curr) => {
+                    const cookie = parse(curr);
+                    return { ...acc, ...cookie }
+                }, {})
+            };
+        };
 
-        this.request.postGraphQL = (query, bearerToken, refreshToken) => new Promise((resolve, reject) => {
-            let request = this.request.post('/')
+        this.request.postGraphQL = async function (query, bearerToken, refreshToken): Promise<any> {
+            let request = this.post('/')
                 .set('Accept', 'application/json')
                 .set("Content-Type", "application/json");
             if (bearerToken) request.set("Authorization", "Bearer " + bearerToken);
             if (refreshToken) request.set('Cookie', ['refreshToken=' + refreshToken])
 
-            request.send(JSON.stringify(query))
-                .then(res => resolve(JSON.parse(res.text)))
-                .catch(err => reject(err));
-        });
-
-
+            const res = await request.send(JSON.stringify(query))
+            return {
+                ...JSON.parse(res.text),
+                cookies: res.headers['set-cookie'].reduce((acc, curr) => {
+                    const cookie = parse(curr);
+                    return { ...acc, ...cookie }
+                }, {})
+            };
+        };
     }
 };
