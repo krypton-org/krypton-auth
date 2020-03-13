@@ -383,6 +383,8 @@ export const login = async (
         await Session.removeSession(payload.user._id, req.cookies.refreshToken)
     }
 
+    await Session.removeOutdatedSessions(payload.user._id)
+
     const { refreshToken } = await Session.createSession(payload.user._id)
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true });
