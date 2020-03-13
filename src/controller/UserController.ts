@@ -4,11 +4,9 @@
  */
 import ejs from 'ejs';
 import { NextFunction, Request, Response } from 'express';
+import agenda from '../agenda/agenda';
 import config from '../config';
 import generateToken from '../crypto/TokenGenerator';
-import User from '../model/UserModel';
-import Session from '../model/SessionModel';
-import agenda from '../agenda/agenda';
 import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
@@ -19,6 +17,9 @@ import {
     UserValidationError,
     WrongPasswordError,
 } from '../error/ErrorTypes';
+import Session from '../model/SessionModel';
+import User from '../model/UserModel';
+
 
 const TOKEN_LENGTH = 64;
 const REFRESH_TOKEN_LENGTH = 256;
@@ -66,6 +67,7 @@ const isMockEmailAndClientCanReceivePreview = (req: Request): boolean => {
  */
 const sendConfirmationEmail = (user: any, confirmationToken: string, host: string, clientId?: string): void => {
     agenda.now('email', {
+        clientId,
         locals: {
             link: host + '/user/email/confirmation?token=' + confirmationToken,
             user,
@@ -73,7 +75,6 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
         recipient: user.email,
         subject: 'Activate your account',
         template: config.verifyEmailTemplate,
-        clientId,
     });
 };
 
@@ -420,6 +421,7 @@ export const sendPasswordRecoveryEmail = async (
     }
 
     agenda.now('email', {
+        clientId,
         locals: {
             link: host + '/form/reset/password?token=' + passwordRecoveryToken,
             user,
@@ -427,7 +429,6 @@ export const sendPasswordRecoveryEmail = async (
         recipient: email,
         subject: 'Password Recovery',
         template: config.resetPasswordEmailTemplate,
-        clientId,
     });
     return { notifications };
 };

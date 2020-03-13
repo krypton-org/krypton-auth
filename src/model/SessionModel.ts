@@ -3,10 +3,9 @@
  * @module model/SessionModel
  */
 import { Document, model, Model, Schema } from 'mongoose';
-import generateToken from '../crypto/TokenGenerator';
 import config from '../config';
+import generateToken from '../crypto/TokenGenerator';
 import { UserNotFound } from '../error/ErrorTypes';
-import UserModel from './UserModel';
 
 const REFRESH_TOKEN_LENGTH = 256;
 
@@ -59,13 +58,13 @@ export interface ISessionModel extends Model<any, {}> {
 }
 
 const sessionFields = {
-    refreshToken: {
-        isPublic: false,
-        type: String,
-    },
     expiryDate: {
         isPublic: false,
         type: Date,
+    },
+    refreshToken: {
+        isPublic: false,
+        type: String,
     },
     userId: {
         type: Schema.Types.ObjectId,
@@ -123,8 +122,8 @@ SessionSchema.statics.updateSession = async function(
     refreshToken: string,
 ): Promise<{ refreshToken: string; expiryDate: Date }> {
     const data = {
-        refreshToken: generateToken(REFRESH_TOKEN_LENGTH),
         expiryDate: getExpiryDate(),
+        refreshToken: generateToken(REFRESH_TOKEN_LENGTH),
     };
     await this.updateOne({ userId, refreshToken }, data, { runValidators: true });
     return data;
@@ -138,10 +137,10 @@ SessionSchema.statics.getUserAndSessionFromRefreshToken = async function(
         { $match: { refreshToken } },
         {
             $lookup: {
+                as: 'user',
+                foreignField: '_id',
                 from: 'users',
                 localField: 'userId',
-                foreignField: '_id',
-                as: 'user',
             },
         },
     ]);

@@ -7,19 +7,18 @@ import accepts from 'accepts';
 import bodyParser from 'body-parser';
 import { parse } from 'cookie';
 import cookieParser from 'cookie-parser';
-import express, { Router } from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import graphqlHTTP from 'express-graphql';
-import generateToken from '../crypto/TokenGenerator';
 import helmet from 'helmet';
+import socketIo from 'socket.io';
 import config from '../config';
 import * as UserController from '../controller/UserController';
+import generateToken from '../crypto/TokenGenerator';
+import ErrorHandler from '../error/ErrorHandler';
+import OperationalError from '../error/ErrorTypes';
 import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
-import ErrorHandler from '../error/ErrorHandler';
-import socketIo from 'socket.io';
-import { NextFunction, Request, Response } from 'express';
-import OperationalError from '../error/ErrorTypes';
 
 const router: Router = express.Router();
 
@@ -81,16 +80,14 @@ router.use(
     graphqlHTTP(async (req, res) => {
         return {
             context: { req, res },
-            graphiql: false,
-            schema: graphqlSchema,
             customFormatErrorFn: (err: Error) => {
                 // @ts-ignore
-                let operationalError = err.originalError;
+                const operationalError = err.originalError;
                 if (operationalError instanceof OperationalError) {
                     return {
                         message: operationalError.message,
-                        type: operationalError.type,
                         statusCode: operationalError.statusCode,
+                        type: operationalError.type,
                     };
                 } else {
                     // @ts-ignore
@@ -98,6 +95,8 @@ router.use(
                     return err;
                 }
             },
+            graphiql: false,
+            schema: graphqlSchema,
         };
     }),
 );

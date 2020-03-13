@@ -22,11 +22,11 @@ export default function(agenda: Agenda): void {
                 const clientId = job.attrs.data.clientId;
                 if (clientId && config.clientIdToSocket.has(clientId)) {
                     config.clientIdToSocket.get(clientId).emit('notification', {
-                        title: 'Mock email sent!',
                         message:
                             'To open the preview click <a style="color: #007bff; text-decoration: none; background-color: transparent;" href="' +
                             nodemailer.getTestMessageUrl(info) +
                             '" target="_blank"/>here</a>.',
+                        title: 'Mock email sent!',
                         type: 'info',
                     });
                 }
