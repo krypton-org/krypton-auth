@@ -97,6 +97,17 @@ router.use(
             },
             graphiql: false,
             schema: graphqlSchema,
+            customFormatErrorFn: (err: Error) => {
+                // @ts-ignore
+                let operationalError = err.originalError;
+                if(operationalError instanceof OperationalError){
+                    return ({message: operationalError.message, type: operationalError.type, statusCode: operationalError.statusCode});
+                } else {
+                    // @ts-ignore
+                    err.type = err.constructor.name;
+                    return err;
+                }
+            },
         };
     }),
 );
