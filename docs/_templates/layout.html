@@ -4,43 +4,124 @@
   {{ super() }}
 
 <!-- GraphiQL -->
-<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/graphiql/graphiql.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/graphiql/graphiql.min.css" />
+
+<link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.2.0/umd/graphiql-auth-token.css"> 
+<script crossorigin src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
+<script crossorigin src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
+<script crossorigin src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql-auth-token@1.2.0/umd/graphiql-auth-token.min.js"></script>
+<script crossorigin src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
 
 <script type="text/javascript">
+var token = null;
+var fetchURL = "{{ graphiql_endpoint }}";
+// Defines a callback call on token update
+function onTokenUpdate(newToken){
+    token = newToken;
+}
+
 function graphQLFetcher(graphQLParams) {
-    var fetchURL = "{{ graphiql_endpoint }}";
+    var headers = { 'Content-Type': 'application/json' }
+    if (token){
+        headers['Authorization'] = 'Bearer ' + token;
+    }
     return fetch(fetchURL, {
         method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: headers,
         body: JSON.stringify(graphQLParams),
     }).then(function(response) {
         return response.json();
-    });
+    }).then(function(response) {
+        if (response
+            && response.data
+            && response.data.login
+            && response.data.login.token){
+            updateTokenInputs(response.data.login.token);
+        }
+        if (response
+            && response.data
+            && response.data.refreshToken
+            && response.data.refreshToken.token){
+            updateTokenInputs(response.data.refreshToken.token);
+        }
+        return response;
+    });;
 }
 
 function setupGraphiQL() {
-    if (typeof(React) === 'undefined' || typeof(ReactDOM) === 'undefined' || typeof(GraphiQL) === 'undefined') {
+    if (typeof(React) === 'undefined' || typeof(ReactDOM) === 'undefined' || typeof(GraphiQLAuthToken) === 'undefined') {
         return;
     }
+
+    class GraphiQLIDE extends React.Component {
+        
+        constructor(props) {
+            super(props);
+            this.state = {
+                notification: null,
+                query: props.query,
+                response: props.response
+            }
+        }
+        
+        componentDidMount() {
+          this.socket = io(fetchURL);
+          this.socket.on("notification", data => {
+              this.setState({ ...this.state, notification: data, query: parameters.query });
+          });
+        }
+
+        componentWillUnmount() {
+            this.socket.close();
+        }
+
+        render() {
+          return React.createElement(GraphiQLAuthToken, {
+            fetcher: this.props.fetcher,
+            onTokenUpdate: onTokenUpdate,
+            query: this.state.query,
+            notification: this.state.notification,
+            response: this.state.response
+          });
+        }
+      }
 
     const targets = document.getElementsByClassName('graphiql');
     for (let i = 0; i < targets.length; i++) {
         const target = targets[i];
         const query = target.getElementsByClassName("query")[0].innerHTML.trim();
         const response = target.getElementsByClassName("response")[0].innerHTML.trim();
-        const graphiQLElement = React.createElement(GraphiQL, {
+        const graphiQLElement = React.createElement(GraphiQLIDE, {
             fetcher: graphQLFetcher,
+            onTokenUpdate: onTokenUpdate,
             query: query,
             response: response
         });
         ReactDOM.render(graphiQLElement, target);
     }
 };
+
+function setNativeValue(element, value) {
+  const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+  const prototype = Object.getPrototypeOf(element);
+  const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+  
+  if (valueSetter && valueSetter !== prototypeValueSetter) {
+  	prototypeValueSetter.call(element, value);
+  } else {
+    valueSetter.call(element, value);
+  }
+}
+
+function updateTokenInputs(token){
+    var inputs = document.querySelectorAll(".token-container input");
+    for (let i = 0; i < inputs.length; i++) {
+        var input = inputs[i];
+        setNativeValue(input, token);
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
 
 if (document.getElementsByClassName('graphiql').length > 0) {
     setupGraphiQL();

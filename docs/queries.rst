@@ -84,7 +84,6 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
    :query:
     mutation {
       updateMe(fields: {username: "newusername"}) {
-        token
         notifications {
           message
         }
