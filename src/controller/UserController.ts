@@ -21,7 +21,6 @@ import Session from '../model/SessionModel';
 import User from '../model/UserModel';
 
 const TOKEN_LENGTH = 64;
-const REFRESH_TOKEN_LENGTH = 256;
 const DELAY_TO_CHANGE_PASSWORD_IN_MINUTS = 60;
 
 /**
@@ -38,15 +37,6 @@ interface Notification {
  * @returns {boolean} user is logged in
  */
 const isUserLoggedIn = (req: Request): boolean => req.user !== undefined;
-
-/**
- * Returns the adress of GraphQL Auth Service
- * @param  {Request} req
- * @returns The adress of the service
- */
-const getHostAdress = (req: Request): string => {
-    return config.host ? config.host + req.baseUrl : req.protocol + '://' + req.get('host') + req.baseUrl;
-};
 
 /**
  * Returns true if a notificaiton should be sent to client with the preview link in case of a mock email.
@@ -171,7 +161,7 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
         if (isMockEmailAndClientCanReceivePreview(req)) {
             clientId = req.cookies.clientId;
         }
-        sendConfirmationEmail(user, user.verificationToken, getHostAdress(req), clientId);
+        sendConfirmationEmail(user, user.verificationToken, config.getRouterAddress(req), clientId);
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'info',
@@ -208,7 +198,7 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
         if (isMockEmailAndClientCanReceivePreview(req)) {
             clientId = req.cookies.clientId;
         }
-        sendConfirmationEmail(req.user, user.verificationToken, getHostAdress(req), clientId);
+        sendConfirmationEmail(req.user, user.verificationToken, config.getRouterAddress(req), clientId);
         notifications.push({
             message: 'You will receive a confirmation link at your email address in a few minutes.',
             type: 'success',
@@ -303,7 +293,7 @@ export const updateUser = async (
             if (isMockEmailAndClientCanReceivePreview(req)) {
                 clientId = req.cookies.clientId;
             }
-            sendConfirmationEmail(req.user, userUpdates.verificationToken, getHostAdress(req), clientId);
+            sendConfirmationEmail(req.user, userUpdates.verificationToken, config.getRouterAddress(req), clientId);
             notifications.push({
                 message: 'You will receive a confirmation link at your email address in a few minutes.',
                 type: 'info',
@@ -378,8 +368,8 @@ export const login = async (
     await Session.removeOutdatedSessions(payload.user._id);
 
     const { refreshToken } = await Session.createSession(payload.user._id);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, domain: '.' + config.getDomainAddress() });
 
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
     return payload;
 };
 
@@ -412,7 +402,7 @@ export const sendPasswordRecoveryEmail = async (
     const passwordRecoveryRequestDate = new Date();
     await User.updateUser({ email }, { passwordRecoveryToken, passwordRecoveryRequestDate });
     const user = await User.getUser({ email });
-    const host = getHostAdress(req);
+    const host = config.getRouterAddress(req);
 
     let clientId;
     if (isMockEmailAndClientCanReceivePreview(req)) {
@@ -446,7 +436,7 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
         res.json({ notifications });
         return;
     }
-    const host = getHostAdress(req);
+    const host = config.getRouterAddress(req);
     const locals = {
         link: host,
         token: req.query.token,
@@ -472,7 +462,7 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
     if (user && session && now.getTime() < session.expiryDate) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);
         const { refreshToken } = await Session.updateSession(user._id, session.refreshToken);
-        res.cookie('refreshToken', refreshToken, { httpOnly: true });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, domain: '.' + config.getDomainAddress() });
         return payload;
     } else {
         throw new UserNotFound('Please login!');

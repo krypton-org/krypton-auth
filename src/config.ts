@@ -4,11 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
+import { Request } from 'express';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import { Transporter } from 'nodemailer';
 import path from 'path';
 import SocketIO from 'socket.io';
+import Url from 'url-parse';
 import { generateKeys } from './crypto/RSAKeysGeneration';
 const DEFAULT_PUBLIC_KEY_FILE = __dirname.includes('node_modules')
     ? path.resolve(__dirname, '../../../public-key.txt')
@@ -198,6 +200,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     public graphiql = true;
     public hasUsername = true;
     public host = undefined;
+    public hostURLObject = undefined;
     public isAgendaReady: boolean = false;
     public isMongooseReady: boolean = false;
     public isTestEmailReady: boolean = false;
@@ -269,6 +272,26 @@ export class DefaultConfig implements Config, ReadyStatus {
     };
 
     /**
+     * Returns the complete router adress of GraphQL Auth Service
+     * @param  {Request} req
+     * @returns The the complete router of the service
+     */
+    public getRouterAddress = (req: Request): string => {
+        return config.hostURLObject
+            ? config.hostURLObject.href + req.baseUrl
+            : req.protocol + '://' + req.get('host') + req.baseUrl;
+    };
+
+    /**
+     * Returns the domain of GraphQL Auth Service to set the domain parameter into cookies
+     * @param  {Request} req
+     * @returns The domain of the service
+     */
+    public getDomainAddress = (): string => {
+        return config.hostURLObject ? config.hostURLObject.hostname : null;
+    };
+
+    /**
      * Merging user options and default properties
      * @param  {Config} options?
      * @returns {void}
@@ -311,18 +334,37 @@ export class DefaultConfig implements Config, ReadyStatus {
             }.bind(this),
         );
 
-        if (!this.hasMongoProtocol(this.dbAddress)) {
-            this.dbAddress = 'mongodb://' + this.dbAddress;
-        }
+        this.dbAddress = this.getValidMongoDBUrl(this.dbAddress);
 
-        const levels = {
-            email: 0,
-            error: 1,
-        };
+        if (this.host) {
+            this.host = this.getValidhttpUrl(this.host);
+            this.hostURLObject = Url(this.host);
+        }
     }
 
-    private hasMongoProtocol(url: string): boolean {
-        return url.match(/mongodb(?:\+srv)?:\/\/.*/) !== null;
+    private getValidMongoDBUrl(url: string): string {
+        if (url.match(/mongodb(?:\+srv)?:\/\/.*/) !== null) {
+            return url;
+        } else {
+            return 'mongodb://' + url;
+        }
+    }
+
+    private getValidhttpUrl(url: string): string {
+        url = url.trim().replace(/\s/g, '');
+
+        if (/\/$/.test(url)) {
+            url = url.slice(0, -1);
+        }
+
+        if (/^(:\/\/)/.test(url)) {
+            return `http${url}`;
+        }
+        if (!/^(f|ht)tps?:\/\//i.test(url)) {
+            return `http://${url}`;
+        }
+
+        return url;
     }
 }
 
