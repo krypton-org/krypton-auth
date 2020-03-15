@@ -29,6 +29,7 @@ function graphQLFetcher(graphQLParams) {
     return fetch(fetchURL, {
         method: 'post',
         headers: headers,
+        credentials: 'include',
         body: JSON.stringify(graphQLParams),
     }).then(function(response) {
         return response.json();
