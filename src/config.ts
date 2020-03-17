@@ -111,7 +111,7 @@ export interface Config {
     /**
      * The filepath to the `EJS <https://ejs.co/>`_ template file of notification page.
      * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs>`_.
-     * You can create another, just gives the pass to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
+     * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
      * * ``notifications``: ``Array`` of ``Object`` notification. Each notification object contains two properties:
      *     * ``type``: ``String Enum`` either equal to ``success`` - ``warning`` - ``error`` - ``info``
@@ -145,18 +145,18 @@ export interface Config {
      */
     refreshTokenExpiryTime?: number;
     /**
-     * The filepath to the `EJS <https://ejs.co/>`_ template file of the email to reset forgotten password.
+     * The file path to the `EJS <https://ejs.co/>`_ template file of the email to reset forgotten password.
      * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/emails/ResetPassword.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/ResetPassword.ejs>`_.
-     * You can create another, just gives the pass to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
+     * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
      * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
      * * ``link`` - The link to the reset form: ``Click here: <a href="<%= link %>"><%= link %>``
      */
     resetPasswordEmailTemplate?: string;
     /**
-     * The filepath to the `EJS <https://ejs.co/>`_ template file of the reset password form.
+     * The file path to the `EJS <https://ejs.co/>`_ template file of the reset password form.
      * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/forms/ResetPassword.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/forms/ResetPassword.ejs>`_.
-     * You can create another, just gives the pass to the `EJS <https://ejs.co/>`_ file you wish to send.
+     * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
      * * ``link``: The link of the API: ``xhr.open("POST", '<%= link %>')``
@@ -182,7 +182,7 @@ export interface Config {
     /**
      * The filepath to the `EJS <https://ejs.co/>`_ template file of the email to verify user account.
      * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs>`_.
-     * You can create another, just gives the pass to the `EJS <https://ejs.co/>`_ file you wish to send.
+     * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
      * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``

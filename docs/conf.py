@@ -67,7 +67,10 @@ html_theme_options = {
     'font_family': 'sans-serif'
 }
 
-html_context = {'graphiql_endpoint': 'https://nusid.net/graphql-auth-service/'}
+html_context = {
+    'graphiql_endpoint': 'https://nusid.net/graphql-auth-service/',
+    'graphiql_notification_endpoint': 'https://nusid.net/'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

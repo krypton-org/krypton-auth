@@ -1,50 +1,23 @@
-{%- extends "alabaster/layout.html" %}
+{%- extends "alabaster/layout.html" %} 
 
-{%- block footer %}
-  {{ super() }}
+{%- block footer %} 
+
+{{ super() }}
 
 <!-- GraphiQL -->
-<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/graphiql/graphiql.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/graphiql/graphiql.min.css" />
 
+<link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.2.0/umd/graphiql-auth-token.css">
+<script crossorigin src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
+<script crossorigin src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
+<script crossorigin src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql-auth-token@1.2.0/umd/graphiql-auth-token.min.js"></script>
+<script crossorigin src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+<script type="text/javascript" src="_static/queries.js"></script>
 <script type="text/javascript">
-function graphQLFetcher(graphQLParams) {
     var fetchURL = "{{ graphiql_endpoint }}";
-    return fetch(fetchURL, {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(graphQLParams),
-    }).then(function(response) {
-        return response.json();
-    });
-}
-
-function setupGraphiQL() {
-    if (typeof(React) === 'undefined' || typeof(ReactDOM) === 'undefined' || typeof(GraphiQL) === 'undefined') {
-        return;
-    }
-
-    const targets = document.getElementsByClassName('graphiql');
-    for (let i = 0; i < targets.length; i++) {
-        const target = targets[i];
-        const query = target.getElementsByClassName("query")[0].innerHTML.trim();
-        const response = target.getElementsByClassName("response")[0].innerHTML.trim();
-        const graphiQLElement = React.createElement(GraphiQL, {
-            fetcher: graphQLFetcher,
-            query: query,
-            response: response
-        });
-        ReactDOM.render(graphiQLElement, target);
-    }
-};
-
-if (document.getElementsByClassName('graphiql').length > 0) {
-    setupGraphiQL();
-}
+    var socketURL = "{{ graphiql_notification_endpoint }}";
+    setupGraphiQLHelpers(fetchURL, socketURL);
 </script>
 
 {% endblock %}
