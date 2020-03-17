@@ -9,7 +9,7 @@ To register simply use the ``register`` mutation. You will have to provide the d
 .. graphiql::
    :query:
     mutation {
-      register(fields: {username: "yourname", email: "your@mail.com", password: "yourpassword"}) {
+      register(fields: {username: "yourname", email: "yourname@mail.com", password: "yourpassword"}) {
         notifications {
           type
           message
@@ -38,11 +38,68 @@ You will be able to access private mutations/queries by including it in the ``Au
 .. graphiql::
    :query:
     mutation {
-      login(login: "your@mail.com", password: "yourpassword") {
+      login(login: "yourname@mail.com", password: "yourpassword") {
         token
         expiryDate
+        user {
+          _id
+          verified
+        }
       }
     }
+
+.. _access-user-private-data:
+
+Access user private data
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+To access your own private data use the ``me`` query.  You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`).
+
+.. graphiql::
+   :query:
+    query {
+      me {
+        _id
+        verified
+        email
+        username
+      }
+    }
+
+.. _update-user:
+
+Update user information
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To change any of your user fields, use the ``updateMe`` mutation. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). If you update your ``email``, you will receive a verification email like for registration. To change your password, please see in the next section. 
+
+.. graphiql::
+   :query:
+    mutation {
+      updateMe(fields: {username: "yourname2"}) {
+        notifications {
+          message
+        }
+      }
+    }
+
+.. note:: By updating your user data, remember to refresh your auth token by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data.
+
+Change password
+^^^^^^^^^^^^^^^
+
+To change your password, use the ``updateMe`` mutation passing your ``previousPassword`` and your new desired ``password``. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). 
+
+.. graphiql::
+   :query:
+    mutation {
+      updateMe(fields: {previousPassword: "yourpassword", password: "newpassword"}) {
+        notifications {
+          message
+        }
+      }
+    }
+
 
 .. _refresh-authentication-tokens:
 
@@ -73,40 +130,6 @@ Easily fetch the public key of the service with this query in order to decode th
       publicKey
     }
 
-.. _update-user:
-
-Update user information
-^^^^^^^^^^^^^^^^^^^^^^^
-
-To change any of your user fields, use the ``updateMe`` mutation. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). If you update your ``email``, you will receive a verification email like for registration. To change your password, please see in the next section. 
-
-.. graphiql::
-   :query:
-    mutation {
-      updateMe(fields: {username: "newusername"}) {
-        notifications {
-          message
-        }
-      }
-    }
-
-.. note:: By updating your user data, remember to refresh your auth token by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data.
-
-Change password
-^^^^^^^^^^^^^^^
-
-To change your password, use the ``updateMe`` mutation passing your ``previousPassword`` and your new desired ``password``. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). 
-
-.. graphiql::
-   :query:
-    mutation {
-      updateMe(fields: {previousPassword: "yourpassword", password: "newpassword"}) {
-        notifications {
-          message
-        }
-      }
-    }
-
 .. _reset-password:
 
 Reset password
@@ -117,7 +140,7 @@ To reset your forgotten password, use the ``sendPasswordRecoveryEmail`` query pa
 .. graphiql::
    :query:
     query {
-      sendPasswordRecoveryEmail(email: "your@mail.com") {
+      sendPasswordRecoveryEmail(email: "yourname@mail.com") {
         notifications {
           message
         }
@@ -159,6 +182,16 @@ Get public user data
 
 There are many query types to fetch public user data. You don't need to be authenticated to perform those queries. It will retrieve only the user data declared as public in your user model. See :ref:`extended-schema` to learn how to customize your user model.
 
+To fetch one public user information from any of its public fields use the ``userOne`` query.
+
+.. graphiql::
+    :query:
+     query {
+       userOne(filter: {username: "yourname"}) {
+         _id
+       }
+     }
+
 To fetch public user information from its ``id`` use use the ``userById`` query.
 
 .. graphiql::
@@ -178,17 +211,6 @@ To fetch public user information from a list of ``ids`` use use the ``userByIds`
         username
       }
     } 
-
-To fetch one public user information from any of its public fields use the ``userOne`` query.
-
-.. graphiql::
-    :query:
-     query {
-       userOne(filter: {username: "yourname"}) {
-         _id
-       }
-     }
-
 
 * ``userMany``: to fetch one or many user public information from any of its public fields.
 * ``userCount``: to count users according to criteria based on any user public fields.
