@@ -11,16 +11,24 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
         pushToast(data)
     });
 
+    function isAuthRequired(element){
+        if (hasAncestorWithId(element, 'update-user-information') 
+                || hasAncestorWithId(element, 'change-password')
+                || hasAncestorWithId(element, 'delete-account')
+                || hasAncestorWithId(element, 'access-user-private-data')){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function getInputsInWhichToSetAuthToken(){
         var inputs = document.querySelectorAll(".token-container input");
         var inputsInWhichToSetAuthToken = [];
         for (let i = 0; i < inputs.length; i++) {
             var input = inputs[i];
-            if (hasAncestorWithId(input, 'update-user-information') 
-                || hasAncestorWithId(input, 'change-password')
-                || hasAncestorWithId(input, 'delete-account')
-                || hasAncestorWithId(input, 'access-user-private-data')){
-                    inputsInWhichToSetAuthToken.push(input);
+            if (isAuthRequired(input)){
+                inputsInWhichToSetAuthToken.push(input);
             }
         }
         return inputsInWhichToSetAuthToken;
@@ -125,7 +133,7 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
             render() {
                 return React.createElement(GraphiQLAuthToken, {
                     fetcher: this.props.fetcher,
-                    onTokenUpdate: onTokenUpdate,
+                    onTokenUpdate: this.props.isAuthRequired ? onTokenUpdate : null,
                     query: this.state.query,
                     notification: this.state.notification,
                     response: this.state.response
@@ -142,7 +150,8 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
                 fetcher: graphQLFetcher,
                 onTokenUpdate: onTokenUpdate,
                 query: query,
-                response: response
+                response: response,
+                isAuthRequired: isAuthRequired(target),
             });
             ReactDOM.render(graphiQLElement, target);
         }
