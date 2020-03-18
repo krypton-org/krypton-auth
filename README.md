@@ -4,7 +4,7 @@
 <a href="https://coveralls.io/github/jrebecchi/GraphQL-Auth-Service?branch=master">
   <img src="https://coveralls.io/repos/github/jrebecchi/GraphQL-Auth-Service/badge.svg?branch=master">
 </a>
-<a href="https://github.com/jrebecchi/GraphQL-Auth-Service/workflows/Node%20CI/badge.svg">
+<a href="https://github.com/jrebecchi/GraphQL-Auth-Service/actions">
   <img src="https://img.shields.io/github/workflow/status/jrebecchi/GraphQL-Auth-Service/Node CI?label=tests">
 </a>
 <a href="https://heroku.com/deploy?template=https://github.com/jrebecchi/GraphQL-Auth-Service-Heroku">
