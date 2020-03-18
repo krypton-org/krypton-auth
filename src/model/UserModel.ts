@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
 import config from '../config';
 import * as PasswordEncryption from '../crypto/PasswordEncryption';
-import { EncryptionFailedError, UserNotFound, WrongPasswordError, WrongTokenError } from '../error/ErrorTypes';
+import { EncryptionFailedError, UserNotFound, WrongPasswordError } from '../error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
 
 export interface IUserModel extends Model<any> {
@@ -70,7 +70,7 @@ export interface IUserModel extends Model<any> {
     /**
      * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
      * Returns the user data decrypted.
-     * @throws {WrongTokenError} - token not valid
+     * @throws {UserNotFound} - token not valid
      * @param  {string} token
      * @param  {string} publicKey
      * @returns {Promise<object | string>} Promise to the user data decrypted
@@ -105,7 +105,7 @@ const computeUserToken = (user: any, privateKey: string, expiresIn: number): Pro
     return new Promise((resolve, reject) => {
         jwt.sign(user, privateKey, { expiresIn: expiresIn + 'ms', algorithm: config.algorithm }, async (err, token) => {
             if (err) {
-                reject(new WrongTokenError(err.message));
+                reject(new UserNotFound(err.message));
             } else {
                 resolve(token);
             }
@@ -219,7 +219,7 @@ User.statics.verify = function(token: string, publicKey: string): Promise<object
     return new Promise((resolve, reject) => {
         jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
-                reject(new WrongTokenError('User not found, please log in!'));
+                reject(new UserNotFound('User not found, please log in!'));
             } else {
                 resolve(userDecrypted);
             }

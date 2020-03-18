@@ -99,19 +99,6 @@ export class UserNotFound extends OperationalError {
 }
 
 /**
- * Auth token is wrong.
- * @export
- * @class WrongTokenError
- * @extends {OperationalError}
- */
-export class WrongTokenError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 500;
-    }
-}
-
-/**
  * Email already confirmed.
  * @export
  * @class EmailAlreadyConfirmedError
