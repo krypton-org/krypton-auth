@@ -56,6 +56,7 @@ Access user private data
 To access your own private data use the ``me`` query.  You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`).
 
 .. graphiql::
+   :withtoken:
    :query:
     query {
       me {
@@ -74,6 +75,7 @@ Update user information
 To change any of your user fields, use the ``updateMe`` mutation. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). If you update your ``email``, you will receive a verification email like for registration. To change your password, please see in the next section. 
 
 .. graphiql::
+   :withtoken:
    :query:
     mutation {
       updateMe(fields: {username: "yourname2"}) {
@@ -91,6 +93,7 @@ Change password
 To change your password, use the ``updateMe`` mutation passing your ``previousPassword`` and your new desired ``password``. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). 
 
 .. graphiql::
+   :withtoken:
    :query:
     mutation {
       updateMe(fields: {previousPassword: "yourpassword", password: "newpassword"}) {
@@ -166,6 +169,7 @@ Delete account
 To delete your account, use the ``deleteMe`` mutation. You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`). 
 
 .. graphiql::
+   :withtoken:
    :query:
     mutation {
       deleteMe(password: "yourpassword") {
