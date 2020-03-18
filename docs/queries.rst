@@ -22,7 +22,6 @@ To register simply use the ``register`` mutation. You will have to provide the d
 :any:`ErrorTypes.UsernameAlreadyExistsError`,
 :any:`ErrorTypes.UserValidationError`,
 :any:`ErrorTypes.EncryptionFailedError`,
-:any:`ErrorTypes.EmailNotSentError`.
 
 Once registered you will receive an email to verify your account. This email is customizable, see :any:`Config.verifyEmailTemplate`.
 
@@ -57,7 +56,6 @@ You will be able to access private mutations/queries by including it in the ``Au
 
 **Errors:**
 :any:`ErrorTypes.UserNotFound`,
-:any:`ErrorTypes.WrongPasswordError`.
 
 .. _access-user-private-data:
 
@@ -103,7 +101,9 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
 
 **Errors:**
 :any:`ErrorTypes.UserNotFound`,
-:any:`ErrorType.UserValidationError`.
+:any:`EmailAlreadyExistsError,
+:any:`UsernameAlreadyExistsError,
+:any:`ErrorType.UserValidationError.
 
 .. note:: By updating your user data, remember to refresh your auth token by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data.
 
@@ -174,9 +174,6 @@ To reset your forgotten password, use the ``sendPasswordRecoveryEmail`` query pa
       }
     }
 
-**Errors:**
-:any:`ErrorTypes.EmailNotSentError`.
-
 If your email is present in the user database you will receive an email to reset your password. This email is customizable, see :any:`Config.resetPasswordEmailTemplate`.
 
 .. image:: _images/graphql_auth_service-reset-password-email.png
@@ -207,6 +204,7 @@ To delete your account, use the ``deleteMe`` mutation. You have to be logged in 
     }
 
 **Errors:**
+:any:`WrongPasswordError`,
 :any:`ErrorTypes.UserNotFound`.
 
 .. _fetch-public-user-data:
