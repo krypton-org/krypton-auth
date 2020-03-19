@@ -17,6 +17,12 @@ To register simply use the ``register`` mutation. You will have to provide the d
       }
     }
 
+**Errors:**
+:any:`EmailAlreadyExistsError`,
+:any:`UsernameAlreadyExistsError`,
+:any:`UserValidationError`,
+:any:`EncryptionFailedError`.
+
 Once registered you will receive an email to verify your account. This email is customizable, see :any:`Config.verifyEmailTemplate`.
 
 .. image:: _images/graphql_auth_service-verification-email.png
@@ -48,12 +54,17 @@ You will be able to access private mutations/queries by including it in the ``Au
       }
     }
 
+**Errors:**
+:any:`UserNotFound`.
+
 .. _access-user-private-data:
 
 Access user private data
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 To access your own private data use the ``me`` query.  You have to be logged in to perform this request. Simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request (see :ref:`graphql-queries`).
+
+**Errors:** 
 
 .. graphiql::
    :withtoken:
@@ -66,6 +77,9 @@ To access your own private data use the ``me`` query.  You have to be logged in 
         username
       }
     }
+
+**Errors:**
+:any:`UserNotFound`.
 
 .. _update-user:
 
@@ -85,6 +99,12 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
       }
     }
 
+**Errors:**
+:any:`UserNotFound`,
+:any:`EmailAlreadyExistsError`,
+:any:`UsernameAlreadyExistsError`,
+:any:`UserValidationError`.
+
 .. note:: By updating your user data, remember to refresh your auth token by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data.
 
 Change password
@@ -103,6 +123,10 @@ To change your password, use the ``updateMe`` mutation passing your ``previousPa
       }
     }
 
+**Errors:**
+:any:`UserNotFound`,
+:any:`WrongPasswordError`,
+:any:`EncryptionFailedError`.
 
 .. _refresh-authentication-tokens:
 
@@ -179,6 +203,10 @@ To delete your account, use the ``deleteMe`` mutation. You have to be logged in 
       }
     }
 
+**Errors:**
+:any:`WrongPasswordError`,
+:any:`UserNotFound`.
+
 .. _fetch-public-user-data:
 
 Get public user data
@@ -219,3 +247,21 @@ To fetch public user information from a list of ``ids`` use use the ``userByIds`
 * ``userMany``: to fetch one or many user public information from any of its public fields.
 * ``userCount``: to count users according to criteria based on any user public fields.
 * ``userPagination``: to list users with pagination configuration.
+
+Errors
+^^^^^^
+
+.. Unfortunately, we have to list errors by hand since
+   `.. autoclass:: ErrorTypes` produces dotted names.
+
+.. autoattribute:: EmailAlreadyExistsError
+.. autoattribute:: UsernameAlreadyExistsError
+.. autoattribute:: WrongPasswordError
+.. autoattribute:: UpdatePasswordTooLateError
+.. autoattribute:: EmailNotSentError
+.. autoattribute:: UserNotFound
+.. autoattribute:: EmailAlreadyConfirmedError
+.. autoattribute:: UserValidationError
+.. autoattribute:: AlreadyLoggedInError
+.. autoattribute:: EncryptionFailedError
+

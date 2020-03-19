@@ -11,38 +11,8 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
         pushToast(data)
     });
 
-    function isAuthRequired(element){
-        if (hasAncestorWithId(element, 'update-user-information') 
-                || hasAncestorWithId(element, 'change-password')
-                || hasAncestorWithId(element, 'delete-account')
-                || hasAncestorWithId(element, 'access-user-private-data')){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function getInputsInWhichToSetAuthToken(){
-        var inputs = document.querySelectorAll(".token-container input");
-        var inputsInWhichToSetAuthToken = [];
-        for (let i = 0; i < inputs.length; i++) {
-            var input = inputs[i];
-            if (isAuthRequired(input)){
-                inputsInWhichToSetAuthToken.push(input);
-            }
-        }
-        return inputsInWhichToSetAuthToken;
-    }
-
-    function hasAncestorWithId(el, id){
-        var current = el.parentNode;
-        while(current !== document){
-            if (current.id === id){
-                return true;
-            }
-            current = current.parentNode;
-        }
-        return false;
+        return document.querySelectorAll(".with-token .token-container input");
     }
 
     function pushToast(data) {
@@ -77,35 +47,37 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
         token = newToken;
     }
 
-    function graphQLFetcher(graphQLParams) {
-        var headers = {
-            'Content-Type': 'application/json'
-        }
-        if (token) {
-            headers['Authorization'] = 'Bearer ' + token;
-        }
-        return fetch(fetchURL, {
-            method: 'post',
-            headers: headers,
-            credentials: 'include',
-            body: JSON.stringify(graphQLParams),
-        }).then(function(response) {
-            return response.json();
-        }).then(function(response) {
-            if (response &&
-                response.data &&
-                response.data.login &&
-                response.data.login.token) {
-                updateTokenInputs(response.data.login.token);
+    function getFetcher(isAuthRequired){
+        return function graphQLFetcher(graphQLParams) {
+            var headers = {
+                'Content-Type': 'application/json'
             }
-            if (response &&
-                response.data &&
-                response.data.refreshToken &&
-                response.data.refreshToken.token) {
-                updateTokenInputs(response.data.refreshToken.token);
+            if (token && isAuthRequired) {
+                headers['Authorization'] = 'Bearer ' + token;
             }
-            return response;
-        });;
+            return fetch(fetchURL, {
+                method: 'post',
+                headers: headers,
+                credentials: 'include',
+                body: JSON.stringify(graphQLParams),
+            }).then(function(response) {
+                return response.json();
+            }).then(function(response) {
+                if (response &&
+                    response.data &&
+                    response.data.login &&
+                    response.data.login.token) {
+                    updateTokenInputs(response.data.login.token);
+                }
+                if (response &&
+                    response.data &&
+                    response.data.refreshToken &&
+                    response.data.refreshToken.token) {
+                    updateTokenInputs(response.data.refreshToken.token);
+                }
+                return response;
+            });;
+        }
     }
 
     function setupGraphiQL() {
@@ -146,12 +118,13 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
             var target = targets[i];
             var query = target.getElementsByClassName("query")[0].innerHTML.trim();
             var response = target.getElementsByClassName("response")[0].innerHTML.trim();
+            const isAuthRequired = target.classList.contains('with-token');
             var graphiQLElement = React.createElement(GraphiQLIDE, {
-                fetcher: graphQLFetcher,
+                fetcher: getFetcher(isAuthRequired),
                 onTokenUpdate: onTokenUpdate,
                 query: query,
                 response: response,
-                isAuthRequired: isAuthRequired(target),
+                isAuthRequired,
             });
             ReactDOM.render(graphiQLElement, target);
         }
