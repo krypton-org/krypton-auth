@@ -51,19 +51,31 @@ if (config.graphiql) {
             config.io = socketIo(req.socket.server);
             config.clientIdToSocket = new Map<string, SocketIO.Socket>();
             config.io.on('connection', socket => {
-                const cookies = parse(socket.handshake.headers.cookie);
-                const clientId = cookies.clientId;
-                config.clientIdToSocket.set(clientId, socket);
-                socket.on('disconnect', () => {
-                    if (config.clientIdToSocket.has(clientId)) {
-                        config.clientIdToSocket.delete(clientId);
-                    }
-                });
+                let clientId = null;
+                if (socket.handshake.headers.cookie){
+                    clientId =  parse(socket.handshake.headers.cookie).clientId
+                }
+                if (clientId){
+                    config.clientIdToSocket.set(clientId, socket);
+                    socket.on('disconnect', () => {
+                        if (config.clientIdToSocket.has(clientId)){
+                            config.clientIdToSocket.delete(clientId);
+                        }
+                    });
+                } else {
+                    socket.disconnect(true);
+                }
             });
         }
+
         if (!req.cookies.clientId) {
-            res.cookie('clientId', generateToken(32), { httpOnly: true, domain: '.' + config.getDomainAddress() });
+            const params: any = { httpOnly: true }
+            if (config.host){
+                params.domain =  '.' + config.getDomainAddress();
+            }
+            res.cookie('clientId', generateToken(32), params);
         }
+
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
         params.query = defaultQuery();
         if (!params.raw && accepts(req).types(['json', 'html']) === 'html') {
