@@ -8,7 +8,7 @@ from venv import EnvBuilder
 PACKAGES = [
     "sphinx",
     "sphinx-js",
-    "https://github.com/maxmouchet/sphinx-plugins/archive/master.zip",
+    "https://github.com/krypton-org/sphinx-plugins/archive/master.zip",
 ]
 
 DOCS_PATH = Path(__file__).resolve().parent
