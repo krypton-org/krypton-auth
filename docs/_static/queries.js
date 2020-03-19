@@ -11,38 +11,8 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
         pushToast(data)
     });
 
-    function isAuthRequired(element){
-        if (hasAncestorWithId(element, 'update-user-information') 
-                || hasAncestorWithId(element, 'change-password')
-                || hasAncestorWithId(element, 'delete-account')
-                || hasAncestorWithId(element, 'access-user-private-data')){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function getInputsInWhichToSetAuthToken(){
-        var inputs = document.querySelectorAll(".token-container input");
-        var inputsInWhichToSetAuthToken = [];
-        for (let i = 0; i < inputs.length; i++) {
-            var input = inputs[i];
-            if (isAuthRequired(input)){
-                inputsInWhichToSetAuthToken.push(input);
-            }
-        }
-        return inputsInWhichToSetAuthToken;
-    }
-
-    function hasAncestorWithId(el, id){
-        var current = el.parentNode;
-        while(current !== document){
-            if (current.id === id){
-                return true;
-            }
-            current = current.parentNode;
-        }
-        return false;
+        return document.querySelectorAll(".token-container input");
     }
 
     function pushToast(data) {
@@ -151,7 +121,7 @@ function setupGraphiQLHelpers(fetchURL, socketURL){
                 onTokenUpdate: onTokenUpdate,
                 query: query,
                 response: response,
-                isAuthRequired: isAuthRequired(target),
+                isAuthRequired: target.classList.contains('with-token'),
             });
             ReactDOM.render(graphiQLElement, target);
         }
