@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+from argparse import ArgumentParser
 from pathlib import Path
+from shutil import rmtree
 from subprocess import run
 from venv import EnvBuilder
 
@@ -17,6 +19,11 @@ def create_env(path):
     print(f"Creating virtualenv in {path}...")
     builder = EnvBuilder(with_pip=True)
     builder.create(path)
+
+
+def rm_env(path):
+    print(f"Removing virtualenv at {path}...")
+    rmtree(path, ignore_errors=True)
 
 
 def upgrade_pip(path):
@@ -40,6 +47,13 @@ def build_docs(venv_path, docs_path):
 
 def main():
     print(f"Documentation: {DOCS_PATH}")
+
+    parser = ArgumentParser()
+    parser.add_argument("--refresh", action="store_true", default=False)
+    args = parser.parse_args()
+
+    if args.refresh:
+        rm_env(VENV_PATH)
 
     if not VENV_PATH.exists():
         create_env(VENV_PATH)

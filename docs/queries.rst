@@ -18,10 +18,10 @@ To register simply use the ``register`` mutation. You will have to provide the d
     }
 
 **Errors:**
-:any:`ErrorTypes.EmailAlreadyExistsError`,
-:any:`ErrorTypes.UsernameAlreadyExistsError`,
-:any:`ErrorTypes.UserValidationError`,
-:any:`ErrorTypes.EncryptionFailedError`,
+:any:`EmailAlreadyExistsError`,
+:any:`UsernameAlreadyExistsError`,
+:any:`UserValidationError`,
+:any:`EncryptionFailedError`.
 
 Once registered you will receive an email to verify your account. This email is customizable, see :any:`Config.verifyEmailTemplate`.
 
@@ -55,7 +55,7 @@ You will be able to access private mutations/queries by including it in the ``Au
     }
 
 **Errors:**
-:any:`ErrorTypes.UserNotFound`,
+:any:`UserNotFound`.
 
 .. _access-user-private-data:
 
@@ -79,7 +79,7 @@ To access your own private data use the ``me`` query.  You have to be logged in 
     }
 
 **Errors:**
-:any:`ErrorTypes.UserNotFound`.
+:any:`UserNotFound`.
 
 .. _update-user:
 
@@ -100,10 +100,10 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
     }
 
 **Errors:**
-:any:`ErrorTypes.UserNotFound`,
-:any:`EmailAlreadyExistsError,
-:any:`UsernameAlreadyExistsError,
-:any:`ErrorType.UserValidationError.
+:any:`UserNotFound`,
+:any:`EmailAlreadyExistsError`,
+:any:`UsernameAlreadyExistsError`,
+:any:`UserValidationError`.
 
 .. note:: By updating your user data, remember to refresh your auth token by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation. If you don't, other services decrypting the token with the Public Key would have an outdated version of your data.
 
@@ -124,9 +124,9 @@ To change your password, use the ``updateMe`` mutation passing your ``previousPa
     }
 
 **Errors:**
-:any:`ErrorTypes.UserNotFound`,
-:any:`ErrorTypes.WrongPasswordError`,
-:any:`ErrorTypes.EncryptionFailedError`.
+:any:`UserNotFound`,
+:any:`WrongPasswordError`,
+:any:`EncryptionFailedError`.
 
 .. _refresh-authentication-tokens:
 
@@ -205,7 +205,7 @@ To delete your account, use the ``deleteMe`` mutation. You have to be logged in 
 
 **Errors:**
 :any:`WrongPasswordError`,
-:any:`ErrorTypes.UserNotFound`.
+:any:`UserNotFound`.
 
 .. _fetch-public-user-data:
 
@@ -251,5 +251,17 @@ To fetch public user information from a list of ``ids`` use use the ``userByIds`
 Errors
 ^^^^^^
 
-.. js:autoclass:: ErrorTypes
-   :members:
+.. Unfortunately, we have to list errors by hand since
+   `.. autoclass:: ErrorTypes` produces dotted names.
+
+.. autoattribute:: EmailAlreadyExistsError
+.. autoattribute:: UsernameAlreadyExistsError
+.. autoattribute:: WrongPasswordError
+.. autoattribute:: UpdatePasswordTooLateError
+.. autoattribute:: EmailNotSentError
+.. autoattribute:: UserNotFound
+.. autoattribute:: EmailAlreadyConfirmedError
+.. autoattribute:: UserValidationError
+.. autoattribute:: AlreadyLoggedInError
+.. autoattribute:: EncryptionFailedError
+
