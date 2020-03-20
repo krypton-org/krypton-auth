@@ -16,9 +16,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'GraphQL Auth Service'
-copyright = '2020, Johann Rebecchi'
-author = 'Johann Rebecchi'
+project = 'Krypton Authentication'
+copyright = '2020, The Krypton Project'
+author = 'The Krypton Project'
 
 
 # -- General configuration ---------------------------------------------------
@@ -51,8 +51,8 @@ html_theme = 'alabaster'
 
 # https://alabaster.readthedocs.io/en/latest/customization.html
 html_theme_options = {
-    'github_user': 'jrebecchi',
-    'github_repo': 'GraphQL-Auth-Service',
+    'github_user': 'krypton-org',
+    'github_repo': 'krypton-auth',
     'github_type': 'star',
     'logo': 'logo.svg',
     'logo_name': False,
