@@ -1,13 +1,13 @@
 <p align="center">
 <img src="/docs/_static/banner.svg">
 <i>Express authentication middleware, using GraphQL and JSON Web Tokens.</i><br/><br/>
-<a href="https://coveralls.io/github/jrebecchi/GraphQL-Auth-Service?branch=master">
-  <img src="https://coveralls.io/repos/github/jrebecchi/GraphQL-Auth-Service/badge.svg?branch=master">
+<a href="https://coveralls.io/github/krypton-org/krypton-auth?branch=master">
+  <img src="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master">
 </a>
-<a href="https://github.com/jrebecchi/GraphQL-Auth-Service/actions">
-  <img src="https://img.shields.io/github/workflow/status/jrebecchi/GraphQL-Auth-Service/Node CI?label=tests">
+<a href="https://github.com/krypton-org/krypton-auth/actions">
+  <img src="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests">
 </a>
-<a href="https://heroku.com/deploy?template=https://github.com/jrebecchi/GraphQL-Auth-Service-Heroku">
+<a href="https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-heroku">
   <img src="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku">
 </a>
 </p>
@@ -16,7 +16,7 @@ GraphQL Auth Sevice is an authentication middleware for Express handling login, 
 
 It is a free & open-source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).
 
-- [**Documentation**](https://jrebecchi.github.io/GraphQL-Auth-Service) — Consult the quick start guide and the online documentation.
+- [**Documentation**](https://krypton-org.github.io/krypton-auth) — Consult the quick start guide and the online documentation.
 
 ## Features
 
@@ -51,4 +51,4 @@ app.listen(process.env.PORT || 5000, () => {
 })
 ```
 
-See the [documentation](https://jrebecchi.github.io/GraphQL-Auth-Service) for more details.
+See the [documentation](https://krypton-org.github.io/krypton-auth) for more details.
