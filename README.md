@@ -40,7 +40,7 @@ yarn add krypton-auth
 Assuming that you have a [MongoDB](https://www.mongodb.com/) instance running on `mongodb://localhost:27017/users`, you can run the following simple example.
 
 ```javascript
-const { KryptonAuth } = require('krypton-auth');
+const kryptonAuth = require('krypton-auth');
 const express = require('express');
 
 const app = express();
