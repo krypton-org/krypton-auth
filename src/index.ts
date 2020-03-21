@@ -12,6 +12,12 @@ declare global {
     }
 }
 
+/**
+ * Return Krypton Authentication, an Express Router.
+ * @param {Config} properties GraphQL Auth Service config
+ * @returns {Router}
+ * @api public
+ */
 export = function (properties?: Config): Router {
     if (!properties) {
         properties = {};
