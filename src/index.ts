@@ -18,7 +18,7 @@ declare global {
  * @returns {Router}
  * @api public
  */
-export = function (properties?: Config): Router {
+export = function(properties?: Config): Router {
     if (!properties) {
         properties = {};
     }
@@ -28,4 +28,4 @@ export = function (properties?: Config): Router {
     const router: Router = require('./router/Router').default;
     db.init();
     return router;
-}
+};

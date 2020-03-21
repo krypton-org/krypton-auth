@@ -368,9 +368,9 @@ export const login = async (
     await Session.removeOutdatedSessions(payload.user._id);
 
     const { refreshToken } = await Session.createSession(payload.user._id);
-    const params: any = { httpOnly: true }
-    if (config.host){
-        params.domain =  '.' + config.getDomainAddress();
+    const params: any = { httpOnly: true };
+    if (config.host) {
+        params.domain = '.' + config.getDomainAddress();
     }
     res.cookie('refreshToken', refreshToken, params);
 
@@ -466,9 +466,9 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
     if (user && session && now.getTime() < session.expiryDate) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);
         const { refreshToken } = await Session.updateSession(user._id, session.refreshToken);
-        const params: any = { httpOnly: true }
-        if (config.host){
-            params.domain =  '.' + config.getDomainAddress();
+        const params: any = { httpOnly: true };
+        if (config.host) {
+            params.domain = '.' + config.getDomainAddress();
         }
         res.cookie('refreshToken', refreshToken, params);
         return payload;

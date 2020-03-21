@@ -52,13 +52,13 @@ if (config.graphiql) {
             config.clientIdToSocket = new Map<string, SocketIO.Socket>();
             config.io.on('connection', socket => {
                 let clientId = null;
-                if (socket.handshake.headers.cookie){
-                    clientId =  parse(socket.handshake.headers.cookie).clientId
+                if (socket.handshake.headers.cookie) {
+                    clientId = parse(socket.handshake.headers.cookie).clientId;
                 }
-                if (clientId){
+                if (clientId) {
                     config.clientIdToSocket.set(clientId, socket);
                     socket.on('disconnect', () => {
-                        if (config.clientIdToSocket.has(clientId)){
+                        if (config.clientIdToSocket.has(clientId)) {
                             config.clientIdToSocket.delete(clientId);
                         }
                     });
@@ -69,11 +69,11 @@ if (config.graphiql) {
         }
 
         if (!req.cookies.clientId) {
-            const params: any = { httpOnly: true }
-            if (config.host){
-                params.domain =  '.' + config.getDomainAddress();
+            const cookieParams: any = { httpOnly: true };
+            if (config.host) {
+                cookieParams.domain = '.' + config.getDomainAddress();
             }
-            res.cookie('clientId', generateToken(32), params);
+            res.cookie('clientId', generateToken(32), cookieParams);
         }
 
         const params = await (graphqlHTTP as any).getGraphQLParams(req);
