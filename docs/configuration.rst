@@ -8,7 +8,7 @@ Properties are set when the service is instantiated, for example:
 
 .. code-block:: js
 
-    app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
+    app.use(kryptonAuth({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
 
 .. autoclass:: Config
     :members:
@@ -16,11 +16,11 @@ Properties are set when the service is instantiated, for example:
 Error Handling
 --------------
 
-GraphQL Auth Service provides an ``eventBus`` to notify eventual errors. The ``email-error`` event is related to unsent emails. The ``error`` event is related to any other kind of errors.
+Krypton Authentication provides an ``eventBus`` to notify eventual errors. The ``email-error`` event is related to unsent emails. The ``error`` event is related to any other kind of errors.
 
 .. code-block:: js
 
-    const { GraphQLAuthService } = require('graphql-auth-service');
+    const kryptonAuth = require('krypton-auth');
     const express = require('express');
     const EventEmitter = require('events');
     
@@ -34,7 +34,7 @@ GraphQL Auth Service provides an ``eventBus`` to notify eventual errors. The ``e
         console.log("An error occured: "+err)
     });
 
-    app.use('/auth', GraphQLAuthService({ eventEmitter }));
+    app.use('/auth', kryptonAuth({ eventEmitter }));
 
 
 .. _extended-schema:
@@ -42,7 +42,7 @@ GraphQL Auth Service provides an ``eventBus`` to notify eventual errors. The ``e
 Extended Schema
 ---------------
 
-The true power of GraphQL Auth Service is the ability to customize the user model to your own needs.
+The true power of Krypton Authentication is the ability to customize the user model to your own needs.
    
 To achieve that you simply need to pass the different `Mongoose Schema <https://mongoosejs.com/docs/guide.html>`_ fields you want to add.
 Under the hood, those extra fields will be converted into GraphQL types thanks to `graphql-compose-mongoose <https://github.com/graphql-compose/graphql-compose-mongoose>`_ and added to the different queries and mutations automatically.
@@ -96,5 +96,5 @@ For example, you could pass the following ``extendedSchema``:
         }
     };
 
-    app.use(GraphQLAuthService({ extendedSchema }));
+    app.use(kryptonAuth({ extendedSchema }));
 

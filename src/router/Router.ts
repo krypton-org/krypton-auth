@@ -116,7 +116,7 @@ router.use(
 router.use(ErrorHandler);
 
 function defaultQuery() {
-    return `# Welcome to GraphQL Auth Service
+    return `# Welcome to Krypton Authentication
 #
 # You can use GraphiQL IDE to test GraphQL queries.
 #

@@ -12,7 +12,7 @@ declare global {
     }
 }
 
-export function GraphQLAuthService(properties?: Config): Router {
+export = function (properties?: Config): Router {
     if (!properties) {
         properties = {};
     }
@@ -23,5 +23,3 @@ export function GraphQLAuthService(properties?: Config): Router {
     db.init();
     return router;
 }
-
-export { Config, Address } from './config';

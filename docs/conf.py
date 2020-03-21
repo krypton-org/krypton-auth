@@ -68,7 +68,7 @@ html_theme_options = {
 }
 
 html_context = {
-    'graphiql_endpoint': 'https://nusid.net/graphql-auth-service/',
+    'graphiql_endpoint': 'https://nusid.net/krypton-auth/',
     'graphiql_notification_endpoint': 'https://nusid.net/'
 }
 

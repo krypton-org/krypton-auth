@@ -1,4 +1,4 @@
-Online documentation is at https://jrebecchi.github.io/GraphQL-Auth-Service.
+Online documentation is at https://krypton-org.github.io/krypton-auth.
 
 ## Instructions for building the documentation
 

@@ -2,7 +2,7 @@ import MongooseConnection from '../../src/db/db';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
-import { GraphQLAuthService } from '../../src/index';
+import kryptonAuth from '../../src/index';
 import mailer, { Transporter } from 'nodemailer';
 import { parse } from 'cookie';
 
@@ -117,7 +117,7 @@ export default class AppTester {
         }
 
         const app = express();
-        app.use(GraphQLAuthService(options));
+        app.use(kryptonAuth(options));
         this.request = request(app);
 
         this.request.getGraphQL = async function (query, bearerToken, refreshToken): Promise<any> {

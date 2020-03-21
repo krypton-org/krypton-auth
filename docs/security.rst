@@ -1,7 +1,7 @@
 Security
 ========
 
-GraphQL Auth Service follows the security guidelines of this article: `The Ultimate Guide to handling JWTs on frontend clients <https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/>`_.
+Krypton Authentication follows the security guidelines of this article: `The Ultimate Guide to handling JWTs on frontend clients <https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/>`_.
 
 By logging-in a user will receive a short-lived authentication token and a long-lived refresh token. The authentication token should not be saved in the localstorage (prone to `XSS <https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>`_), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from `XSS <https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>`_).
 
@@ -9,7 +9,7 @@ By default, the authentication token is valid for 15 minutes. Afterwards you wil
 
 .. image:: _images/sequence_diagram-security.svg
    :align: center
-   :alt: GraphQL Auth Service - System Design diagram
+   :alt: Krypton Authentication - System Design diagram
 
 This process is safe from `CSRF <https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)>`_ attacks, because even though a form submit attack can make a call to the :ref:`refreshToken <refresh-authentication-tokens>` mutation, the attacker cannot get the new JWT token value that is returned.
 

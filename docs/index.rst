@@ -1,4 +1,4 @@
-.. title:: GraphQL Auth Service
+.. title:: Krypton Authentication
 
 .. md2html:: ../README.md
 

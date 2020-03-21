@@ -14,16 +14,16 @@ Service Setup
 
 .. code-block:: bash
 
-    npm install graphql-auth-service --save
+    npm install krypton-auth --save
 
 .. code-block:: js
 
-    const { GraphQLAuthService } = require('graphql-auth-service');
+    const kryptonAuth = require('krypton-auth');
     const express = require('express');
     
     const app = express();
     
-    app.use('/auth', GraphQLAuthService());
+    app.use('/auth', kryptonAuth());
     
     app.listen(process.env.PORT || 5000, () => {
         // The service will be accessible on http://localhost:5000/auth
@@ -35,7 +35,7 @@ Service Setup
 GraphQL Queries
 ---------------
 
-To use GraphQL Auth Service, you can use the ``fetch`` method or the ``XMLHttpRequest`` Object in JavaScript. To make an authenticated request, simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request. Please refer to this example below:
+To use Krypton Authentication, you can use the ``fetch`` method or the ``XMLHttpRequest`` Object in JavaScript. To make an authenticated request, simply include your authentication token as ``Bearer token`` in the ``Authorization`` header of your request. Please refer to this example below:
 
 .. code-block:: js
 

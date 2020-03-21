@@ -1,14 +1,14 @@
 {
   "name": "little-example",
   "version": "1.0.0",
-  "description": "A minimal example to use graphql-auth-service",
+  "description": "A minimal example to use krypton-auth",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.17.1",
-    "graphql-auth-service": "^2.1.1"
+    "krypton-auth": "^1.0.0"
   },
   "author": "jrebecchi",
   "license": "MIT"

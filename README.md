@@ -1,5 +1,7 @@
 <p align="center">
-<img src="/docs/_static/banner.svg">
+<img src="/docs/_static/logo.svg"/>
+</p>
+<p align="center">
 <i>Express authentication middleware, using GraphQL and JSON Web Tokens.</i><br/><br/>
 <a href="https://coveralls.io/github/krypton-org/krypton-auth?branch=master">
   <img src="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master">
@@ -12,7 +14,7 @@
 </a>
 </p>
 
-GraphQL Auth Sevice is an authentication middleware for Express handling login, registration, password recovery and account management with GraphQL & JSON Web Tokens.
+Krypton Authentication is a middleware for Express offering an API for login, registration, password recovery and account management with GraphQL & JSON Web Tokens.
 
 It is a free & open-source alternative to [Firebase Authentication](https://firebase.google.com/products/auth/).
 
@@ -30,21 +32,21 @@ It is a free & open-source alternative to [Firebase Authentication](https://fire
 ## Installation
 
 ```bash
-npm install graphql-auth-service --save
+npm install krypton-auth --save
 # or
-yarn add graphql-auth-service
+yarn add krypton-auth
 ```
 
 Assuming that you have a [MongoDB](https://www.mongodb.com/) instance running on `mongodb://localhost:27017/users`, you can run the following simple example.
 
 ```javascript
-const { GraphQLAuthService } = require('graphql-auth-service');
+const { KryptonAuth } = require('krypton-auth');
 const express = require('express');
 
 const app = express();
 
 // API entry point is localhost:5000/auth
-app.use('/auth', GraphQLAuthService());
+app.use('/auth', kryptonAuth());
 
 app.listen(process.env.PORT || 5000, () => {
     console.log(`server is listening on ${process.env.PORT || 5000}`)

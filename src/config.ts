@@ -37,7 +37,7 @@ export interface Address {
 }
 
 /**
- * Properties for configuring GraphQL Auth Service.
+ * Properties for configuring Krypton Authentication.
  */
 export interface Config {
     /** JSON Web Token signing algorithm. The default value is ``RS256``. */
@@ -71,15 +71,15 @@ export interface Config {
     /**
      * Public URL of the service.
      *
-     * **Very important for use in production:** when users receive emails to reset their password or to confirm their account, the links will be pointing to the ``host`` of the service. The default value is ``null``. When ``null``, GraphQL Auth Service uses the address located in ``req.headers.host`` that can correspond to the machine ``localhost``.
+     * **Very important for use in production:** when users receive emails to reset their password or to confirm their account, the links will be pointing to the ``host`` of the service. The default value is ``null``. When ``null``, Krypton Authentication uses the address located in ``req.headers.host`` that can correspond to the machine ``localhost``.
      */
     host?: string;
     /**
      * Sender address displayed in emails sent to users. The default value is ``undefined``.
      * ::
-     *     app.use(GraphQLAuthService({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
+     *     app.use(kryptonAuth({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
      *     // or
-     *     app.use(GraphQLAuthService({
+     *     app.use(kryptonAuth({
      *         mailFrom: {
      *              name: "Fred Foo 👻";
      *              address: "foo@example.com";
@@ -100,7 +100,7 @@ export interface Config {
      *        }
      *    });
      *
-     *    app.use('/auth', GraphQLAuthService({ transporter }));
+     *    app.use('/auth', kryptonAuth({ transporter }));
      *
      * If left ``undefined`` a Nodemailer test account is set automatically. It will print URL links on the command line to let you preview the emails that would have normally been sent.
      * ::
@@ -110,7 +110,7 @@ export interface Config {
     mailTransporter?: Transporter;
     /**
      * The filepath to the `EJS <https://ejs.co/>`_ template file of notification page.
-     * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/pages/Notification.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/pages/Notification.ejs>`_.
+     * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/pages/Notification.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/pages/Notification.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
      * * ``notifications``: ``Array`` of ``Object`` notification. Each notification object contains two properties:
@@ -119,7 +119,7 @@ export interface Config {
      */
     notificationPageTemplate?: string;
     /**
-     * The callback that will be executed when service is launched and ready. The default value is: ``() => console.log("GraphQL Auth Service is ready.");``.
+     * The callback that will be executed when service is launched and ready. The default value is: ``() => console.log("Krypton Authentication is ready.");``.
      */
     onReady?: () => void;
     /**
@@ -146,7 +146,7 @@ export interface Config {
     refreshTokenExpiryTime?: number;
     /**
      * The file path to the `EJS <https://ejs.co/>`_ template file of the email to reset forgotten password.
-     * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/emails/ResetPassword.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/ResetPassword.ejs>`_.
+     * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/emails/ResetPassword.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/ResetPassword.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
      * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
@@ -155,7 +155,7 @@ export interface Config {
     resetPasswordEmailTemplate?: string;
     /**
      * The file path to the `EJS <https://ejs.co/>`_ template file of the reset password form.
-     * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/forms/ResetPassword.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/forms/ResetPassword.ejs>`_.
+     * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/forms/ResetPassword.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/forms/ResetPassword.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
@@ -181,7 +181,7 @@ export interface Config {
     resetPasswordFormTemplate?: string;
     /**
      * The filepath to the `EJS <https://ejs.co/>`_ template file of the email to verify user account.
-     * This library include a simple one located in `./nodes_module/graphql-auth-service/lib/templates/emails/VerifyEmail.ejs <https://github.com/JohannC/GraphQL-Auth-Service/blob/master/lib/templates/emails/VerifyEmail.ejs>`_.
+     * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/emails/VerifyEmail.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/VerifyEmail.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
@@ -220,7 +220,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     public clientIdToSocket: Map<string, SocketIO.Socket>;
 
     /**
-     * Called by GraphQL Auth Service once it is launched
+     * Called by Krypton Authentication once it is launched
      */
     public onReady = () => {
         // Something to do
@@ -254,7 +254,7 @@ export class DefaultConfig implements Config, ReadyStatus {
         }
         if (this.isAgendaReady && this.isMongooseReady && (this.mailTransporter || this.isTestEmailReady)) {
             console.log('Connection to MongoDB established \u2705');
-            console.log('GraphQL Auth Service is ready \u2705');
+            console.log('Krypton Authentication is ready \u2705');
             this.onReady();
         }
     };
@@ -272,7 +272,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     };
 
     /**
-     * Returns the complete router adress of GraphQL Auth Service
+     * Returns the complete router adress of Krypton Authentication
      * @param  {Request} req
      * @returns The the complete router of the service
      */
@@ -283,7 +283,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     };
 
     /**
-     * Returns the domain of GraphQL Auth Service to set the domain parameter into cookies
+     * Returns the domain of Krypton Authentication to set the domain parameter into cookies
      * @param  {Request} req
      * @returns The domain of the service
      */
