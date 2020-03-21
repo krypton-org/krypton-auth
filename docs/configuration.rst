@@ -20,7 +20,7 @@ Krypton Authentication provides an ``eventBus`` to notify eventual errors. The `
 
 .. code-block:: js
 
-    const kryptonAuth = require('krypton-auth');
+    const kryptonAuth = require('@krypton-org/krypton-auth');
     const express = require('express');
     const EventEmitter = require('events');
     

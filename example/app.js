@@ -1,7 +1,7 @@
 /**
  * NOTE: You need to run a local instance of MongoDB for this to work!
  */
-const kryptonAuth = require('krypton-auth');
+const kryptonAuth = require('@krypton-org/krypton-auth');
 const express = require('express');
 const app = express();
 
