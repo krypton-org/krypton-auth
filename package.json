@@ -69,7 +69,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/krypton-org/krypton-auth"
+    "url": "git+https://github.com/krypton-org/krypton-auth.git"
   },
   "keywords": [
     "NodeJS",
