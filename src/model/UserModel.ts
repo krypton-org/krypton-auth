@@ -150,7 +150,6 @@ User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
 
 /** @see {@link IUserModel#createUser} */
 User.statics.createUser = async function(data: any): Promise<void> {
-    await this.ensureIndexes();
     const UserInstance = model('user', User);
     return PasswordEncryption.hashAndSalt(data.password).then(
         results => {
@@ -230,7 +229,6 @@ User.statics.verify = function(token: string, publicKey: string): Promise<object
 
 /** @see {@link IUserModel#updateUser} */
 User.statics.updateUser = async function(filter: any, data: any): Promise<void> {
-    await this.ensureIndexes();
     if (data.password) {
         try {
             const results = await PasswordEncryption.hashAndSalt(data.password);
