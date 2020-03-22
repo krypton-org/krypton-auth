@@ -11,7 +11,6 @@
 export default class OperationalError extends Error {
     public message: string;
     public type: string;
-    public statusCode: number;
 
     constructor(message: string, type?: string) {
         super();
@@ -27,10 +26,7 @@ export default class OperationalError extends Error {
  * @extends {OperationalError}
  */
 export class EmailAlreadyExistsError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 403;
-    }
+
 }
 
 /**
@@ -40,10 +36,7 @@ export class EmailAlreadyExistsError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UsernameAlreadyExistsError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 403;
-    }
+
 }
 
 /**
@@ -53,10 +46,7 @@ export class UsernameAlreadyExistsError extends OperationalError {
  * @extends {OperationalError}
  */
 export class WrongPasswordError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 401;
-    }
+
 }
 
 /**
@@ -66,10 +56,7 @@ export class WrongPasswordError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UpdatePasswordTooLateError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 401;
-    }
+
 }
 
 /**
@@ -79,10 +66,7 @@ export class UpdatePasswordTooLateError extends OperationalError {
  * @extends {OperationalError}
  */
 export class EmailNotSentError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 500;
-    }
+
 }
 
 /**
@@ -92,10 +76,7 @@ export class EmailNotSentError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UserNotFound extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 401;
-    }
+
 }
 
 /**
@@ -105,10 +86,7 @@ export class UserNotFound extends OperationalError {
  * @extends {OperationalError}
  */
 export class EmailAlreadyConfirmedError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 403;
-    }
+
 }
 
 /**
@@ -118,10 +96,7 @@ export class EmailAlreadyConfirmedError extends OperationalError {
  * @extends {OperationalError}
  */
 export class UserValidationError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 400;
-    }
+
 }
 
 /**
@@ -131,10 +106,7 @@ export class UserValidationError extends OperationalError {
  * @extends {OperationalError}
  */
 export class AlreadyLoggedInError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 400;
-    }
+
 }
 
 /**
@@ -144,8 +116,5 @@ export class AlreadyLoggedInError extends OperationalError {
  * @extends {OperationalError}
  */
 export class EncryptionFailedError extends OperationalError {
-    constructor(message: string, type?: string) {
-        super(message, type);
-        this.statusCode = 500;
-    }
+
 }

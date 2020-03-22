@@ -48,7 +48,6 @@ test('Wrong password', async (done) => {
     let res = await request.postGraphQL(query, token);
     expect(res.errors[0].message.includes("wrong password")).toBeTruthy();
     expect(res.errors[0].type).toBe('WrongPasswordError');
-    expect(res.errors[0].statusCode).toBe(401);
     done()
 });
 
@@ -70,7 +69,6 @@ test('Delete user', async (done) => {
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserNotFound');
-    expect(res.errors[0].statusCode).toBe(401);
 
     done();
 });
