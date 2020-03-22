@@ -98,7 +98,6 @@ router.use(
                 if (operationalError instanceof OperationalError) {
                     return {
                         message: operationalError.message,
-                        statusCode: operationalError.statusCode,
                         type: operationalError.type,
                     };
                 } else {
