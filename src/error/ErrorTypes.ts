@@ -80,6 +80,26 @@ export class UserNotFound extends OperationalError {
 }
 
 /**
+ * Request not authorized.
+ * @export
+ * @class UnauthorizedError
+ * @extends {OperationalError}
+ */
+export class UnauthorizedError extends OperationalError {
+
+}
+
+/**
+ * User token encryption failed.
+ * @export
+ * @class TokenEncryptionError
+ * @extends {OperationalError}
+ */
+export class TokenEncryptionError extends OperationalError {
+
+}
+
+/**
  * Email already confirmed.
  * @export
  * @class EmailAlreadyConfirmedError

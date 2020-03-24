@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
 import config from '../config';
 import * as PasswordEncryption from '../crypto/PasswordEncryption';
-import { EncryptionFailedError, UserNotFound, WrongPasswordError } from '../error/ErrorTypes';
+import { EncryptionFailedError, UnauthorizedError, UserNotFound, TokenEncryptionError } from '../error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
 
 export interface IUserModel extends Model<any> {
@@ -19,7 +19,7 @@ export interface IUserModel extends Model<any> {
 
     /**
      * Fetch user according to `filter`.
-     * @throws {UserNotFound}
+     * @throws {UnauthorizedError}
      * @param  {any} filter
      * @returns {Promise<any>} Promise to the user fetched
      */
@@ -27,7 +27,7 @@ export interface IUserModel extends Model<any> {
 
     /**
      * Return private and public user fields, user selected by `filter`.
-     * @throws {UserNotFound}
+     * @throws {UnauthorizedError}
      * @param  {any} filter
      * @returns {Promise<any>}
      */
@@ -52,6 +52,7 @@ export interface IUserModel extends Model<any> {
     /**
      * Sign-in user selected by `filter`.
      * @throws {UserNotFound}
+     * @throws {TokenEncryptionError}
      * @param  {any} filter
      * @param  {string} password
      * @param  {string} privateKey
@@ -61,6 +62,7 @@ export interface IUserModel extends Model<any> {
 
     /**
      * Returns a new authentication token. Should be called only after checking that user refresh token set on cookies is valid.
+     * @throws {TokenEncryptionError}
      * @param  {any} filter
      * @param  {string} privateKey
      * @returns {Promise<{ token: string; expiryDate: Date }>}
@@ -70,7 +72,7 @@ export interface IUserModel extends Model<any> {
     /**
      * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
      * Returns the user data decrypted.
-     * @throws {UserNotFound} - token not valid
+     * @throws {UnauthorizedError} - token not valid
      * @param  {string} token
      * @param  {string} publicKey
      * @returns {Promise<object | string>} Promise to the user data decrypted
@@ -96,6 +98,7 @@ export interface IUserModel extends Model<any> {
 
 /**
  * Compute users JsonWebTokens encoding the `user` data with the `privateKey`. This authentication token will be valid for `expiresIn` number of milliseconds.
+ * @throws {TokenEncryptionError}
  * @param  {any} user
  * @param  {string} privateKey
  * @param  {number} expiresIn
@@ -105,7 +108,7 @@ const computeUserToken = (user: any, privateKey: string, expiresIn: number): Pro
     return new Promise((resolve, reject) => {
         jwt.sign(user, privateKey, { expiresIn: expiresIn + 'ms', algorithm: config.algorithm }, async (err, token) => {
             if (err) {
-                reject(new UserNotFound(err.message));
+                reject(new TokenEncryptionError(err.message));
             } else {
                 resolve(token);
             }
@@ -129,7 +132,7 @@ User.statics.userExists = function (filter: any): Promise<boolean> {
 User.statics.getUser = function (filter: any): Promise<any> {
     return this.findOne(filter).then(user => {
         if (user == null) {
-            throw new UserNotFound('User not found!');
+            throw new UnauthorizedError('User not found!');
         }
         return user;
     });
@@ -142,7 +145,7 @@ User.statics.getUserNonInternalFields = function (filter: any): Promise<any> {
         .lean()
         .then(user => {
             if (user == null) {
-                throw new UserNotFound('User not found!');
+                throw new UnauthorizedError('User not found!');
             }
             return user;
         });
@@ -219,7 +222,7 @@ User.statics.verify = function (token: string, publicKey: string): Promise<objec
     return new Promise((resolve, reject) => {
         jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
-                reject(new UserNotFound('User not found, please log in!'));
+                reject(new UnauthorizedError('User not found, please log in!'));
             } else {
                 resolve(userDecrypted);
             }

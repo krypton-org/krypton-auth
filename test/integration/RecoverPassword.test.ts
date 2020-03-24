@@ -151,7 +151,7 @@ test("Wrong token", async (done) => {
 
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("Unvalid token!")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UnauthorizedError');
 
     res = await appTester.login(user2.email, newPassword);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();

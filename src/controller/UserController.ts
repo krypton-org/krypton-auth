@@ -13,6 +13,7 @@ import {
     EmailAlreadyExistsError,
     UpdatePasswordTooLateError,
     UsernameAlreadyExistsError,
+    UnauthorizedError,
     UserNotFound,
     UserValidationError,
     WrongPasswordError,
@@ -69,7 +70,7 @@ const sendConfirmationEmail = (user: any, confirmationToken: string, host: strin
 
 /**
  * Returns the user data of the logged in user.
- * @throws {UserNotFound} User does not exist
+ * @throws {UnauthorizedError} User does not exist
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ user: any }>} Promise to the user data
@@ -78,7 +79,7 @@ export const getUser = async (req: Request, res: Response): Promise<{ user: any 
     try {
         return await User.findById(req.user._id);
     } catch (err) {
-        throw new UserNotFound('User not found, please log in!');
+        throw new UnauthorizedError('User not found, please log in!');
     }
 };
 
@@ -104,7 +105,7 @@ export const checkUsernameAvailable = async (username: string): Promise<boolean>
 
 /**
  * Verifying link clicked by users in the account verification email.
- * @throws {UserNotFound} User does not exist
+ * @throws {UnauthorizedError} User does not exist
  * @param  {Request} req
  * @param  {Response} res
  * @param  {NextFunction} next
@@ -116,7 +117,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
     try {
         const exists = await User.userExists({ verificationToken: token });
         if (!exists) {
-            throw new UserNotFound('This link is no longer valid.');
+            throw new UnauthorizedError('This link is no longer valid.');
         }
         const user = await User.getUser({ verificationToken: token });
         await User.updateUser({ email: user.email }, { verificationToken: null, verified: true });
@@ -174,14 +175,14 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
 
 /**
  * Resend an account verification email to logged in user.
- * @throws {UserNotFound}
+ * @throws {UnauthorizedError}
  * @throws {EmailAlreadyConfirmedError}
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
  */
 export const resendConfirmationEmail = async (req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
-        throw new UserNotFound('Please login!');
+        throw new UnauthorizedError('Please login!');
     }
     const user = await User.getUser({ _id: req.user._id });
     if (user.verified) {
@@ -199,7 +200,7 @@ export const resendConfirmationEmail = async (req: Request): Promise<boolean> =>
 
 /**
  * Updating user password from the password recovery form.
- * @throws {UserNotFound}
+ * @throws {UnauthorizedError}
  * @throws {UpdatePasswordTooLateError}
  * @param  {string} password - new password
  * @param  {string} passwordRecoveryToken - token guaranteeing user identity
@@ -215,7 +216,7 @@ export const recoverPassword = async (
     }
     const userExists = await User.userExists({ passwordRecoveryToken });
     if (!userExists) {
-        throw new UserNotFound('Unvalid token!');
+        throw new UnauthorizedError('Unvalid token!');
     }
     const user = await User.getUser({ passwordRecoveryToken });
     const resetDate = new Date(user.passwordRecoveryRequestDate);
@@ -234,7 +235,8 @@ export const recoverPassword = async (
 };
 /**
  * Update the different user fields of logged in user.
- * @throws {UserNotFound}
+ * @throws {UnauthorizedError}
+ * @throws {TokenEncryptionError}
  * @throws {WrongPasswordError}
  * @throws {UsernameAlreadyExistsError}
  * @throws {EmailAlreadyExistsError}
@@ -251,7 +253,7 @@ export const updateUser = async (
 ): Promise<{ expiryDate: Date, token: string; user: any }> => {
     if (!isUserLoggedIn(req) || !(await Session.isValid(req.user._id, req.cookies.refreshToken))) {
         res.status(401);
-        throw new UserNotFound('Please login!');
+        throw new UnauthorizedError('Please login!');
     }
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
@@ -303,7 +305,7 @@ export const updateUser = async (
 };
 /**
  * Delete logged in user.
- * @throws {UserNotFound}
+ * @throws {UnauthorizedError}
  * @throws {WrongPasswordError}
  * @param  {string} password
  * @param  {Request} req
@@ -311,7 +313,7 @@ export const updateUser = async (
  */
 export const deleteUser = async (password: string, req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
-        throw new UserNotFound('Please login!');
+        throw new UnauthorizedError('Please login!');
     }
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
     if (!isValid) {
@@ -324,6 +326,7 @@ export const deleteUser = async (password: string, req: Request): Promise<boolea
 /**
  * User log-in.
  * @throws {UserNotFound}
+ * @throws {TokenEncryptionError}
  * @param  {string} loginStr
  * @param  {string} password
  * @param  {Request} req
@@ -435,7 +438,8 @@ export const resetPasswordForm = (req: Request, res: Response, next: NextFunctio
 };
 /**
  * Refresh the auth token and the refresh token. This last one is set in an httpOnly cookie.
- * @throws {UserNotFound}
+ * @throws {UnauthorizedError}
+ * @throws {TokenEncryptionError}
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; expiryDate: Date }>} Promise to the new authentication token and its expiry date.
@@ -453,6 +457,6 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
         res.cookie('refreshToken', refreshToken, params);
         return payload;
     } else {
-        throw new UserNotFound('Please login!');
+        throw new UnauthorizedError('Please login!');
     }
 };
