@@ -31,12 +31,8 @@ beforeAll((done) => {
                         receiveNewsletter:${user.receiveNewsletter},
                         gender:${user.gender}
                         firstName:"${user.firstName}" 
-                        lastName:"${user.lastName}"}){
-                    notifications{
-                        type
-                        message
-                    }
-                    }}`
+                        lastName:"${user.lastName}"})
+                    }`
             }
             const res = await request.postGraphQL(registerQuery);
             if (res.errors) done(res.errors);

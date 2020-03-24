@@ -65,7 +65,7 @@ export interface IUserModel extends Model<any> {
      * @param  {string} privateKey
      * @returns {Promise<{ token: string; expiryDate: Date }>}
      */
-    refreshAuthToken(filter: any, privateKey: string): Promise<{ token: string; expiryDate: Date }>;
+    refreshAuthToken(filter: any, privateKey: string): Promise<{ expiryDate: Date, token: string, user: any }>;
 
     /**
      * Decrypt user authentication token with the `publicKey`. If the operation works, it means that only the private key could issue the token and thus that the user is authentified.
@@ -121,12 +121,12 @@ internalFields.map(x => internalFieldsMap.set(x, true));
 const User: Schema = new Schema(UserSchema);
 
 /** @see {@link IUserModel#userExists} */
-User.statics.userExists = function(filter: any): Promise<boolean> {
+User.statics.userExists = function (filter: any): Promise<boolean> {
     return this.findOne(filter).then(result => !!result);
 };
 
 /** @see {@link IUserModel#getUser} */
-User.statics.getUser = function(filter: any): Promise<any> {
+User.statics.getUser = function (filter: any): Promise<any> {
     return this.findOne(filter).then(user => {
         if (user == null) {
             throw new UserNotFound('User not found!');
@@ -136,7 +136,7 @@ User.statics.getUser = function(filter: any): Promise<any> {
 };
 
 /** @see {@link IUserModel#getUserNonInternalFields} */
-User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
+User.statics.getUserNonInternalFields = function (filter: any): Promise<any> {
     return this.findOne(filter)
         .select(noninternalFieldsFilter)
         .lean()
@@ -149,7 +149,7 @@ User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
 };
 
 /** @see {@link IUserModel#createUser} */
-User.statics.createUser = async function(data: any): Promise<void> {
+User.statics.createUser = async function (data: any): Promise<void> {
     const UserInstance = model('user', User);
     return PasswordEncryption.hashAndSalt(data.password).then(
         results => {
@@ -173,7 +173,7 @@ User.statics.createUser = async function(data: any): Promise<void> {
     );
 };
 /** @see {@link IUserModel#isPasswordValid} */
-User.statics.isPasswordValid = function(filter: any, password: string): Promise<boolean> {
+User.statics.isPasswordValid = function (filter: any, password: string): Promise<boolean> {
     let user;
     return this.getUser(filter)
         .then(userFound => {
@@ -186,11 +186,11 @@ User.statics.isPasswordValid = function(filter: any, password: string): Promise<
 };
 
 /** @see {@link IUserModel#sign} */
-User.statics.sign = async function(
+User.statics.sign = async function (
     filter: any,
     password: string,
     privateKey: string,
-): Promise<{ user: any; token: string; expiryDate: Date }> {
+): Promise<{ expiryDate: Date, token: string, user: any }> {
     const isPasswordValid = await this.isPasswordValid(filter, password);
     if (!isPasswordValid) {
         throw new UserNotFound('Wrong credentials!');
@@ -203,19 +203,19 @@ User.statics.sign = async function(
 };
 
 /** @see {@link IUserModel#refreshAuthToken} */
-User.statics.refreshAuthToken = async function(
+User.statics.refreshAuthToken = async function (
     filter: any,
     privateKey: string,
-): Promise<{ token: string; expiryDate: Date }> {
+): Promise<{ expiryDate: Date, token: string, user: any }> {
     const user = await this.getUserNonInternalFields(filter);
     const expiryDate = new Date();
     expiryDate.setTime(expiryDate.getTime() + config.authTokenExpiryTime);
     const token = await computeUserToken(user, privateKey, config.authTokenExpiryTime);
-    return { token, expiryDate };
+    return { expiryDate, token, user };
 };
 
 /** @see {@link IUserModel#verify} */
-User.statics.verify = function(token: string, publicKey: string): Promise<object | string> {
+User.statics.verify = function (token: string, publicKey: string): Promise<object | string> {
     return new Promise((resolve, reject) => {
         jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
@@ -228,7 +228,7 @@ User.statics.verify = function(token: string, publicKey: string): Promise<object
 };
 
 /** @see {@link IUserModel#updateUser} */
-User.statics.updateUser = async function(filter: any, data: any): Promise<void> {
+User.statics.updateUser = async function (filter: any, data: any): Promise<void> {
     if (data.password) {
         try {
             const results = await PasswordEncryption.hashAndSalt(data.password);
@@ -250,7 +250,7 @@ User.statics.updateUser = async function(filter: any, data: any): Promise<void> 
 };
 
 /** @see {@link IUserModel#removeUser} */
-User.statics.removeUser = function(filter: any): Promise<void> {
+User.statics.removeUser = function (filter: any): Promise<void> {
     return this.deleteOne(filter);
 };
 

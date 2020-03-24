@@ -73,12 +73,8 @@ test('Password to small', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+            }`
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message).toBe("The password must contain at least 8 characters!");
@@ -98,12 +94,8 @@ test('Email invalid', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+            }`
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("This email address is not valid!")).toBeTruthy();
@@ -123,12 +115,8 @@ test('Username contains unauthorized characters', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+            }`
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("A username may only contain letters, numbers, dashes, dots and underscores")).toBeTruthy();
@@ -149,12 +137,8 @@ test('Username to small', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+            }`
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
@@ -174,16 +158,12 @@ test('Register a correct user', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+            }`
     }
     const res = await request.postGraphQL(query);
     if (res.errors) { return done(res.errors); }
-    expect(res.data.register.notifications[0].type).toBe("SUCCESS");
+    expect(res.data.register).toBeTruthy();
     done();
 }, 10000);
 
@@ -199,12 +179,8 @@ test('Username already exists', async (done) => {
                 receiveNewsletter:${user4.receiveNewsletter},
                 gender:${user4.gender}
                 firstName:"${user4.firstName}" 
-                lastName:"${user4.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user4.lastName}"})
+            }`
     }
     let res = await request.postGraphQL(query1);
     const query2 = {
@@ -217,12 +193,8 @@ test('Username already exists', async (done) => {
                 receiveNewsletter:${user4.receiveNewsletter},
                 gender:${user4.gender}
                 firstName:"${user4.firstName}" 
-                lastName:"${user4.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user4.lastName}"})
+            }`
     }
     res = await request.postGraphQL(query2);
     expect(res.errors[0].message).toBe("Username already exists");
@@ -242,12 +214,8 @@ test('Email already exists', async (done) => {
                 receiveNewsletter:${user3.receiveNewsletter},
                 gender:${user3.gender}
                 firstName:"${user3.firstName}" 
-                lastName:"${user3.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user3.lastName}"})
+            }`
     }
     let res = await request.postGraphQL(query1);
     const query2 = {
@@ -260,12 +228,8 @@ test('Email already exists', async (done) => {
                 receiveNewsletter:${user3.receiveNewsletter},
                 gender:${user3.gender}
                 firstName:"${user3.firstName}" 
-                lastName:"${user3.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user3.lastName}"})
+            }`
     }
     res = await request.postGraphQL(query2);
     expect(res.errors[0].message).toBe("Email already exists");

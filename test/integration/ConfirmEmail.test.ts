@@ -48,16 +48,11 @@ beforeAll((done) => {
 test("Confirm email", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendVerificationEmail{
-              notifications{
-                type
-                message
-              }
-            }
+            sendVerificationEmail
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery, token);
-    expect(res.data.sendVerificationEmail.notifications[0].message.includes("You will receive a confirmation link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendVerificationEmail).toBeTruthy();
     
     
     

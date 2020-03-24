@@ -115,10 +115,7 @@ test("Can't update user without refresh token", async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{age: ${35}, gender: M,}){
-              notifications{
-                type
-                message
-              }
+                token
             }
           }`
     }
@@ -133,10 +130,7 @@ test("Can't update user with expired auth token", async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{age: ${35}, gender: M,}){
-              notifications{
-                type
-                message
-              }
+                token
             }
           }`
     }

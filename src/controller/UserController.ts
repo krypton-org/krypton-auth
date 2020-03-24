@@ -87,9 +87,9 @@ export const getUser = async (req: Request, res: Response): Promise<{ user: any 
  * @param  {string} email
  * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
  */
-export const checkEmailAvailable = async (email: string): Promise<{ isAvailable: boolean }> => {
+export const checkEmailAvailable = async (email: string): Promise<boolean> => {
     const emailExists = await User.userExists({ email });
-    return { isAvailable: !emailExists };
+    return !emailExists;
 };
 
 /**
@@ -97,9 +97,9 @@ export const checkEmailAvailable = async (email: string): Promise<{ isAvailable:
  * @param  {string} username
  * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
  */
-export const checkUsernameAvailable = async (username: string): Promise<{ isAvailable: boolean }> => {
+export const checkUsernameAvailable = async (username: string): Promise<boolean> => {
     const usernameExists = await User.userExists({ username });
-    return { isAvailable: !usernameExists };
+    return !usernameExists;
 };
 
 /**
@@ -143,8 +143,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
  * @param  {Request} req
  * @returns {Promise<{ user: any; notifications: Notification[] }>} Promise to the notifications of success or failure
  */
-export const createUser = async (user: any, req: Request): Promise<{ user: any; notifications: Notification[] }> => {
-    const notifications: Notification[] = [];
+export const createUser = async (user: any, req: Request): Promise<boolean> => {
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
     if (!user.password) {
@@ -156,17 +155,12 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
     }
     try {
         await User.createUser(user);
-        notifications.push({ type: 'success', message: 'User created!' });
         let clientId;
         if (isMockEmailAndClientCanReceivePreview(req)) {
             clientId = req.cookies.clientId;
         }
         sendConfirmationEmail(user, user.verificationToken, config.getRouterAddress(req), clientId);
-        notifications.push({
-            message: 'You will receive a confirmation link at your email address in a few minutes.',
-            type: 'info',
-        });
-        return { notifications, user };
+        return true;
     } catch (err) {
         if (err.message.includes('username') && err.message.includes('duplicate key')) {
             throw new UsernameAlreadyExistsError('Username already exists');
@@ -185,11 +179,10 @@ export const createUser = async (user: any, req: Request): Promise<{ user: any; 
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
  */
-export const resendConfirmationEmail = async (req: Request): Promise<{ notifications: Notification[] }> => {
+export const resendConfirmationEmail = async (req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
         throw new UserNotFound('Please login!');
     }
-    const notifications: Notification[] = [];
     const user = await User.getUser({ _id: req.user._id });
     if (user.verified) {
         throw new EmailAlreadyConfirmedError('Your email adress has already been confirmed.');
@@ -199,12 +192,9 @@ export const resendConfirmationEmail = async (req: Request): Promise<{ notificat
             clientId = req.cookies.clientId;
         }
         sendConfirmationEmail(req.user, user.verificationToken, config.getRouterAddress(req), clientId);
-        notifications.push({
-            message: 'You will receive a confirmation link at your email address in a few minutes.',
-            type: 'success',
-        });
+
     }
-    return { notifications };
+    return true;
 };
 
 /**
@@ -219,7 +209,7 @@ export const recoverPassword = async (
     password: string,
     passwordRecoveryToken: string,
 ): Promise<{ notifications: Notification[] }> => {
-    const notifications = [];
+    const notifications: Notification[] = [];
     if (password.length < 8) {
         throw new UserValidationError('The password must contain at least 8 characters!');
     }
@@ -258,13 +248,11 @@ export const updateUser = async (
     userUpdates: any,
     req: Request,
     res: Response,
-): Promise<{ user: any; notifications: Notification[] }> => {
+): Promise<{ expiryDate: Date, token: string; user: any }> => {
     if (!isUserLoggedIn(req) || !(await Session.isValid(req.user._id, req.cookies.refreshToken))) {
         res.status(401);
         throw new UserNotFound('Please login!');
     }
-    const notifications = [];
-
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
         if (!isValid) {
@@ -286,7 +274,6 @@ export const updateUser = async (
 
         await User.updateUser({ _id: req.user._id }, userUpdates);
         req.user = await User.getUserNonInternalFields({ _id: req.user._id });
-        notifications.push({ type: 'success', message: 'User information updated!' });
 
         if (!isEmailVerified) {
             let clientId;
@@ -294,15 +281,16 @@ export const updateUser = async (
                 clientId = req.cookies.clientId;
             }
             sendConfirmationEmail(req.user, userUpdates.verificationToken, config.getRouterAddress(req), clientId);
-            notifications.push({
-                message: 'You will receive a confirmation link at your email address in a few minutes.',
-                type: 'info',
-            });
+
         }
-        return {
-            notifications,
-            user: req.user,
-        };
+        const payload = await User.refreshAuthToken({ _id: req.user._id }, config.privateKey);
+        const { refreshToken } = await Session.updateSession(req.user._id, req.cookies.refreshToken);
+        const params: any = { httpOnly: true };
+        if (config.host) {
+            params.domain = '.' + config.getDomainAddress();
+        }
+        res.cookie('refreshToken', refreshToken, params);
+        return payload;
     } catch (err) {
         if (err.message.includes('username') && err.message.includes('duplicate key')) {
             throw new UsernameAlreadyExistsError('Username already exists');
@@ -321,18 +309,16 @@ export const updateUser = async (
  * @param  {Request} req
  * @returns Notification
  */
-export const deleteUser = async (password: string, req: Request): Promise<{ notifications: Notification[] }> => {
+export const deleteUser = async (password: string, req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
         throw new UserNotFound('Please login!');
     }
-    const notifications: Notification[] = [];
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
     if (!isValid) {
         throw new WrongPasswordError('You entered a wrong password');
     }
     await User.removeUser({ _id: req.user._id });
-    notifications.push({ type: 'success', message: 'Your account has been deleted.' });
-    return { notifications };
+    return true;
 };
 
 /**
@@ -349,8 +335,8 @@ export const login = async (
     password: string,
     req: Request,
     res: Response,
-): Promise<{ token: string; user: any }> => {
-    let payload: { token: string; user: any };
+): Promise<{ expiryDate: Date, token: string; user: any }> => {
+    let payload: { expiryDate: Date, token: string; user: any, };
     const emailExists = await User.userExists({ email: loginStr });
     const usernameExists = await User.userExists({ username: loginStr });
     if (emailExists) {
@@ -387,20 +373,14 @@ export const login = async (
 export const sendPasswordRecoveryEmail = async (
     email: string,
     req: Request,
-): Promise<{ notifications: Notification[] }> => {
-    const notifications: Notification[] = [];
-    notifications.push({
-        message:
-            'If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.',
-        type: 'info',
-    });
+): Promise<boolean> => {
     if (req.user !== undefined) {
         throw new AlreadyLoggedInError('Oups, you are already logged in!');
     }
 
     const exists = await User.userExists({ email });
     if (!exists) {
-        return { notifications };
+        return true;
     }
     const passwordRecoveryToken = generateToken(TOKEN_LENGTH);
     const passwordRecoveryRequestDate = new Date();
@@ -423,7 +403,7 @@ export const sendPasswordRecoveryEmail = async (
         subject: 'Password Recovery',
         template: config.resetPasswordEmailTemplate,
     });
-    return { notifications };
+    return true;
 };
 
 /**
