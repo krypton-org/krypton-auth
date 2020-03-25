@@ -72,12 +72,7 @@ beforeAll((done) => {
 test("Can't get recovery pawwsord when logged in", async (done) => {
     const query = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "${user.email}"){
-              notifications{
-                type
-                message
-              }
-            }
+            sendPasswordRecoveryEmail(email: "${user.email}")
           }`
     }
     let res = await request.getGraphQL(query, token);
@@ -89,44 +84,35 @@ test("Can't get recovery pawwsord when logged in", async (done) => {
 test("Ask password recovery for unknown email address", async (done) => {
     const query = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "unknown@email.com"){
-              notifications{
-                type
-                message
-              }
-            }
+            sendPasswordRecoveryEmail(email: "unknown@email.com")
           }`
     }
     let res = await request.getGraphQL(query);
-    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     done();
 });
 
 test("Change password with recovery token", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "${user.email}"){
-              notifications{
-                type
-                message
-              }
-            }
+            sendPasswordRecoveryEmail(email: "${user.email}")
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user.username }, { verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     let newPassword = "newPassword";
     const updatePasswordQuery = {
-        query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
-            notifications{
-            type
-            message
-            }
-        }}`
+        query: `mutation{
+            resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
+                notifications{
+                    message
+                }
+            }    
+          }`
     }
 
     res = await request.postGraphQL(updatePasswordQuery);
@@ -134,7 +120,7 @@ test("Change password with recovery token", async (done) => {
 
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     res = await appTester.login(user.email, newPassword);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -146,34 +132,30 @@ test("Change password with recovery token", async (done) => {
 test("Wrong token", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "${user2.email}"){
+            sendPasswordRecoveryEmail(email: "${user2.email}")
+          }`
+    }
+    let res = await request.getGraphQL(recoveryEmailQuery);
+    expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
+
+    let newPassword = "newPassword";
+    const updatePasswordQuery = {
+        query: `mutation{
+            resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"WRONGTOKEN"){
               notifications{
-                type
                 message
               }
             }
           }`
     }
-    let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
-
-    let newPassword = "newPassword";
-    const updatePasswordQuery = {
-        query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"WRONGTOKEN"){
-            notifications{
-            type
-            message
-            }
-        }}`
-    }
 
     res = await request.postGraphQL(updatePasswordQuery);
     expect(res.errors[0].message.includes("Unvalid token!")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UnauthorizedError');
 
     res = await appTester.login(user2.email, newPassword);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     done();
 });
@@ -181,27 +163,23 @@ test("Wrong token", async (done) => {
 test("Password too short", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "${user3.email}"){
-              notifications{
-                type
-                message
-              }
-            }
+            sendPasswordRecoveryEmail(email: "${user3.email}")
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user3.username });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     const updatePasswordQuery = {
-        query: `mutation{resetMyPassword(password:"toto" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
+        query: `mutation{
+          resetMyPassword(password:"toto" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
             notifications{
-            type
-            message
+              message
             }
-        }}`
+          }
+        }`
     }
 
     res = await request.postGraphQL(updatePasswordQuery);
@@ -214,16 +192,11 @@ test("Password too short", async (done) => {
 test("Token too old", async (done) => {
     const recoveryEmailQuery = {
         query: `query{
-            sendPasswordRecoveryEmail(email: "${user4.email}"){
-              notifications{
-                type
-                message
-              }
-            }
+            sendPasswordRecoveryEmail(email: "${user4.email}")
           }`
     }
     let res = await request.getGraphQL(recoveryEmailQuery);
-    expect(res.data.sendPasswordRecoveryEmail.notifications[0].message.includes("If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes")).toBeTruthy();
+    expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
     const userRetrieved = await UserModel.getUser({ username: user4.username });
     let oldDate = new Date()
@@ -234,12 +207,13 @@ test("Token too old", async (done) => {
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     let newPassword = "newPassword";
     const updatePasswordQuery = {
-        query: `mutation{resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
+        query: `mutation{
+          resetMyPassword(password:"${newPassword}" passwordRecoveryToken:"${userRetrieved.passwordRecoveryToken}"){
             notifications{
-            type
-            message
+              message
             }
-        }}`
+          }
+        }`
     }
 
     res = await request.postGraphQL(updatePasswordQuery);

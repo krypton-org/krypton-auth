@@ -5,7 +5,7 @@
 import { Document, model, Model, Schema } from 'mongoose';
 import config from '../config';
 import generateToken from '../crypto/TokenGenerator';
-import { UserNotFound } from '../error/ErrorTypes';
+import { UnauthorizedError } from '../error/ErrorTypes';
 
 const REFRESH_TOKEN_LENGTH = 256;
 
@@ -50,7 +50,7 @@ export interface ISessionModel extends Model<any, {}> {
 
     /**
      * Returns the user and session corresponding to the refresh token.
-     * @throws {UserNotFound}
+     * @throws {UnauthorizedError}
      * @param  {string} userId
      * @returns {Promise<any>} Returns the user and session corresponding to the refresh token.
      */
@@ -153,7 +153,7 @@ SessionSchema.statics.getUserAndSessionFromRefreshToken = async function(
     ) {
         return { user: aggregate[0].user[0], session: aggregate[0] };
     } else {
-        throw new UserNotFound('Please login!');
+        throw new UnauthorizedError('Please login!');
     }
 };
 

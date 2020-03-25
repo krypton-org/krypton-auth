@@ -55,7 +55,8 @@ You will be able to access private mutations/queries by including it in the ``Au
     }
 
 **Errors:**
-:any:`UserNotFound`.
+:any:`UserNotFoundError`,
+:any:`TokenEncryptionError`.
 
 .. _access-user-private-data:
 
@@ -79,7 +80,7 @@ To access your own private data use the ``me`` query.  You have to be logged in 
     }
 
 **Errors:**
-:any:`UserNotFound`.
+:any:`UnauthorizedError`.
 
 .. _update-user:
 
@@ -93,14 +94,17 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
    :query:
     mutation {
       updateMe(fields: {username: "yourname2"}) {
-        notifications {
-          message
+        token
+        expiryDate
+        user {
+          _id
+          verified
         }
       }
     }
 
 **Errors:**
-:any:`UserNotFound`,
+:any:`UnauthorizedError`,
 :any:`EmailAlreadyExistsError`,
 :any:`UsernameAlreadyExistsError`,
 :any:`UserValidationError`.
@@ -117,14 +121,17 @@ To change your password, use the ``updateMe`` mutation passing your ``previousPa
    :query:
     mutation {
       updateMe(fields: {previousPassword: "yourpassword", password: "newpassword"}) {
-        notifications {
-          message
+        token
+        expiryDate
+        user {
+          _id
+          verified
         }
       }
     }
 
 **Errors:**
-:any:`UserNotFound`,
+:any:`UnauthorizedError`,
 :any:`WrongPasswordError`,
 :any:`EncryptionFailedError`.
 
@@ -167,10 +174,7 @@ To reset your forgotten password, use the ``sendPasswordRecoveryEmail`` query pa
 .. graphiql::
    :query:
     query {
-      sendPasswordRecoveryEmail(email: "yourname@mail.com") {
-        notifications {
-          message
-        }
+        sendPasswordRecoveryEmail(email: "yourname@mail.com")
       }
     }
 
@@ -196,16 +200,33 @@ To delete your account, use the ``deleteMe`` mutation. You have to be logged in 
    :withtoken:
    :query:
     mutation {
-      deleteMe(password: "yourpassword") {
-        notifications {
-          message
-        }
-      }
+      deleteMe(password: "yourpassword") 
     }
 
 **Errors:**
 :any:`WrongPasswordError`,
-:any:`UserNotFound`.
+:any:`UnauthorizedError`.
+
+.. _check-available-credentials:
+
+Check for available credentials
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To know if an email is available use the ``emailAvailable`` query.
+
+.. graphiql::
+    :query:
+     query {
+       emailAvailable(email: "yourname@mail.com")
+     }
+
+To know if a username is available use the ``usernameAvailable`` query.
+
+.. graphiql::
+    :query:
+     query {
+       usernameAvailable(email: "yourname@mail.com")
+     }
 
 .. _fetch-public-user-data:
 
@@ -234,7 +255,25 @@ To fetch public user information from its ``id`` use use the ``userById`` query.
       }
     }
 
-To fetch public user information from a list of ``ids`` use use the ``userByIds`` query.
+To fetch multiple users from any of its public fields use the ``userMany`` query.
+
+.. graphiql::
+    :query:
+     query {
+       userMany(filter: {gender: Male}) {
+         username
+       }
+     }
+
+To count users, with filters on one some of the public fields, use the ``userCount`` query.
+
+.. graphiql::
+    :query:
+     query {
+       userCount(filter: {gender: Male})
+     }
+
+To fetch public user information from a list of ``ids`` use the ``userByIds`` query.
 
 .. graphiql::
    :query:
@@ -244,9 +283,17 @@ To fetch public user information from a list of ``ids`` use use the ``userByIds`
       }
     } 
 
-* ``userMany``: to fetch one or many user public information from any of its public fields.
-* ``userCount``: to count users according to criteria based on any user public fields.
-* ``userPagination``: to list users with pagination configuration.
+To get a paginated list of users, with filters on one some of the public fields, use the ``userPagination`` query.
+
+.. graphiql::
+    :query:
+     query {
+       userPagination(filter: {gender: Male}, page:1, perPage:5){
+         items{
+           username
+         }
+       }
+     }
 
 Errors
 ^^^^^^
@@ -259,7 +306,9 @@ Errors
 .. autoattribute:: WrongPasswordError
 .. autoattribute:: UpdatePasswordTooLateError
 .. autoattribute:: EmailNotSentError
-.. autoattribute:: UserNotFound
+.. autoattribute:: UserNotFoundError
+.. autoattribute:: UnauthorizedError
+.. autoattribute:: TokenEncryptionError
 .. autoattribute:: EmailAlreadyConfirmedError
 .. autoattribute:: UserValidationError
 .. autoattribute:: AlreadyLoggedInError

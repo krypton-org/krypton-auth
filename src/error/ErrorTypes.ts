@@ -72,10 +72,30 @@ export class EmailNotSentError extends OperationalError {
 /**
  * User not found.
  * @export
- * @class UserNotFound
+ * @class UserNotFoundError
  * @extends {OperationalError}
  */
-export class UserNotFound extends OperationalError {
+export class UserNotFoundError extends OperationalError {
+
+}
+
+/**
+ * Request not authorized.
+ * @export
+ * @class UnauthorizedError
+ * @extends {OperationalError}
+ */
+export class UnauthorizedError extends OperationalError {
+
+}
+
+/**
+ * User token encryption failed.
+ * @export
+ * @class TokenEncryptionError
+ * @extends {OperationalError}
+ */
+export class TokenEncryptionError extends OperationalError {
 
 }
 

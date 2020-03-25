@@ -60,7 +60,7 @@ test('Wrong token', async (done) => {
 
     let res = await request.postGraphQL(buildGetMeQuery());
 
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UnauthorizedError');
 
     done();
 });

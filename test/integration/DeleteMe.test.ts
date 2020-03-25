@@ -37,12 +37,7 @@ test('Wrong password', async (done) => {
 
     const query = {
         query: `mutation{
-            deleteMe(password:"wrongpassword"){
-                notifications{
-                  type
-                  message
-                }
-            }
+            deleteMe(password:"wrongpassword")
           }`
     }
     let res = await request.postGraphQL(query, token);
@@ -55,20 +50,15 @@ test('Delete user', async (done) => {
 
     const query = {
         query: `mutation{
-            deleteMe(password:"${user.password}"){
-                notifications{
-                  type
-                  message
-                }
-            }
+            deleteMe(password:"${user.password}")
           }`
     }
     let res = await request.postGraphQL(query, token);
-    expect(res.data.deleteMe.notifications[0].message.includes("Your account has been deleted")).toBeTruthy();
+    expect(res.data.deleteMe).toBeTruthy();
     
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     done();
 });

@@ -21,12 +21,8 @@ export default class AppTester {
                 receiveNewsletter:${user.receiveNewsletter},
                 gender:${user.gender}
                 firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"}){
-            notifications{
-                type
-                message
-            }
-            }}`
+                lastName:"${user.lastName}"})
+            }`
         }
         return await this.request.postGraphQL(registerQuery);
     };

@@ -20,7 +20,7 @@ beforeAll((done) => {
         onReady: async () => {
             try {
                 request = appTester.getRequestSender();
-            done();
+                done();
             } catch (err) {
                 done(err);
             }
@@ -42,12 +42,8 @@ test('Can\'t record username', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+        }`
     }
     let res = await request.postGraphQL(queryRegister);
     expect(res.errors[0].message).toBe('Field "username" is not defined by type UserRegisterInput. Did you mean lastName?');
@@ -62,15 +58,11 @@ test('Can\'t record username', async (done) => {
                 receiveNewsletter:${user1.receiveNewsletter},
                 gender:${user1.gender}
                 firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"}){
-              notifications{
-                  type
-                  message
-              }
-            }}`
+                lastName:"${user1.lastName}"})
+        }`
     }
     res = await request.postGraphQL(queryRegister);
-    expect(res.data.register.notifications[0].type).toBe("SUCCESS");
+    expect(res.data.register).toBeTruthy();
 
     //Login
     let queryLogin = {
@@ -81,7 +73,7 @@ test('Can\'t record username', async (done) => {
     }
     res = await request.postGraphQL(queryLogin);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
 
     queryLogin = {

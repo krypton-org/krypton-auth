@@ -28,9 +28,7 @@ let user2 = {
 const buildUsernameAvailableQuery = (username) => {
     return {
         query: `query{
-            usernameAvailable(username:"${username}"){
-            isAvailable
-            }
+            usernameAvailable(username:"${username}")
         }`
     }
 }
@@ -38,9 +36,7 @@ const buildUsernameAvailableQuery = (username) => {
 const buildEmailAvailableQuery = (email) => {
     return {
         query: `query{
-            emailAvailable(email:"${email}"){
-            isAvailable
-            }
+            emailAvailable(email:"${email}")
         }`
     }
 }
@@ -63,21 +59,21 @@ beforeAll((done) => {
 
 test("Username availability", async (done) => {
     let res = await request.getGraphQL(buildUsernameAvailableQuery("availableUsername"));
-    expect(res.data.usernameAvailable.isAvailable).toBeTruthy();
+    expect(res.data.usernameAvailable).toBeTruthy();
     res = await request.getGraphQL(buildUsernameAvailableQuery(user1.username));
-    expect(res.data.usernameAvailable.isAvailable).toBeFalsy();
+    expect(res.data.usernameAvailable).toBeFalsy();
     res = await request.getGraphQL(buildUsernameAvailableQuery(user2.username));
-    expect(res.data.usernameAvailable.isAvailable).toBeFalsy();
+    expect(res.data.usernameAvailable).toBeFalsy();
     done()
 });
 
 test("Email availability", async (done) => {
     let res = await request.getGraphQL(buildEmailAvailableQuery("available.email@mail.com"));
-    expect(res.data.emailAvailable.isAvailable).toBeTruthy();
+    expect(res.data.emailAvailable).toBeTruthy();
     res = await request.getGraphQL(buildEmailAvailableQuery(user1.email));
-    expect(res.data.emailAvailable.isAvailable).toBeFalsy();
+    expect(res.data.emailAvailable).toBeFalsy();
     res = await request.getGraphQL(buildEmailAvailableQuery(user2.email));
-    expect(res.data.emailAvailable.isAvailable).toBeFalsy();
+    expect(res.data.emailAvailable).toBeFalsy();
     done()
 });
 

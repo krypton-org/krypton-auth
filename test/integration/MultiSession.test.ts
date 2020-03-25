@@ -85,14 +85,14 @@ test("User can have 2 sessions", async (done) => {
     let resLogin1 = await appTester.login(user1.email, user1.password);
     expect(resLogin1.data.login.token).not.toBeUndefined();
     expect(resLogin1.cookies.refreshToken).not.toBeUndefined();
-    const token1 = resLogin1.data.login.token;
-    const refreshToken1 = resLogin1.cookies.refreshToken;
+    let token1 = resLogin1.data.login.token;
+    let refreshToken1 = resLogin1.cookies.refreshToken;
     // Session 2
     let resLogin2 = await appTester.login(user1.email, user1.password);
     expect(resLogin2.data.login.token).not.toBeUndefined();
     expect(resLogin2.cookies.refreshToken).not.toBeUndefined();
     let token2 = resLogin2.data.login.token;
-    const refreshToken2 = resLogin2.cookies.refreshToken;
+    let refreshToken2 = resLogin2.cookies.refreshToken;
 
     // Check sessions are different
     expect(refreshToken1).not.toBe(refreshToken2);
@@ -108,28 +108,27 @@ test("User can have 2 sessions", async (done) => {
     const query1 = {
         query: `mutation{
             updateMe(fields:{age: ${35}}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
     let resUpdate1 = await request.postGraphQL(query1, token1, refreshToken1);
-    expect(resUpdate1.data.updateMe.notifications[0].type).toBe("SUCCESS");
+    expect(resUpdate1.data.updateMe.token).not.toBeUndefined();
+    refreshToken1 = resUpdate1.cookies.refreshToken;
+    token1 = resUpdate1.data.updateMe.token;
+
     // Update user with session 2
     const query2 = {
         query: `mutation{
             updateMe(fields:{gender: M}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
     let resUpdate2 = await request.postGraphQL(query2, token2, refreshToken2);
-    expect(resUpdate2.data.updateMe.notifications[0].type).toBe("SUCCESS");
+    expect(resUpdate2.data.updateMe.token).not.toBeUndefined();
+    refreshToken2 = resUpdate2.cookies.refreshToken;
+    token2 = resUpdate2.data.updateMe.token;
 
     await wait(1000);
     // Refresh token with session 1

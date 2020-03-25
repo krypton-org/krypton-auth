@@ -31,12 +31,8 @@ beforeAll((done) => {
                         receiveNewsletter:${user.receiveNewsletter},
                         gender:${user.gender}
                         firstName:"${user.firstName}" 
-                        lastName:"${user.lastName}"}){
-                    notifications{
-                        type
-                        message
-                    }
-                    }}`
+                        lastName:"${user.lastName}"})
+                    }`
             }
             const res = await request.postGraphQL(registerQuery);
             if (res.errors) done(res.errors);
@@ -143,7 +139,7 @@ test("Wrong login", async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 
@@ -157,7 +153,7 @@ test("Wrong password", async (done) => {
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 afterAll(async (done) => {

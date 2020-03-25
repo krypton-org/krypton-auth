@@ -5,6 +5,7 @@ import config from '../../src/config';
 let appTester;
 let request;
 let token1;
+let expiryDate1;
 let token2;
 let token3;
 let token4;
@@ -62,6 +63,9 @@ let updates = {
     password: "tototototo"
 }
 
+const wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
+
 beforeAll((done) => {
     appTester = new AppTester({
         dbAddress: "mongodb://localhost:27017/UpdateMeTest",
@@ -74,6 +78,7 @@ beforeAll((done) => {
                 res = await appTester.register(user4);
                 res = await appTester.login(user1.email, user1.password);
                 token1 = res.data.login.token;
+                expiryDate1 = new Date(res.data.login.expiryDate);
                 refreshToken1 = res.cookies.refreshToken;
                 res = await appTester.login(user2.email, user2.password);
                 token2 = res.data.login.token;
@@ -96,29 +101,29 @@ test('Update usersname - email - password', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{username:"${updates.username}" email: "${updates.email}" password: "${updates.password}" previousPassword:"${user1.password}"}){
+              token,
+              expiryDate
               user{
                 username
                 verified
                 _id
                 email
               }
-              notifications{
-                type
-                message
-              }
             }
           }`
     }
-
+    await wait(1000);
     let res = await request.postGraphQL(query, token1, refreshToken1);
-
-    expect(res.data.updateMe.notifications[0].type).toBe("SUCCESS");
+    expect(res.data.updateMe.token).not.toBe(token1);
+    expect(new Date(res.data.updateMe.expiryDate).getTime()).toBeGreaterThan(expiryDate1.getTime());
+    expect(res.cookies.refreshToken).not.toBe(refreshToken1);
+    
     expect(res.data.updateMe.user.email).toBe("otheremail@mail.com");
     expect(res.data.updateMe.user.username).toBe("otherUsername");
 
     res = await appTester.login(user1.email, user1.password)
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     res = await appTester.login(updates.email, updates.password);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -148,10 +153,7 @@ test('Wrong previous password', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{password: "newpassword" previousPassword:"wrongpassword"}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -167,7 +169,7 @@ test('Wrong previous password', async (done) => {
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 
@@ -176,10 +178,7 @@ test('Password too short', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{password: "toto" previousPassword:"${user2.password}"}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -191,12 +190,12 @@ test('Password too short', async (done) => {
     let loginQuery = {
         query: `mutation{
             login(login:"${user2.email}" password:"toto"){
-            token
+                token
         }}`
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 
@@ -205,10 +204,7 @@ test('Username too short', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{username: "Yo"}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -224,10 +220,7 @@ test('Username already exists', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{username: "${user2.username}"}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -243,10 +236,7 @@ test('Email already exists', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{email: "${user2.email}"}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -262,10 +252,7 @@ test('Wrong gender', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{gender: Mutant}){
-              notifications{
-                type
-                message
-              }
+              token
             }
           }`
     }
@@ -285,16 +272,17 @@ test('Update email of a verified user', async (done) => {
     const query = {
         query: `mutation{
             updateMe(fields:{email: "${newEmail}"}){
-              notifications{
-                type
-                message
+              token
+              user{
+                verified
               }
             }
           }`
     }
 
     let updateRes = await request.postGraphQL(query, token3, refreshToken3);
-    expect(updateRes.data.updateMe.notifications.filter(notif => notif.message.includes("You will receive a confirmation link at your email address in a few minutes")).length).toBe(1);
+    expect(updateRes.data.updateMe.user.verified).toBeFalsy();
+
     done();
 });
 
