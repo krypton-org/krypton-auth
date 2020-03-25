@@ -58,7 +58,7 @@ test('Delete user', async (done) => {
     
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     done();
 });

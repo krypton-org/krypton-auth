@@ -14,7 +14,7 @@ import {
     UpdatePasswordTooLateError,
     UsernameAlreadyExistsError,
     UnauthorizedError,
-    UserNotFound,
+    UserNotFoundError,
     UserValidationError,
     WrongPasswordError,
 } from '../error/ErrorTypes';
@@ -325,7 +325,7 @@ export const deleteUser = async (password: string, req: Request): Promise<boolea
 
 /**
  * User log-in.
- * @throws {UserNotFound}
+ * @throws {UserNotFoundError}
  * @throws {TokenEncryptionError}
  * @param  {string} loginStr
  * @param  {string} password
@@ -347,7 +347,7 @@ export const login = async (
     } else if (usernameExists) {
         payload = await User.sign({ username: loginStr }, password, config.privateKey);
     } else {
-        throw new UserNotFound('Wrong credentials!');
+        throw new UserNotFoundError('Wrong credentials!');
     }
 
     if (req.cookies.refreshToken) {

@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Document, model, Model, Schema } from 'mongoose';
 import config from '../config';
 import * as PasswordEncryption from '../crypto/PasswordEncryption';
-import { EncryptionFailedError, UnauthorizedError, UserNotFound, TokenEncryptionError } from '../error/ErrorTypes';
+import { EncryptionFailedError, UnauthorizedError, UserNotFoundError, TokenEncryptionError } from '../error/ErrorTypes';
 import { internalFields, UserSchema } from './UserSchema';
 
 export interface IUserModel extends Model<any> {
@@ -51,7 +51,7 @@ export interface IUserModel extends Model<any> {
 
     /**
      * Sign-in user selected by `filter`.
-     * @throws {UserNotFound}
+     * @throws {UserNotFoundError}
      * @throws {TokenEncryptionError}
      * @param  {any} filter
      * @param  {string} password
@@ -196,7 +196,7 @@ User.statics.sign = async function (
 ): Promise<{ expiryDate: Date, token: string, user: any }> {
     const isPasswordValid = await this.isPasswordValid(filter, password);
     if (!isPasswordValid) {
-        throw new UserNotFound('Wrong credentials!');
+        throw new UserNotFoundError('Wrong credentials!');
     }
     const user = await this.getUserNonInternalFields(filter);
     const expiryDate = new Date();

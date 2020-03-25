@@ -123,7 +123,7 @@ test('Update usersname - email - password', async (done) => {
 
     res = await appTester.login(user1.email, user1.password)
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     res = await appTester.login(updates.email, updates.password);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -169,7 +169,7 @@ test('Wrong previous password', async (done) => {
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 
@@ -195,7 +195,7 @@ test('Password too short', async (done) => {
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
 

@@ -72,10 +72,10 @@ export class EmailNotSentError extends OperationalError {
 /**
  * User not found.
  * @export
- * @class UserNotFound
+ * @class UserNotFoundError
  * @extends {OperationalError}
  */
-export class UserNotFound extends OperationalError {
+export class UserNotFoundError extends OperationalError {
 
 }
 

@@ -32,9 +32,9 @@ It is a free & open-source alternative to [Firebase Authentication](https://fire
 ## Installation
 
 ```bash
-npm install krypton-auth --save
+npm install @krypton-org/krypton-auth --save
 # or
-yarn add krypton-auth
+yarn add @krypton-org/krypton-auth
 ```
 
 Assuming that you have a [MongoDB](https://www.mongodb.com/) instance running on `mongodb://localhost:27017/users`, you can run the following simple example.

@@ -73,7 +73,7 @@ test('Can\'t record username', async (done) => {
     }
     res = await request.postGraphQL(queryLogin);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
 
     queryLogin = {

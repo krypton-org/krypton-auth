@@ -120,7 +120,7 @@ test("Change password with recovery token", async (done) => {
 
     res = await appTester.login(user.email, user.password);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     res = await appTester.login(user.email, newPassword);
     expect(typeof res.data.login.token === "string").toBeTruthy();
@@ -155,7 +155,7 @@ test("Wrong token", async (done) => {
 
     res = await appTester.login(user2.email, newPassword);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserNotFound');
+    expect(res.errors[0].type).toBe('UserNotFoundError');
 
     done();
 });
