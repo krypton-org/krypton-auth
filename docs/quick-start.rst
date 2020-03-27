@@ -48,8 +48,9 @@ To use Krypton Authentication, you can use the ``fetch`` method or the ``XMLHttp
     let query =
         `mutation {
             updateMe(fields: {username:"newusername"}) {
-                notifications {
-                    message
+                token
+                user {
+                    username
                 }
             }
         }`;

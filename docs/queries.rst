@@ -9,12 +9,11 @@ To register simply use the ``register`` mutation. You will have to provide the d
 .. graphiql::
    :query:
     mutation {
-      register(fields: {username: "yourname", email: "yourname@mail.com", password: "yourpassword"}) {
-        notifications {
-          type
-          message
-        }
-      }
+      register(fields: {
+        username: "yourname", 
+        email: "yourname@mail.com", 
+        password: "yourpassword"
+      })
     }
 
 **Errors:**
