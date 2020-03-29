@@ -48,7 +48,6 @@ const buildRefreshTokenQuery = () => {
 
 const wait = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
-
 beforeAll((done) => {
     appTester = new AppTester({
         dbAddress: "mongodb://localhost:27017/RefreshToken",

@@ -145,7 +145,7 @@ export interface Config {
      * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/emails/ResetPassword.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/ResetPassword.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
-     * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
+     * * ``user`` - The current user: ``<p>Hi <%= user.fistName %></p>``
      * * ``link`` - The link to the reset form: ``Click here: <a href="<%= link %>"><%= link %>``
      */
     resetPasswordEmailTemplate?: string;
@@ -181,7 +181,7 @@ export interface Config {
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
-     * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
+     * * ``user`` - The current user: ``<p>Hi <%= user.firstName %></p>``
      * * ``link`` - The verification link: ``Click here: <a href="<%= link %>"><%= link %>``
      */
     verifyEmailTemplate?: string;
