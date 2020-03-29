@@ -81,7 +81,7 @@ test('Register a correct user', async (done) => {
             register(fields: {
                 username:"${user1.username}" 
                 email:"${user1.email}" 
-                password:"${user1.password}")
+                password:"${user1.password}"})
             }`
     }
     const res = await request.postGraphQL(query);
@@ -98,13 +98,12 @@ test('Username contains unauthorized characters', async (done) => {
             register(fields: {
                 username:"Yo^^^^" 
                 email:"${user1.email}" 
-                password:"${user1.password}")
+                password:"${user1.password}"})
             }`
     }
     const res = await request.postGraphQL(query);
     expect(res.errors[0].message.includes("A username may only contain letters, numbers, dashes, dots and underscores")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
-
     done();
 });
 
@@ -115,7 +114,7 @@ test('Username to small', async (done) => {
             register(fields: {
                 username:"Yo" 
                 email:"${user1.email}" 
-                password:"${user1.password}")
+                password:"${user1.password}"})
             }`
     }
     const res = await request.postGraphQL(query);
@@ -124,7 +123,6 @@ test('Username to small', async (done) => {
     done();
 });
 
-
 test('Username already exists', async (done) => {
     request = appTester.getRequestSender();
     const query1 = {
@@ -132,7 +130,7 @@ test('Username already exists', async (done) => {
             register(fields: {
                 username:"${user4.username}" 
                 email:"${user4.email}" 
-                password:"${user4.password}")
+                password:"${user4.password}"})
             }`
     }
     let res = await request.postGraphQL(query1);
@@ -141,29 +139,25 @@ test('Username already exists', async (done) => {
             register(fields: {
                 username:"${user4.username}" 
                 email:"another.email@mail.com" 
-                password:"${user4.password}"
-               )
+                password:"${user4.password}"})
             }`
     }
     res = await request.postGraphQL(query2);
-    expect(res.errors[0].message).toBe("Username already exists");
-    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
+    expect(res.errors[0].message.includes("duplicate key")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
-
-
-
 
 test('Update usersname - email - password', async (done) => {
     await appTester.register(user3);
     const loginRes = await appTester.login(user3.email, user3.password);
-    const expiryDate = loginRes.data.login.expiryDate;
+    const expiryDate = new Date(loginRes.data.login.expiryDate);
     const token = loginRes.data.login.token;
     const refreshToken = loginRes.cookies.refreshToken;
 
     const query = {
         query: `mutation{
-            updateMe(fields:{username:"${updates.username}" email: "${updates.email}" password: "${updates.password}" previousPassword:"${user1.password}"}){
+            updateMe(fields:{username:"${updates.username}" email: "${updates.email}" password: "${updates.password}" previousPassword:"${user3.password}"}){
               token,
               expiryDate
               user{
@@ -180,13 +174,13 @@ test('Update usersname - email - password', async (done) => {
     expect(res.data.updateMe.token).not.toBe(token);
     expect(new Date(res.data.updateMe.expiryDate).getTime()).toBeGreaterThan(expiryDate.getTime());
     expect(res.cookies.refreshToken).not.toBe(refreshToken);
-    
     expect(res.data.updateMe.user.email).toBe("otheremail@mail.com");
     expect(res.data.updateMe.user.username).toBe("otherUsername");
+    done();
 });
 
 test('Username too short', async (done) => {
-    await appTester.register(user2);
+    const resReg = await appTester.register(user2);
     const loginRes = await appTester.login(user2.email, user2.password);
     const token = loginRes.data.login.token;
     const refreshToken = loginRes.cookies.refreshToken;
@@ -222,7 +216,11 @@ test('Username already exists', async (done) => {
     }
 
     let res = await request.postGraphQL(query, token, refreshToken);
-    expect(res.errors[0].message.includes("Username already exists")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
+    expect(res.errors[0].message.includes("duplicate key")).toBeTruthy();
+    expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
+
+afterAll(async (done) => {
+    await appTester.close(done);
+}, 40000);

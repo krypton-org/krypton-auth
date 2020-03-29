@@ -1,6 +1,4 @@
 import AppTester from '../utils/AppTester';
-import jwt from 'jsonwebtoken';
-import config from '../../src/config';
 
 let appTester;
 let request;
@@ -31,7 +29,7 @@ beforeAll((done) => {
         onReady: async () => {
             try{
                 request = appTester.getRequestSender();
-                await appTester.register(user);
+                let re2 = await appTester.register(user);
                 await appTester.register(user2);
                 const res = await appTester.login(user.email, user.password);
                 token = res.data.login.token;

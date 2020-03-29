@@ -9,50 +9,7 @@ import { parse } from 'cookie';
 
 export default class AppTester {
     private request: any;
-
-    public register = async function (user: any): Promise<any> {
-        const registerQuery = {
-            query: `mutation{
-            register(fields: {
-                email:"${user.email}" 
-                password:"${user.password}"
-                age:${user.age}
-                receiveNewsletter:${user.receiveNewsletter},
-                gender:${user.gender}
-                firstName:"${user.firstName}" 
-                lastName:"${user.lastName}"})
-            }`
-        }
-        return await this.request.postGraphQL(registerQuery);
-    };
-
-    /**
-        Log user in and return token
-        @param String email
-        @param String password
-        @return String token
-    */
-    public login = async function (email: string, password: string): Promise<any> {
-        let loginQuery = {
-            query: `mutation{
-            login(email:"${email}" password:"${password}"){
-            token
-            expiryDate
-        }}`
-        }
-        return await this.request.postGraphQL(loginQuery)
-    };
-
-    public close: (done: () => void) => Promise<any> = async (done) => {
-        const agenda = require('../../src/agenda/agenda').default;
-        await agenda.stop();
-        await mongoose.connection.db.dropDatabase();
-        await MongooseConnection.close(done);
-    }
-
-    getRequestSender: () => any = () => {
-        return this.request;
-    };
+    private enumSet: Set<string>;
 
     constructor(options) {
         const mailTransporter: Transporter = mailer.createTransport({
@@ -63,6 +20,8 @@ export default class AppTester {
                 pass: 'JAXPXSY9MQP3uHtFjB'
             }
         });
+
+        this.enumSet = new Set<string>();
 
         options = {
             ...{
@@ -111,6 +70,12 @@ export default class AppTester {
             ...options
         }
 
+        if (options.extendedSchema) {
+            Object.keys(options.extendedSchema).map((key) => {
+                options.extendedSchema[key].hasOwnProperty('enum') ? this.enumSet.add(key) : null;
+            })
+        }
+
         const app = express();
         app.use(kryptonAuth(options));
         this.request = request(app);
@@ -148,5 +113,55 @@ export default class AppTester {
                 }, {})
             };
         };
+    }
+
+    public register = async function (user: any): Promise<any> {
+        let query = `mutation{register(fields: {`;
+
+        for (const key in user) {
+            if (user.hasOwnProperty(key)) {
+                if (typeof user[key] === "number" || typeof user[key] === "boolean" || this.isEnum(key)) {
+                    query += key + ':' + user[key] + ' ';
+                } else {
+                    query += key + ':"' + user[key] + '" ';
+                }
+            }
+        }
+
+        query += "})}";
+        const registerQuery = { query };
+        return await this.request.postGraphQL(registerQuery);
+    };
+
+    /**
+        Log user in and return token
+        @param String email
+        @param String password
+        @return String token
+    */
+    public login = async function (email: string, password: string): Promise<any> {
+        let loginQuery = {
+            query: `mutation{
+            login(email:"${email}" password:"${password}"){
+            token
+            expiryDate
+        }}`
+        }
+        return await this.request.postGraphQL(loginQuery)
+    };
+
+    public close: (done: () => void) => Promise<any> = async (done) => {
+        const agenda = require('../../src/agenda/agenda').default;
+        await agenda.stop();
+        await mongoose.connection.db.dropDatabase();
+        await MongooseConnection.close(done);
+    }
+
+    public getRequestSender: () => any = () => {
+        return this.request;
+    };
+
+    private isEnum: (key: string) => boolean = (key) => {
+        return this.enumSet.has(key);
     }
 };
