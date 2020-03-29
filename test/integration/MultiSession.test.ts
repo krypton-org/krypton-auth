@@ -5,7 +5,6 @@ let request;
 let refreshTokenExpiryTime = 20 * 1000
 
 let user1 = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -16,7 +15,6 @@ let user1 = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password2",
     firstName: "firstname2",
@@ -27,7 +25,6 @@ let user2 = {
 };
 
 let user3 = {
-    username: "username3",
     email: "test3@test.com",
     password: "password3",
     firstName: "firstname3",
@@ -52,7 +49,6 @@ const buildGetMeQuery = () => {
     return {
         query: `query{
             me{
-                username
                 email
             }
         }`
@@ -98,11 +94,9 @@ test("User can have 2 sessions", async (done) => {
     expect(refreshToken1).not.toBe(refreshToken2);
     // Perform authenticated request with session 1
     let resAuth1 = await request.postGraphQL(buildGetMeQuery(), token1, refreshToken1);
-    expect(resAuth1.data.me.username).toBe(user1.username);
     expect(resAuth1.data.me.email).toBe(user1.email);
     // Perform authenticated request with session 2
     let resAuth2 = await request.postGraphQL(buildGetMeQuery(), token2, refreshToken2);
-    expect(resAuth2.data.me.username).toBe(user1.username);
     expect(resAuth2.data.me.email).toBe(user1.email);
     // Update user with session 1
     const query1 = {
@@ -153,7 +147,7 @@ test("Remove previous session on relog-in", async (done) => {
     // Session 2 including refresh token of session 1
     let loginQuery = {
         query: `mutation{
-        login(login:"${user2.email}" password:"${user2.password}"){
+        login(email:"${user2.email}" password:"${user2.password}"){
         token
         expiryDate
         user {
@@ -185,7 +179,7 @@ test("Remove outdated session on (re)log-in", async (done) => {
     // Re log-in
     let loginQuery = {
         query: `mutation{
-        login(login:"${user3.email}" password:"${user3.password}"){
+        login(email:"${user3.email}" password:"${user3.password}"){
         token
         expiryDate
         user {

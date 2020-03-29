@@ -6,7 +6,6 @@ let appTester: AppTester;
 let request;
 
 let user = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -24,7 +23,6 @@ beforeAll((done) => {
             const registerQuery = {
                 query: `mutation{
                     register(fields: {
-                        username:"${user.username}" 
                         email:"${user.email}" 
                         password:"${user.password}"
                         age:${user.age}
@@ -41,16 +39,15 @@ beforeAll((done) => {
     });
 }, 40000);
 
-test('Login by username & query user data', async (done) => {
+test('Login by email & query user data', async (done) => {
 
     const query = {
         query: `mutation{
-            login(login:"${user.username}" password:"${user.password}"){
+            login(email:"${user.email}" password:"${user.password}"){
             user{
                 email
                 _id
                 verified
-                username
                 age
                 receiveNewsletter
                 gender
@@ -67,7 +64,6 @@ test('Login by username & query user data', async (done) => {
     expect(typeof res.data.login.token === "string").toBeTruthy();
     expect(res.data.login.token.length > 10).toBeTruthy();
     expect(res.data.login.user.email).toBe(user.email);
-    expect(res.data.login.user.username).toBe(user.username);
     expect(res.data.login.user.verified).toBe(false);
     expect(res.data.login.user.age).toBe(user.age);
     expect(res.data.login.user.receiveNewsletter).toBe(user.receiveNewsletter);
@@ -82,7 +78,7 @@ test('Login by email & decrypting token to get user data', async (done) => {
 
     const query = {
         query: `mutation{
-            login(login:"${user.email}" password:"${user.password}"){
+            login(email:"${user.email}" password:"${user.password}"){
             token
         }}`
     }
@@ -96,7 +92,6 @@ test('Login by email & decrypting token to get user data', async (done) => {
             expect(typeof userDecrypted._id === "string").toBeTruthy();
             expect(userDecrypted._id.length > 5).toBeTruthy();
             expect(userDecrypted.email).toBe(user.email);
-            expect(userDecrypted.username).toBe(user.username);
             expect(userDecrypted.verified).toBe(false);
             expect(userDecrypted.age).toBe(user.age);
             expect(userDecrypted.receiveNewsletter).toBe(user.receiveNewsletter);
@@ -112,7 +107,7 @@ test("Can't decrypt token with a wrong public key", async (done) => {
 
     const query = {
         query: `mutation{
-            login(login:"${user.email}" password:"${user.password}"){
+            login(email:"${user.email}" password:"${user.password}"){
             token
         }}`
     }
@@ -133,7 +128,7 @@ test("Wrong login", async (done) => {
 
     const query = {
         query: `mutation{
-            login(login:"blabla" password:"${user.password}"){
+            login(email:"blabla" password:"${user.password}"){
             token
         }}`
     }
@@ -147,7 +142,7 @@ test("Wrong password", async (done) => {
 
     const query = {
         query: `mutation{
-            login(login:"${user.username}" password:"wrong password"){
+            login(email:"${user.email}" password:"wrong password"){
             token
         }}`
     }

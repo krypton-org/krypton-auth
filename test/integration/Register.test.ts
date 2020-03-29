@@ -4,7 +4,6 @@ let appTester;
 let request;
 
 let user1 = {
-    username: "username", 
     email: "test@test.com", 
     password: "password", 
     firstName: "firstname",
@@ -15,7 +14,6 @@ let user1 = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password2",
     firstName: "firstname2",
@@ -26,7 +24,6 @@ let user2 = {
 };
 
 let user3= {
-    username: "username3",
     email: "test3@test.com",
     password: "password3",
     firstName: "firstname3",
@@ -37,7 +34,6 @@ let user3= {
 };
 
 let user4= {
-    username: "username4",
     email: "test4@test.com",
     password: "password4",
     firstName: "firstname4",
@@ -66,7 +62,6 @@ test('Password to small', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user1.username}" 
                 email:"${user1.email}" 
                 password:"1234"
                 age:${user1.age}
@@ -87,7 +82,6 @@ test('Email invalid', async (done) => {
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user1.username}" 
                 email:"wrong.email.com" 
                 password:"${user1.password}"
                 age:${user1.age}
@@ -103,55 +97,15 @@ test('Email invalid', async (done) => {
     done();
 });
 
-test('Username contains unauthorized characters', async (done) => {
-    request = appTester.getRequestSender();
-    const query = {
-        query: `mutation{
-            register(fields: {
-                username:"Yo^^^^" 
-                email:"${user1.email}" 
-                password:"${user1.password}"
-                age:${user1.age}
-                receiveNewsletter:${user1.receiveNewsletter},
-                gender:${user1.gender}
-                firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"})
-            }`
-    }
-    const res = await request.postGraphQL(query);
-    expect(res.errors[0].message.includes("A username may only contain letters, numbers, dashes, dots and underscores")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserValidationError');
 
-    done();
-});
 
-test('Username to small', async (done) => {
-    request = appTester.getRequestSender();
-    const query = {
-        query: `mutation{
-            register(fields: {
-                username:"Yo" 
-                email:"${user1.email}" 
-                password:"${user1.password}"
-                age:${user1.age}
-                receiveNewsletter:${user1.receiveNewsletter},
-                gender:${user1.gender}
-                firstName:"${user1.firstName}" 
-                lastName:"${user1.lastName}"})
-            }`
-    }
-    const res = await request.postGraphQL(query);
-    expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserValidationError');
-    done();
-});
+
 
 test('Register a correct user', async (done) => {
     request = appTester.getRequestSender();
     const query = {
         query: `mutation{
             register(fields: {
-                username:"${user1.username}" 
                 email:"${user1.email}" 
                 password:"${user1.password}"
                 age:${user1.age}
@@ -167,47 +121,13 @@ test('Register a correct user', async (done) => {
     done();
 }, 10000);
 
-test('Username already exists', async (done) => {
-    request = appTester.getRequestSender();
-    const query1 = {
-        query: `mutation{
-            register(fields: {
-                username:"${user4.username}" 
-                email:"${user4.email}" 
-                password:"${user4.password}"
-                age:${user4.age}
-                receiveNewsletter:${user4.receiveNewsletter},
-                gender:${user4.gender}
-                firstName:"${user4.firstName}" 
-                lastName:"${user4.lastName}"})
-            }`
-    }
-    let res = await request.postGraphQL(query1);
-    const query2 = {
-        query: `mutation{
-            register(fields: {
-                username:"${user4.username}" 
-                email:"other.email@mail.com" 
-                password:"${user4.password}"
-                age:${user4.age}
-                receiveNewsletter:${user4.receiveNewsletter},
-                gender:${user4.gender}
-                firstName:"${user4.firstName}" 
-                lastName:"${user4.lastName}"})
-            }`
-    }
-    res = await request.postGraphQL(query2);
-    expect(res.errors[0].message).toBe("Username already exists");
-    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
-    done();
-});
+
 
 test('Email already exists', async (done) => {
     request = appTester.getRequestSender();
     const query1 = {
         query: `mutation{
             register(fields: {
-                username:"${user3.username}" 
                 email:"${user3.email}" 
                 password:"${user3.password}"
                 age:${user3.age}
@@ -221,7 +141,6 @@ test('Email already exists', async (done) => {
     const query2 = {
         query: `mutation{
             register(fields: {
-                username:"other_username" 
                 email:"${user3.email}" 
                 password:"${user3.password}"
                 age:${user3.age}

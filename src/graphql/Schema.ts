@@ -130,14 +130,7 @@ schemaComposer.Query.addFields({
     sendVerificationEmail: {
         resolve: async (_, {}, { req }) => UserController.resendConfirmationEmail(req),
         type: 'Boolean',
-    },
-    usernameAvailable: {
-        args: {
-            username: 'String!',
-        },
-        resolve: async (_, { username }) => await UserController.checkUsernameAvailable(username),
-        type: 'Boolean',
-    },
+    }
 });
 
 schemaComposer.Mutation.addFields({
@@ -150,10 +143,10 @@ schemaComposer.Mutation.addFields({
     },
     login: {
         args: {
-            login: 'String!', // email or username
+            email: 'String!',
             password: 'String!',
         },
-        resolve: async (_, { login, password }, { req, res }) => await UserController.login(login, password, req, res),
+        resolve: async (_, { email, password }, { req, res }) => await UserController.login(email, password, req, res),
         type: UserAndTokenTC,
     },
     refreshToken: {

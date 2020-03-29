@@ -6,7 +6,6 @@ let appTester;
 let request;
 let token
 let user = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -17,7 +16,6 @@ let user = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password2",
     firstName: "firstname2",
@@ -28,7 +26,6 @@ let user2 = {
 };
 
 let user3 = {
-    username: "username3",
     email: "test3@test.com",
     password: "password3",
     firstName: "firstname3",
@@ -39,7 +36,6 @@ let user3 = {
 };
 
 let user4 = {
-    username: "username4",
     email: "test4@test.com",
     password: "password4",
     firstName: "firstname4",
@@ -101,7 +97,7 @@ test("Change password with recovery token", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({ username: user.username }, { verified: true });
+    const userRetrieved = await UserModel.getUser({ email: user.email }, { verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     let newPassword = "newPassword";
@@ -169,7 +165,7 @@ test("Password too short", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({ username: user3.username });
+    const userRetrieved = await UserModel.getUser({ email: user3.email });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     const updatePasswordQuery = {
@@ -198,7 +194,7 @@ test("Token too old", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({ username: user4.username });
+    const userRetrieved = await UserModel.getUser({ email: user4.email });
     let oldDate = new Date()
     oldDate.setHours(oldDate.getHours() - 2);
     await UserModel.updateUser({ email: user4.email }, { "passwordRecoveryRequestDate": oldDate });

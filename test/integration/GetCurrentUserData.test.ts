@@ -5,7 +5,6 @@ let request;
 let token1;
 
 let user1 = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -19,7 +18,6 @@ const buildGetMeQuery = () => {
     return {
         query: `query{
             me{
-                username
                 email
             }
         }`
@@ -50,7 +48,6 @@ test('Get current user data', async (done) => {
 
     let res = await request.postGraphQL(buildGetMeQuery(), token1);
 
-    expect(res.data.me.username).toBe(user1.username);
     expect(res.data.me.email).toBe(user1.email);
 
     done();

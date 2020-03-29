@@ -1,12 +1,9 @@
 import AppTester from '../utils/AppTester';
-import jwt from 'jsonwebtoken';
-import config from '../../src/config';
 
 let appTester;
 let request;
 let token
 let user = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -17,7 +14,6 @@ let user = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password",
     firstName: "firstname",
@@ -33,7 +29,7 @@ beforeAll((done) => {
         onReady: async () => {
             try{
                 request = appTester.getRequestSender();
-                await appTester.register(user);
+                let re2 = await appTester.register(user);
                 await appTester.register(user2);
                 const res = await appTester.login(user.email, user.password);
                 token = res.data.login.token;
@@ -57,7 +53,7 @@ test("Confirm email", async (done) => {
     
     
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({username: user.username}, {verified: true});
+    const userRetrieved = await UserModel.getUser({email: user.email}, {verified: true});
     res = await request.get("/user/email/confirmation?token="+userRetrieved.verificationToken);
     expect(res.statusCode).toBe(200);
     expect(res.text.includes("You are now verified")).toBeTruthy();

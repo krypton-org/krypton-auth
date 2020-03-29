@@ -5,7 +5,6 @@ let request;
 const eventEmitter = new EventEmitter();
 
 let user = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -46,7 +45,7 @@ test('Email Error - Event Emitting', async (done) => {
           }`
     }
     eventEmitter.on('email-error', (data) => {
-        expect(data.locals.user.username).toBe(user.username);
+        expect(data.locals.user.email).toBe(user.email);
         expect(data.recipient).toBe(user.email);
         done();
     })

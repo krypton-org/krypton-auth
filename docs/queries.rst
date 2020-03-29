@@ -10,7 +10,6 @@ To register simply use the ``register`` mutation. You will have to provide the d
    :query:
     mutation {
       register(fields: {
-        username: "yourname", 
         email: "yourname@mail.com", 
         password: "yourpassword"
       })
@@ -18,7 +17,6 @@ To register simply use the ``register`` mutation. You will have to provide the d
 
 **Errors:**
 :any:`EmailAlreadyExistsError`,
-:any:`UsernameAlreadyExistsError`,
 :any:`UserValidationError`,
 :any:`EncryptionFailedError`.
 
@@ -37,13 +35,13 @@ Clicking on the link will lead you to a notification page. This page is customiz
 Login
 ^^^^^
 
-To log-in simply use the ``login`` mutation. You will have to provide a ``login`` which can be the email or username of your account and your ``password``. It will return your authentication token with its expiry date and set an HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to `XSS <https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>`_).
+To log-in simply use the ``login`` mutation. You will have to your ``email`` and ``password``. It will return your authentication token with its expiry date and set an HttpOnly cookie with a refresh token. Save the authentication token and its expiry date in a variable of your app and not in the localstorage (prone to `XSS <https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>`_).
 You will be able to access private mutations/queries by including it in the ``Authorization`` header of the request as a ``Bearer token``. This token will be usable until its expiry date (by default 15 minutes). When outdated refresh it by calling the :ref:`refreshToken <refresh-authentication-tokens>` mutation.
 
 .. graphiql::
    :query:
     mutation {
-      login(login: "yourname@mail.com", password: "yourpassword") {
+      login(email: "yourname@mail.com", password: "yourpassword") {
         token
         expiryDate
         user {
@@ -74,7 +72,6 @@ To access your own private data use the ``me`` query.  You have to be logged in 
         _id
         verified
         email
-        username
       }
     }
 
@@ -92,7 +89,7 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
    :withtoken:
    :query:
     mutation {
-      updateMe(fields: {username: "yourname2"}) {
+      updateMe(fields: {email: "yourname2@mail.com"}) {
         token
         expiryDate
         user {
@@ -219,14 +216,6 @@ To know if an email is available use the ``emailAvailable`` query.
        emailAvailable(email: "yourname@mail.com")
      }
 
-To know if a username is available use the ``usernameAvailable`` query.
-
-.. graphiql::
-    :query:
-     query {
-       usernameAvailable(email: "yourname@mail.com")
-     }
-
 .. _fetch-public-user-data:
 
 Get public user data
@@ -239,7 +228,7 @@ To fetch one public user information from any of its public fields use the ``use
 .. graphiql::
     :query:
      query {
-       userOne(filter: {username: "yourname"}) {
+       userOne(filter: {email: "yourname@mail.com"}) {
          _id
        }
      }
@@ -250,7 +239,7 @@ To fetch public user information from its ``id`` use use the ``userById`` query.
    :query:
     query {
       userById(_id:"5dexacb7e951cd02cb8d889") {
-        username
+        email
       }
     }
 
@@ -260,7 +249,7 @@ To fetch multiple users from any of its public fields use the ``userMany`` query
     :query:
      query {
        userMany(filter: {gender: Male}) {
-         username
+         email
        }
      }
 
@@ -278,7 +267,7 @@ To fetch public user information from a list of ``ids`` use the ``userByIds`` qu
    :query:
     query {
       userByIds(_ids:["5deeacb7e9acd02cb8efd889", "5deee11b8938bc27989d63fb"]) {
-        username
+        email
       }
     } 
 
@@ -289,7 +278,7 @@ To get a paginated list of users, with filters on one some of the public fields,
      query {
        userPagination(filter: {gender: Male}, page:1, perPage:5){
          items{
-           username
+           email
          }
        }
      }
@@ -301,7 +290,6 @@ Errors
    `.. autoclass:: ErrorTypes` produces dotted names.
 
 .. autoattribute:: EmailAlreadyExistsError
-.. autoattribute:: UsernameAlreadyExistsError
 .. autoattribute:: WrongPasswordError
 .. autoattribute:: UpdatePasswordTooLateError
 .. autoattribute:: EmailNotSentError

@@ -12,7 +12,6 @@ import {
     EmailAlreadyConfirmedError,
     EmailAlreadyExistsError,
     UpdatePasswordTooLateError,
-    UsernameAlreadyExistsError,
     UnauthorizedError,
     UserNotFoundError,
     UserValidationError,
@@ -94,16 +93,6 @@ export const checkEmailAvailable = async (email: string): Promise<boolean> => {
 };
 
 /**
- * Returns true username address not already taken by another user.
- * @param  {string} username
- * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
- */
-export const checkUsernameAvailable = async (username: string): Promise<boolean> => {
-    const usernameExists = await User.userExists({ username });
-    return !usernameExists;
-};
-
-/**
  * Verifying link clicked by users in the account verification email.
  * @throws {UnauthorizedError} User does not exist
  * @param  {Request} req
@@ -163,9 +152,6 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
         sendConfirmationEmail(user, user.verificationToken, config.getRouterAddress(req), clientId);
         return true;
     } catch (err) {
-        if (err.message.includes('username') && err.message.includes('duplicate key')) {
-            throw new UsernameAlreadyExistsError('Username already exists');
-        }
         if (err.message.includes('email') && err.message.includes('duplicate key')) {
             throw new EmailAlreadyExistsError('Email already exists');
         }
@@ -294,9 +280,6 @@ export const updateUser = async (
         res.cookie('refreshToken', refreshToken, params);
         return payload;
     } catch (err) {
-        if (err.message.includes('username') && err.message.includes('duplicate key')) {
-            throw new UsernameAlreadyExistsError('Username already exists');
-        }
         if (err.message.includes('email') && err.message.includes('duplicate key')) {
             throw new EmailAlreadyExistsError('Email already exists');
         }
@@ -327,25 +310,22 @@ export const deleteUser = async (password: string, req: Request): Promise<boolea
  * User log-in.
  * @throws {UserNotFoundError}
  * @throws {TokenEncryptionError}
- * @param  {string} loginStr
+ * @param  {string} email
  * @param  {string} password
  * @param  {Request} req
  * @param  {Response} res
  * @returns {Promise<{ token: string; user: any }>} Promise to the user token and user data.
  */
 export const login = async (
-    loginStr: string,
+    email: string,
     password: string,
     req: Request,
     res: Response,
 ): Promise<{ expiryDate: Date, token: string; user: any }> => {
     let payload: { expiryDate: Date, token: string; user: any, };
-    const emailExists = await User.userExists({ email: loginStr });
-    const usernameExists = await User.userExists({ username: loginStr });
+    const emailExists = await User.userExists({ email });
     if (emailExists) {
-        payload = await User.sign({ email: loginStr }, password, config.privateKey);
-    } else if (usernameExists) {
-        payload = await User.sign({ username: loginStr }, password, config.privateKey);
+        payload = await User.sign({ email }, password, config.privateKey);
     } else {
         throw new UserNotFoundError('Wrong credentials!');
     }

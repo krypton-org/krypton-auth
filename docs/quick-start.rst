@@ -47,10 +47,10 @@ To use Krypton Authentication, you can use the ``fetch`` method or the ``XMLHttp
 
     let query =
         `mutation {
-            updateMe(fields: {username:"newusername"}) {
+            updateMe(fields: {email:"newaddress@mail.com"}) {
                 token
                 user {
-                    username
+                    email
                 }
             }
         }`;

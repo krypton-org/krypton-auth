@@ -65,10 +65,6 @@ export interface Config {
      */
     graphiql?: boolean;
     /**
-     * Enable or disable username. The default value is ``true``.
-     */
-    hasUsername?: boolean;
-    /**
      * Public URL of the service.
      *
      * **Very important for use in production:** when users receive emails to reset their password or to confirm their account, the links will be pointing to the ``host`` of the service. The default value is ``null``. When ``null``, Krypton Authentication uses the address located in ``req.headers.host`` that can correspond to the machine ``localhost``.
@@ -149,7 +145,7 @@ export interface Config {
      * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/emails/ResetPassword.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/ResetPassword.ejs>`_.
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send. Here are the locals you can use inside the template:
      *
-     * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
+     * * ``user`` - The current user: ``<p>Hi <%= user.fistName %></p>``
      * * ``link`` - The link to the reset form: ``Click here: <a href="<%= link %>"><%= link %>``
      */
     resetPasswordEmailTemplate?: string;
@@ -185,7 +181,7 @@ export interface Config {
      * You can create another, just gives the file path to the `EJS <https://ejs.co/>`_ file you wish to send.
      * Here are the locals you can use inside the template:
      *
-     * * ``user`` - The current user: ``<p>Hi <%= user.username %></p>``
+     * * ``user`` - The current user: ``<p>Hi <%= user.firstName %></p>``
      * * ``link`` - The verification link: ``Click here: <a href="<%= link %>"><%= link %>``
      */
     verifyEmailTemplate?: string;
@@ -198,7 +194,6 @@ export class DefaultConfig implements Config, ReadyStatus {
     public emailConfig: undefined;
     public extendedSchema = {};
     public graphiql = true;
-    public hasUsername = true;
     public host = undefined;
     public hostURLObject = undefined;
     public isAgendaReady: boolean = false;
