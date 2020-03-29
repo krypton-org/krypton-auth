@@ -119,11 +119,10 @@ function defaultQuery() {
 #
 # You can use GraphiQL IDE to test GraphQL queries.
 #
-# If 'extendedSchema' option is undefined and 'hasUsername' option is NOT set to false:
 # Use this query to register.
 #
 # mutation{
-#   register(fields:{username:"yourname", email: "your@mail.com" password:"yourpassword"}){
+#   register(fields:{email: "your@mail.com" password:"yourpassword"}){
 #     notifications{
 #       type
 #       message
@@ -134,7 +133,7 @@ function defaultQuery() {
 # Use this query to log-in.
 #
 # mutation{
-#   login(login: "your@mail.com", password:"yourpassword"){
+#   login(email: "your@mail.com", password:"yourpassword"){
 #     token
 #     expiryDate
 #   }   

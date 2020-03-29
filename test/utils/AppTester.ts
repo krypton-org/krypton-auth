@@ -14,7 +14,6 @@ export default class AppTester {
         const registerQuery = {
             query: `mutation{
             register(fields: {
-                username:"${user.username}" 
                 email:"${user.email}" 
                 password:"${user.password}"
                 age:${user.age}
@@ -29,14 +28,14 @@ export default class AppTester {
 
     /**
         Log user in and return token
-        @param String login
+        @param String email
         @param String password
         @return String token
     */
-    public login = async function (login: string, password: string): Promise<any> {
+    public login = async function (email: string, password: string): Promise<any> {
         let loginQuery = {
             query: `mutation{
-            login(login:"${login}" password:"${password}"){
+            login(email:"${email}" password:"${password}"){
             token
             expiryDate
         }}`

@@ -6,7 +6,6 @@ let authTokenExpiryTime = 15 * 1000;
 let refreshTokenExpiryTime = 20 * 1000
 
 let user1 = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -17,7 +16,6 @@ let user1 = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password2",
     firstName: "firstname2",
@@ -28,7 +26,6 @@ let user2 = {
 };
 
 let user3 = {
-    username: "username3",
     email: "test3@test.com",
     password: "password3",
     firstName: "firstname3",

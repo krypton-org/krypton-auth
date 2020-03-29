@@ -14,7 +14,6 @@ let refreshToken2;
 let refreshToken3;
 let refreshToken4;
 let user1 = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",
@@ -25,7 +24,6 @@ let user1 = {
 };
 
 let user2 = {
-    username: "username2",
     email: "test2@test.com",
     password: "password2",
     firstName: "firstname2",
@@ -36,7 +34,6 @@ let user2 = {
 };
 
 let user3 = {
-    username: "username3",
     email: "test3@test.com",
     password: "password3",
     firstName: "firstname3",
@@ -47,7 +44,6 @@ let user3 = {
 };
 
 let user4 = {
-    username: "username4",
     email: "test4@test.com",
     password: "password4",
     firstName: "firstname4",
@@ -58,7 +54,6 @@ let user4 = {
 };
 
 let updates = {
-    username: "otherUsername",
     email: "otheremail@mail.com",
     password: "tototototo"
 }
@@ -100,11 +95,10 @@ test('Update usersname - email - password', async (done) => {
 
     const query = {
         query: `mutation{
-            updateMe(fields:{username:"${updates.username}" email: "${updates.email}" password: "${updates.password}" previousPassword:"${user1.password}"}){
+            updateMe(fields:{email: "${updates.email}" password: "${updates.password}" previousPassword:"${user1.password}"}){
               token,
               expiryDate
               user{
-                username
                 verified
                 _id
                 email
@@ -119,7 +113,6 @@ test('Update usersname - email - password', async (done) => {
     expect(res.cookies.refreshToken).not.toBe(refreshToken1);
     
     expect(res.data.updateMe.user.email).toBe("otheremail@mail.com");
-    expect(res.data.updateMe.user.username).toBe("otherUsername");
 
     res = await appTester.login(user1.email, user1.password)
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
@@ -136,7 +129,6 @@ test('Update usersname - email - password', async (done) => {
             expect(typeof userDecrypted._id === "string").toBeTruthy();
             expect(userDecrypted._id.length > 5).toBeTruthy();
             expect(userDecrypted.email).toBe(updates.email);
-            expect(userDecrypted.username).toBe(updates.username);
             expect(userDecrypted.verified).toBe(false);
             expect(userDecrypted.age).toBe(user1.age);
             expect(userDecrypted.receiveNewsletter).toBe(user1.receiveNewsletter);
@@ -163,7 +155,7 @@ test('Wrong previous password', async (done) => {
 
     let loginQuery = {
         query: `mutation{
-            login(login:"${user2.email}" password:"newpassword"){
+            login(email:"${user2.email}" password:"newpassword"){
             token
         }}`
     }
@@ -189,45 +181,13 @@ test('Password too short', async (done) => {
 
     let loginQuery = {
         query: `mutation{
-            login(login:"${user2.email}" password:"toto"){
+            login(email:"${user2.email}" password:"toto"){
                 token
         }}`
     }
     res = await request.postGraphQL(loginQuery);
     expect(res.errors[0].message.includes("Wrong credentials")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserNotFoundError');
-    done();
-});
-
-test('Username too short', async (done) => {
-
-    const query = {
-        query: `mutation{
-            updateMe(fields:{username: "Yo"}){
-              token
-            }
-          }`
-    }
-
-    let res = await request.postGraphQL(query, token4, refreshToken4);
-    expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UserValidationError');
-    done();
-});
-
-test('Username already exists', async (done) => {
-
-    const query = {
-        query: `mutation{
-            updateMe(fields:{username: "${user2.username}"}){
-              token
-            }
-          }`
-    }
-
-    let res = await request.postGraphQL(query, token4, refreshToken4);
-    expect(res.errors[0].message.includes("Username already exists")).toBeTruthy();
-    expect(res.errors[0].type).toBe('UsernameAlreadyExistsError');
     done();
 });
 
@@ -264,7 +224,7 @@ test('Wrong gender', async (done) => {
 
 test('Update email of a verified user', async (done) => {
     const UserModel = require('../../src/model/UserModel').default;
-    await UserModel.updateUser({ username: user3.username }, { verified: true });
+    await UserModel.updateUser({ email: user3.email }, { verified: true });
     let loginRes = await appTester.login(user3.email, user3.password);
     token3 = loginRes.data.login.token;
     refreshToken3 = loginRes.cookies.refreshToken;

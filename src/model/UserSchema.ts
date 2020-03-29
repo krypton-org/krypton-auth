@@ -54,23 +54,6 @@ const basicSchema = {
         isPublic: false,
         type: Date,
     },
-    username: {
-        isPublic: true,
-        maxlength: 128,
-        required: true,
-        type: String,
-        unique: true,
-        validate: {
-            message: props => {
-                if (props.value.length < 4) {
-                    return 'The username must contains more than 4 characters!';
-                } else {
-                    return 'A username may only contain letters, numbers, dashes, dots and underscores !';
-                }
-            },
-            validator: v => /^[a-zA-Z0-9\-_.]{4,}$/.test(v),
-        },
-    },
     verificationToken: {
         isInternal: true,
         isPublic: false,
@@ -105,9 +88,5 @@ const internalFields: string[] = Object.keys(UserSchema).filter(x => UserSchema[
  * List of uneditable fields. Users can't change the value of those fields (like if the user is `verified`)
  */
 const uneditableFields: string[] = Object.keys(UserSchema).filter(x => UserSchema[x].isUneditable);
-
-if (!config.hasUsername) {
-    delete UserSchema.username;
-}
 
 export { UserSchema, internalFields, privateFields, uneditableFields };

@@ -30,16 +30,6 @@ export class EmailAlreadyExistsError extends OperationalError {
 }
 
 /**
- * Username already exists in the database.
- * @export
- * @class UsernameAlreadyExistsError
- * @extends {OperationalError}
- */
-export class UsernameAlreadyExistsError extends OperationalError {
-
-}
-
-/**
  * Password does not match.
  * @export
  * @class WrongPasswordError

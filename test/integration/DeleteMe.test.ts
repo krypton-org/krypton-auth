@@ -6,7 +6,6 @@ let appTester;
 let request;
 let token
 let user = {
-    username: "username",
     email: "test@test.com",
     password: "password",
     firstName: "firstname",

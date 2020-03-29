@@ -65,10 +65,6 @@ export interface Config {
      */
     graphiql?: boolean;
     /**
-     * Enable or disable username. The default value is ``true``.
-     */
-    hasUsername?: boolean;
-    /**
      * Public URL of the service.
      *
      * **Very important for use in production:** when users receive emails to reset their password or to confirm their account, the links will be pointing to the ``host`` of the service. The default value is ``null``. When ``null``, Krypton Authentication uses the address located in ``req.headers.host`` that can correspond to the machine ``localhost``.
@@ -198,7 +194,6 @@ export class DefaultConfig implements Config, ReadyStatus {
     public emailConfig: undefined;
     public extendedSchema = {};
     public graphiql = true;
-    public hasUsername = true;
     public host = undefined;
     public hostURLObject = undefined;
     public isAgendaReady: boolean = false;

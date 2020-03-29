@@ -25,7 +25,7 @@ test('Nodemailer send preview link with a test account', async (done) => {
     const infos = await send({
         locals: {
             link: "test",
-            user: { username: "username" },
+            user: { firstName: "name" },
         },
         recipient: "test@test.com",
         subject: 'Activate your account',
@@ -59,7 +59,7 @@ test('Prints preview link on the command line', async (done) => {
     agenda.now('email', {
         locals: {
             link: "test",
-            user: { username: "username" },
+            user: { firstName: "John" },
         },
         recipient: "test@test.com",
         subject: 'Activate your account',
