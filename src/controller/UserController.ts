@@ -11,8 +11,8 @@ import {
     AlreadyLoggedInError,
     EmailAlreadyConfirmedError,
     EmailAlreadyExistsError,
-    UpdatePasswordTooLateError,
     UnauthorizedError,
+    UpdatePasswordTooLateError,
     UserNotFoundError,
     UserValidationError,
     WrongPasswordError,
@@ -179,7 +179,6 @@ export const resendConfirmationEmail = async (req: Request): Promise<boolean> =>
             clientId = req.cookies.clientId;
         }
         sendConfirmationEmail(req.user, user.verificationToken, config.getRouterAddress(req), clientId);
-
     }
     return true;
 };
@@ -236,7 +235,7 @@ export const updateUser = async (
     userUpdates: any,
     req: Request,
     res: Response,
-): Promise<{ expiryDate: Date, token: string; user: any }> => {
+): Promise<{ expiryDate: Date; token: string; user: any }> => {
     if (!isUserLoggedIn(req) || !(await Session.isValid(req.user._id, req.cookies.refreshToken))) {
         res.status(401);
         throw new UnauthorizedError('Please login!');
@@ -269,7 +268,6 @@ export const updateUser = async (
                 clientId = req.cookies.clientId;
             }
             sendConfirmationEmail(req.user, userUpdates.verificationToken, config.getRouterAddress(req), clientId);
-
         }
         const payload = await User.refreshAuthToken({ _id: req.user._id }, config.privateKey);
         const { refreshToken } = await Session.updateSession(req.user._id, req.cookies.refreshToken);
@@ -321,8 +319,8 @@ export const login = async (
     password: string,
     req: Request,
     res: Response,
-): Promise<{ expiryDate: Date, token: string; user: any }> => {
-    let payload: { expiryDate: Date, token: string; user: any, };
+): Promise<{ expiryDate: Date; token: string; user: any }> => {
+    let payload: { expiryDate: Date; token: string; user: any };
     const emailExists = await User.userExists({ email });
     if (emailExists) {
         payload = await User.sign({ email }, password, config.privateKey);
@@ -353,10 +351,7 @@ export const login = async (
  * @param  {Request} req
  * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure.
  */
-export const sendPasswordRecoveryEmail = async (
-    email: string,
-    req: Request,
-): Promise<boolean> => {
+export const sendPasswordRecoveryEmail = async (email: string, req: Request): Promise<boolean> => {
     if (req.user !== undefined) {
         throw new AlreadyLoggedInError('Oups, you are already logged in!');
     }

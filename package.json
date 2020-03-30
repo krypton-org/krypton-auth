@@ -1,6 +1,6 @@
 {
   "name": "@krypton-org/krypton-auth",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Express authentication middleware, using GraphQL and JSON Web Tokens.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

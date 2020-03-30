@@ -130,7 +130,7 @@ schemaComposer.Query.addFields({
     sendVerificationEmail: {
         resolve: async (_, {}, { req }) => UserController.resendConfirmationEmail(req),
         type: 'Boolean',
-    }
+    },
 });
 
 schemaComposer.Mutation.addFields({

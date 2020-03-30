@@ -25,9 +25,7 @@ export default class OperationalError extends Error {
  * @class EmailAlreadyExistsError
  * @extends {OperationalError}
  */
-export class EmailAlreadyExistsError extends OperationalError {
-
-}
+export class EmailAlreadyExistsError extends OperationalError {}
 
 /**
  * Password does not match.
@@ -35,9 +33,7 @@ export class EmailAlreadyExistsError extends OperationalError {
  * @class WrongPasswordError
  * @extends {OperationalError}
  */
-export class WrongPasswordError extends OperationalError {
-
-}
+export class WrongPasswordError extends OperationalError {}
 
 /**
  * Account recorery email too old
@@ -45,9 +41,7 @@ export class WrongPasswordError extends OperationalError {
  * @class UpdatePasswordTooLateError
  * @extends {OperationalError}
  */
-export class UpdatePasswordTooLateError extends OperationalError {
-
-}
+export class UpdatePasswordTooLateError extends OperationalError {}
 
 /**
  * Email could not be sent.
@@ -55,9 +49,7 @@ export class UpdatePasswordTooLateError extends OperationalError {
  * @class EmailNotSentError
  * @extends {OperationalError}
  */
-export class EmailNotSentError extends OperationalError {
-
-}
+export class EmailNotSentError extends OperationalError {}
 
 /**
  * User not found.
@@ -65,9 +57,7 @@ export class EmailNotSentError extends OperationalError {
  * @class UserNotFoundError
  * @extends {OperationalError}
  */
-export class UserNotFoundError extends OperationalError {
-
-}
+export class UserNotFoundError extends OperationalError {}
 
 /**
  * Request not authorized.
@@ -75,9 +65,7 @@ export class UserNotFoundError extends OperationalError {
  * @class UnauthorizedError
  * @extends {OperationalError}
  */
-export class UnauthorizedError extends OperationalError {
-
-}
+export class UnauthorizedError extends OperationalError {}
 
 /**
  * User token encryption failed.
@@ -85,9 +73,7 @@ export class UnauthorizedError extends OperationalError {
  * @class TokenEncryptionError
  * @extends {OperationalError}
  */
-export class TokenEncryptionError extends OperationalError {
-
-}
+export class TokenEncryptionError extends OperationalError {}
 
 /**
  * Email already confirmed.
@@ -95,9 +81,7 @@ export class TokenEncryptionError extends OperationalError {
  * @class EmailAlreadyConfirmedError
  * @extends {OperationalError}
  */
-export class EmailAlreadyConfirmedError extends OperationalError {
-
-}
+export class EmailAlreadyConfirmedError extends OperationalError {}
 
 /**
  * User updates do not pass the fields' validator.
@@ -105,9 +89,7 @@ export class EmailAlreadyConfirmedError extends OperationalError {
  * @class UserValidationError
  * @extends {OperationalError}
  */
-export class UserValidationError extends OperationalError {
-
-}
+export class UserValidationError extends OperationalError {}
 
 /**
  * User already logged in.
@@ -115,9 +97,7 @@ export class UserValidationError extends OperationalError {
  * @class AlreadyLoggedInError
  * @extends {OperationalError}
  */
-export class AlreadyLoggedInError extends OperationalError {
-
-}
+export class AlreadyLoggedInError extends OperationalError {}
 
 /**
  * Encryption failed.
@@ -125,6 +105,4 @@ export class AlreadyLoggedInError extends OperationalError {
  * @class EncryptionFailedError
  * @extends {OperationalError}
  */
-export class EncryptionFailedError extends OperationalError {
-
-}
+export class EncryptionFailedError extends OperationalError {}

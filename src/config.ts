@@ -287,21 +287,6 @@ export class DefaultConfig implements Config, ReadyStatus {
     };
 
     /**
-     * Creates the public and private key pair and saves them in the file paths provided
-     * @private
-     * @param {string} publicKeyFilePath
-     * @param {string} privateKeyFilePath
-     * @returns {{ publicKey: string, privateKey: string }}
-     * @memberof DefaultConfig
-     */
-    private createAndSaveKeyPair(publicKeyFilePath: string, privateKeyFilePath: string): { publicKey: string, privateKey: string } {
-        const { publicKey, privateKey } = generateKeys();
-        fs.writeFileSync(privateKeyFilePath, privateKey);
-        fs.writeFileSync(publicKeyFilePath, publicKey);
-        return { publicKey, privateKey };
-    }
-
-    /**
      * Merging user options and default properties
      * @param  {Config} options?
      * @returns {void}
@@ -313,7 +298,10 @@ export class DefaultConfig implements Config, ReadyStatus {
                     options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();
                     options.privateKey = fs.readFileSync(options.privateKeyFilePath).toString();
                 } else {
-                    const { publicKey, privateKey } = this.createAndSaveKeyPair(options.publicKeyFilePath, options.privateKeyFilePath);
+                    const { publicKey, privateKey } = this.createAndSaveKeyPair(
+                        options.publicKeyFilePath,
+                        options.privateKeyFilePath,
+                    );
                     options.publicKey = publicKey;
                     options.privateKey = privateKey;
                 }
@@ -321,7 +309,10 @@ export class DefaultConfig implements Config, ReadyStatus {
                 options.publicKey = fs.readFileSync(DEFAULT_PUBLIC_KEY_FILE).toString();
                 options.privateKey = fs.readFileSync(DEFAULT_PRIVATE_KEY_FILE).toString();
             } else {
-                const { publicKey, privateKey } = this.createAndSaveKeyPair(DEFAULT_PUBLIC_KEY_FILE, DEFAULT_PRIVATE_KEY_FILE);
+                const { publicKey, privateKey } = this.createAndSaveKeyPair(
+                    DEFAULT_PUBLIC_KEY_FILE,
+                    DEFAULT_PRIVATE_KEY_FILE,
+                );
                 options.publicKey = publicKey;
                 options.privateKey = privateKey;
             }
@@ -329,7 +320,7 @@ export class DefaultConfig implements Config, ReadyStatus {
 
         // Merge taking place here
         Object.keys(options).map(
-            function (prop) {
+            function(prop) {
                 if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
                     this[prop] = {
                         ...this[prop],
@@ -347,6 +338,24 @@ export class DefaultConfig implements Config, ReadyStatus {
             this.host = this.getValidhttpUrl(this.host);
             this.hostURLObject = Url(this.host);
         }
+    }
+
+    /**
+     * Creates the public and private key pair and saves them in the file paths provided
+     * @private
+     * @param {string} publicKeyFilePath
+     * @param {string} privateKeyFilePath
+     * @returns {{ publicKey: string, privateKey: string }}
+     * @memberof DefaultConfig
+     */
+    private createAndSaveKeyPair(
+        publicKeyFilePath: string,
+        privateKeyFilePath: string,
+    ): { publicKey: string; privateKey: string } {
+        const { publicKey, privateKey } = generateKeys();
+        fs.writeFileSync(privateKeyFilePath, privateKey);
+        fs.writeFileSync(publicKeyFilePath, publicKey);
+        return { publicKey, privateKey };
     }
 
     private getValidMongoDBUrl(url: string): string {
