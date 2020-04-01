@@ -8,7 +8,7 @@ let request;
 beforeAll((done) => {
     appTester = new AppTester({
         dbAddress: "mongodb://localhost:27017/TestFakeEMailAccount",
-        mailTransporter: undefined,
+        nodemailerConfig: undefined,
         onReady: async () => {
             request = appTester.getRequestSender();
             done();
