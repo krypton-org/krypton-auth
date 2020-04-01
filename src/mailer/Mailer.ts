@@ -10,8 +10,8 @@ import { EmailNotSentError } from '../error/ErrorTypes';
 
 let transporter: Transporter;
 
-if (config.mailTransporter) {
-    transporter = config.mailTransporter;
+if (config.nodemailerConfig) {
+    transporter = nodemailer.createTransport(config.nodemailerConfig);
 } else {
     nodemailer.createTestAccount((err, account) => {
         config.serviceReady({ isTestEmailReady: true });

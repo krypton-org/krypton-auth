@@ -7,7 +7,7 @@ import { EventEmitter } from 'events';
 import { Request } from 'express';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
-import { Transporter } from 'nodemailer';
+import { Transport } from 'nodemailer';
 import path from 'path';
 import SocketIO from 'socket.io';
 import Url from 'url-parse';
@@ -84,9 +84,9 @@ export interface Config {
      */
     mailFrom?: string | Address;
     /**
-     * A `Nodemailer transporter <https://nodemailer.com/smtp/#examples>`_ used to send administration emails to users. Create one by calling ``createTransport`` from the `Nodemailer API <https://nodemailer.com/smtp/#examples>`_. The default value is ``undefined``.
+     * A `Nodemailer configuration <https://nodemailer.com/smtp/#examples>`_ used to send administration emails to users. The default value is ``undefined``.
      * ::
-     *    const transporter = nodemailer.createTransport({
+     *    const nodemailerConfig = {
      *         host: "smtp.example.email",
      *         port: 587,
      *         secure: false, // true for 465, false for other ports
@@ -94,16 +94,16 @@ export interface Config {
      *             user: credentials.user,
      *             pass: credentials.pass
      *        }
-     *    });
+     *    };
      *
-     *    app.use('/auth', kryptonAuth({ transporter }));
+     *    app.use('/auth', kryptonAuth({ nodemailerConfig }));
      *
      * If left ``undefined`` a Nodemailer test account is set automatically. It will print URL links on the command line to let you preview the emails that would have normally been sent.
      * ::
      *     Message sent: <365ea109-f645-e3a1-5e08-48e4c8a37bcb@JohannC>
      *     Preview URL: https://ethereal.email/message/Xklk07cTigz7mlaKXkllHsRk0gyz7kuxAAAAAWLgnFDcJwUFl8MZ-h1shKs
      */
-    mailTransporter?: Transporter;
+    nodemailerConfig?: any;
     /**
      * The filepath to the `EJS <https://ejs.co/>`_ template file of notification page.
      * This library include a simple one located in `./nodes_module/krypton-auth/lib/templates/pages/Notification.ejs <https://github.com/JohannC/krypton-auth/blob/master/lib/templates/pages/Notification.ejs>`_.
@@ -199,7 +199,7 @@ export class DefaultConfig implements Config, ReadyStatus {
     public isAgendaReady: boolean = false;
     public isMongooseReady: boolean = false;
     public isTestEmailReady: boolean = false;
-    public mailTransporter: undefined;
+    public nodemailerConfig: any;
     public mailFrom: undefined;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
     public privateKey = undefined;
@@ -247,7 +247,7 @@ export class DefaultConfig implements Config, ReadyStatus {
             this.isTestEmailReady = true;
             console.log('Testing email credentials obtained \u2705');
         }
-        if (this.isAgendaReady && this.isMongooseReady && (this.mailTransporter || this.isTestEmailReady)) {
+        if (this.isAgendaReady && this.isMongooseReady && (this.nodemailerConfig || this.isTestEmailReady)) {
             console.log('Connection to MongoDB established \u2705');
             console.log('Krypton Authentication is ready \u2705');
             this.onReady();

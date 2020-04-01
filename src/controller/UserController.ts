@@ -44,7 +44,7 @@ const isUserLoggedIn = (req: Request): boolean => req.user !== undefined;
  * @returns {boolean} true if a notificaiton should be sent to client with the preview link in case of a mock email
  */
 const isMockEmailAndClientCanReceivePreview = (req: Request): boolean => {
-    return !config.mailTransporter && config.graphiql && req.cookies.clientId;
+    return !config.nodemailerConfig && config.graphiql && req.cookies.clientId;
 };
 
 /**

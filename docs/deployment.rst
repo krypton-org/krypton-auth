@@ -7,7 +7,7 @@ Custom
 In production you should provide certain properties:
 
 * :any:`Config.graphiql`: desactivate the development IDE by setting this property to ``false``.
-* :any:`Config.mailTransporter`: provide an email configuration to send real emails to your users.
+* :any:`Config.nodemailerConfig`: provide a nodemailer configuration to send real emails to your users.
 * :any:`Config.mailFrom`: Define the sender address displayed in emails sent to users.
 * :any:`Config.host`: Public URL of the service. It will be used in emails sent to users to define for instance valid confirmation link.
 * :any:`Config.dbAddress`: Define the connection to a MongoDB database.
@@ -39,7 +39,7 @@ Example:
         graphiql: false,
         host: "https://my-service-public-adress.com",
         mailFrom: '"Foo Bar" <foo@bar.com>',
-        mailTransporter: nodemailer.createTransport({
+        nodemailerConfig: {
             host: "smtp.example.email",
             port: 465,
             secure: true,
@@ -47,7 +47,7 @@ Example:
             user: "FooBar",
             pass: "F@@8aR"
             }
-        }),
+        },
         dbAddress: "mongodb://login:password@something.mlab.com:19150/dbName",
         eventEmitter,
         privateKeyFilePath: './private-key.txt',

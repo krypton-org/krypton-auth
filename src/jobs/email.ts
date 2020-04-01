@@ -16,7 +16,7 @@ export default function(agenda: Agenda): void {
     agenda.define('email', async (job: Agenda.Job<Email>) => {
         try {
             const info = await send(job.attrs.data);
-            if (!config.mailTransporter) {
+            if (!config.nodemailerConfig) {
                 console.log('Message sent: %s', info.messageId);
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 const clientId = job.attrs.data.clientId;

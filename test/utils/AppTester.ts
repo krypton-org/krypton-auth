@@ -3,7 +3,6 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import express from 'express';
 import kryptonAuth from '../../src/index';
-import mailer, { Transporter } from 'nodemailer';
 import { parse } from 'cookie';
 
 
@@ -12,20 +11,20 @@ export default class AppTester {
     private enumSet: Set<string>;
 
     constructor(options) {
-        const mailTransporter: Transporter = mailer.createTransport({
+        const nodemailerConfig = {
             host: 'smtp.ethereal.email',
             port: 587,
             auth: {
                 user: 'x6z5n5ywx7wbpgkb@ethereal.email',
                 pass: 'JAXPXSY9MQP3uHtFjB'
             }
-        });
+        };
 
         this.enumSet = new Set<string>();
 
         options = {
             ...{
-                mailTransporter,
+                nodemailerConfig,
                 extendedSchema: {
                     firstName: {
                         type: String,
