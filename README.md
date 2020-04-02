@@ -1,5 +1,5 @@
 <p align="center">
-<img src="/docs/_static/logo.svg"/>
+<img src="https://github.com/krypton-org/krypton-auth/raw/master/docs/_static/logo.png" width="150px"/>
 </p>
 <p align="center">
 <i>Express authentication middleware, using GraphQL and JSON Web Tokens.</i><br/><br/>
