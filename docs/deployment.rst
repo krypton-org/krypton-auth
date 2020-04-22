@@ -61,9 +61,9 @@ Heroku
 ------
 
 .. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-auth-Heroku
+   :target: https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-heroku
 
 Docker
 ------
 
-**TODO**
+See `krypton-org/krypton-docker <https://github.com/krypton-org/krypton-docker>`_.
