@@ -7,7 +7,6 @@ import { EventEmitter } from 'events';
 import { Request } from 'express';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
-import { Transport } from 'nodemailer';
 import path from 'path';
 import SocketIO from 'socket.io';
 import Url from 'url-parse';
