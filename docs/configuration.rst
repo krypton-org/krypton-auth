@@ -10,7 +10,7 @@ Properties are set when the service is instantiated, for example:
 
     app.use(kryptonAuth({ mailFrom: '"Fred Foo 👻" <foo@example.com>' }));
 
-.. autoclass:: Config
+.. autoclass:: Properties
     :members:
 
 Error Handling
