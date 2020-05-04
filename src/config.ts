@@ -244,11 +244,11 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
         }
         if (status.isTestEmailReady) {
             this.isTestEmailReady = true;
-            console.log('Testing email credentials obtained \u2705');
+            console.log('\u2705 Ethereal credentials obtained');
         }
         if (this.isAgendaReady && this.isMongooseReady && (this.nodemailerConfig || this.isTestEmailReady)) {
-            console.log('Connection to MongoDB established \u2705');
-            console.log('Krypton Authentication is ready \u2705');
+            console.log('\u2705 MongoDB connection established');
+            console.log('\u2705 Krypton Authentication is ready');
             this.onReady();
         }
     };
@@ -259,7 +259,7 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
      * @returns {void}
      */
     public dbConnectionFailed = (err: Error): void => {
-        console.log('Connection to MongoDB failed \u274C');
+        console.log('\u274C Connection to MongoDB failed');
         if (config.eventEmitter) {
             config.eventEmitter.emit('error', err);
         }
