@@ -1,4 +1,4 @@
-import defaultConfig, { Config } from '../../src/config';
+import defaultConfig, { Properties } from '../../src/config';
 import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
@@ -20,9 +20,9 @@ test('Create, save and reuse public & private key pair in default file location'
     }
 
     //Config with no privateKeyFilePath & prublicKeyFilePath shouls create them in their default location
-    const properties: Config = {
+    const properties: Properties = {
     }
-    defaultConfig.merge(properties);
+    defaultConfig.set(properties);
     expect(await access(DEFAULT_PUBLIC_KEY_FILE_PATH, fs.constants.F_OK)).toBeUndefined();
     expect(await access(DEFAULT_PRIVATE_KEY_FILE_PATH, fs.constants.F_OK)).toBeUndefined();
 
@@ -30,7 +30,7 @@ test('Create, save and reuse public & private key pair in default file location'
     const privateKey = fs.readFileSync(DEFAULT_PRIVATE_KEY_FILE_PATH).toString();
 
     //Config with no privateKeyFilePath & prublicKeyFilePath shouls reuse them if already present
-    defaultConfig.merge(properties);
+    defaultConfig.set(properties);
     expect(await access(DEFAULT_PUBLIC_KEY_FILE_PATH, fs.constants.F_OK)).toBeUndefined();
     expect(await access(DEFAULT_PRIVATE_KEY_FILE_PATH, fs.constants.F_OK)).toBeUndefined();
     expect(fs.readFileSync(DEFAULT_PUBLIC_KEY_FILE_PATH).toString()).toBe(publicKey);
@@ -43,7 +43,7 @@ test('Create, save and reuse public & private key pair in default file location'
 });
 
 test('Create, save and reuse public & private key pair in file location provided', async (done) => {
-    const properties: Config = {
+    const properties: Properties = {
         publicKeyFilePath: path.resolve(__dirname, '../../not-the-default-file-path-public-key.txt'),
         privateKeyFilePath: path.resolve(__dirname, '../../not-the-default-file-path-private-key.txt')
     }
@@ -57,14 +57,14 @@ test('Create, save and reuse public & private key pair in file location provided
     }
 
     //Shouls create public & private keys in the location set in properties
-    defaultConfig.merge(properties)
+    defaultConfig.set(properties)
     expect(await access(properties.publicKeyFilePath, fs.constants.F_OK)).toBeUndefined();
     expect(await access(properties.privateKeyFilePath, fs.constants.F_OK)).toBeUndefined();
     const publicKey = fs.readFileSync(properties.publicKeyFilePath).toString();
     const privateKey = fs.readFileSync(properties.privateKeyFilePath).toString();
 
     //Shouls reuse public & private keys in the location set in properties
-    defaultConfig.merge({})
+    defaultConfig.set({})
     expect(await access(properties.publicKeyFilePath, fs.constants.F_OK)).toBeUndefined();
     expect(await access(properties.privateKeyFilePath, fs.constants.F_OK)).toBeUndefined();
     expect(fs.readFileSync(properties.publicKeyFilePath).toString()).toBe(publicKey);
@@ -77,11 +77,11 @@ test('Create, save and reuse public & private key pair in file location provided
 });
 
 test('Use  public & private key pair provided directly in option', async (done) => {
-    const properties: Config = {
+    const properties: Properties = {
         privateKey: 'privatekeytest',
         publicKey: 'publickeytest'
     }
-    defaultConfig.merge(properties)
+    defaultConfig.set(properties)
     expect(defaultConfig.privateKey).toBe(properties.privateKey);
     expect(defaultConfig.publicKey).toBe(properties.publicKey);
     done();

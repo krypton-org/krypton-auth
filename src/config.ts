@@ -7,7 +7,6 @@ import { EventEmitter } from 'events';
 import { Request } from 'express';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
-import { Transport } from 'nodemailer';
 import path from 'path';
 import SocketIO from 'socket.io';
 import Url from 'url-parse';
@@ -39,7 +38,7 @@ export interface Address {
 /**
  * Properties for configuring Krypton Authentication.
  */
-export interface Config {
+export interface Properties {
     /** JSON Web Token signing algorithm. The default value is ``RS256``. */
     algorithm?: Algorithm;
     /**
@@ -54,6 +53,9 @@ export interface Config {
      * The default value is ``mongodb://localhost:27017/users``.
      */
     dbAddress?: string;
+    /**
+     * Event emitter transmitting krypton errors on "error" event and email errors on "email-error" event.
+     */
     eventEmitter?: EventEmitter;
     /** Custom user model, see :ref:`extended-schema`. */
     extendedSchema?: object;
@@ -187,39 +189,35 @@ export interface Config {
     verifyEmailTemplate?: string;
 }
 
-export class DefaultConfig implements Config, ReadyStatus {
+export class DefaultProperties implements Properties {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbAddress = 'mongodb://localhost:27017/users';
-    public emailConfig: undefined;
+    public eventEmitter = null;
     public extendedSchema = {};
     public graphiql = true;
-    public host = undefined;
-    public hostURLObject = undefined;
-    public isAgendaReady: boolean = false;
-    public isMongooseReady: boolean = false;
-    public isTestEmailReady: boolean = false;
-    public nodemailerConfig: any;
-    public mailFrom: undefined;
+    public host = null;
+    public mailFrom = null;
+    public nodemailerConfig = null;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
-    public privateKey = undefined;
-    public privateKeyFilePath = undefined;
-    public publicKey = undefined;
-    public publicKeyFilePath = undefined;
+    public onReady = () => {};
+    public privateKey = null;
+    public privateKeyFilePath = null;
+    public publicKey = null;
+    public publicKeyFilePath = null;
     public refreshTokenExpiryTime = 7 * 24 * 60 * 60 * 1000;
     public resetPasswordEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/ResetPassword.ejs');
     public resetPasswordFormTemplate = path.resolve(__dirname, '../lib/templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
-    public eventEmitter = undefined;
+}
+
+class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
+    public hostURLObject = undefined;
+    public isAgendaReady: boolean = false;
+    public isMongooseReady: boolean = false;
+    public isTestEmailReady: boolean = false;
     public io: SocketIO.Server;
     public clientIdToSocket: Map<string, SocketIO.Socket>;
-
-    /**
-     * Called by Krypton Authentication once it is launched
-     */
-    public onReady = () => {
-        // Something to do
-    };
 
     /**
      * Setting SocketIO server to push email notifications to GraphiQL IDE
@@ -288,46 +286,44 @@ export class DefaultConfig implements Config, ReadyStatus {
 
     /**
      * Merging user options and default properties
-     * @param  {Config} options?
+     * @param  {Properties} properties?
      * @returns {void}
      */
-    public merge(options?: Config): void {
-        if (options.publicKey === undefined || options.privateKey === undefined) {
-            if (options.publicKeyFilePath !== undefined || options.privateKeyFilePath !== undefined) {
-                if (fs.existsSync(options.publicKeyFilePath) && fs.existsSync(options.privateKeyFilePath)) {
-                    options.publicKey = fs.readFileSync(options.publicKeyFilePath).toString();
-                    options.privateKey = fs.readFileSync(options.privateKeyFilePath).toString();
+    public set(properties?: Properties): void {
+        if (!properties) {
+            properties = {};
+        }
+        if (!properties.publicKey || !properties.privateKey) {
+            if (properties.publicKeyFilePath || properties.privateKeyFilePath) {
+                if (fs.existsSync(properties.publicKeyFilePath) && fs.existsSync(properties.privateKeyFilePath)) {
+                    properties.publicKey = fs.readFileSync(properties.publicKeyFilePath).toString();
+                    properties.privateKey = fs.readFileSync(properties.privateKeyFilePath).toString();
                 } else {
                     const { publicKey, privateKey } = this.createAndSaveKeyPair(
-                        options.publicKeyFilePath,
-                        options.privateKeyFilePath,
+                        properties.publicKeyFilePath,
+                        properties.privateKeyFilePath,
                     );
-                    options.publicKey = publicKey;
-                    options.privateKey = privateKey;
+                    properties.publicKey = publicKey;
+                    properties.privateKey = privateKey;
                 }
             } else if (fs.existsSync(DEFAULT_PUBLIC_KEY_FILE) && fs.existsSync(DEFAULT_PRIVATE_KEY_FILE)) {
-                options.publicKey = fs.readFileSync(DEFAULT_PUBLIC_KEY_FILE).toString();
-                options.privateKey = fs.readFileSync(DEFAULT_PRIVATE_KEY_FILE).toString();
+                properties.publicKey = fs.readFileSync(DEFAULT_PUBLIC_KEY_FILE).toString();
+                properties.privateKey = fs.readFileSync(DEFAULT_PRIVATE_KEY_FILE).toString();
             } else {
                 const { publicKey, privateKey } = this.createAndSaveKeyPair(
                     DEFAULT_PUBLIC_KEY_FILE,
                     DEFAULT_PRIVATE_KEY_FILE,
                 );
-                options.publicKey = publicKey;
-                options.privateKey = privateKey;
+                properties.publicKey = publicKey;
+                properties.privateKey = privateKey;
             }
         }
 
         // Merge taking place here
-        Object.keys(options).map(
+        Object.keys(new DefaultProperties()).map(
             function(prop) {
-                if (typeof this[prop] === 'object' && typeof options[prop] !== 'string') {
-                    this[prop] = {
-                        ...this[prop],
-                        ...options[prop],
-                    };
-                } else {
-                    this[prop] = options[prop];
+                if (properties[prop]){
+                    this[prop] = properties[prop];
                 }
             }.bind(this),
         );
@@ -385,6 +381,6 @@ export class DefaultConfig implements Config, ReadyStatus {
 }
 
 /* Exporting an instance of Config that acts like singleton */
-const config = new DefaultConfig();
+const config = new ServiceConfiguration();
 
 export default config;
