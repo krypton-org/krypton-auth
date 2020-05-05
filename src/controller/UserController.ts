@@ -85,7 +85,7 @@ export const getUser = async (req: Request, res: Response): Promise<{ user: any 
 /**
  * Returns true email address not already taken by another user.
  * @param  {string} email
- * @returns {Promise<{ isAvailable: boolean }>} Promise to the boolean `isAvailable`
+ * @returns {Promise<boolean>} Promise returning true if`isAvailable`
  */
 export const checkEmailAvailable = async (email: string): Promise<boolean> => {
     const emailExists = await User.userExists({ email });
@@ -131,7 +131,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
  * @throws {UserValidationError}
  * @param  {any} user
  * @param  {Request} req
- * @returns {Promise<{ user: any; notifications: Notification[] }>} Promise to the notifications of success or failure
+ * @returns {Promise<boolean>} Promise returning true on request success
  */
 export const createUser = async (user: any, req: Request): Promise<boolean> => {
     user.verificationToken = generateToken(TOKEN_LENGTH);
@@ -164,7 +164,7 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
  * @throws {UnauthorizedError}
  * @throws {EmailAlreadyConfirmedError}
  * @param  {Request} req
- * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure
+ * @returns {Promise<boolean>} Promise returning true on request success
  */
 export const resendConfirmationEmail = async (req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
@@ -284,13 +284,14 @@ export const updateUser = async (
         throw new UserValidationError(err.message.replace('user validation failed: email: ', ''));
     }
 };
+
 /**
  * Delete logged in user.
  * @throws {UnauthorizedError}
  * @throws {WrongPasswordError}
  * @param  {string} password
  * @param  {Request} req
- * @returns Notification
+ * @returns {Promise<boolean>}
  */
 export const deleteUser = async (password: string, req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
@@ -301,6 +302,21 @@ export const deleteUser = async (password: string, req: Request): Promise<boolea
         throw new WrongPasswordError('You entered a wrong password');
     }
     await User.removeUser({ _id: req.user._id });
+    return true;
+};
+
+/**
+ * User log-out.
+ * @throws {UnauthorizedError}
+ * @returns {Promise<boolean>}
+ */
+export const logout = async (req: Request): Promise<boolean> => {
+    const { user, session } = await Session.getUserAndSessionFromRefreshToken(req.cookies.refreshToken);
+    if (user && session) {
+        await Session.removeSession(req.user._id, req.cookies.refreshToken);
+    } else {
+        throw new UnauthorizedError('Please login!');
+    }
     return true;
 };
 
@@ -349,7 +365,7 @@ export const login = async (
  * @throws {AlreadyLoggedInError}
  * @param  {string} email
  * @param  {Request} req
- * @returns {Promise<{ notifications: Notification[] }>} Promise to the notifications of success or failure.
+ * @returns {Promise<boolean} Returns true
  */
 export const sendPasswordRecoveryEmail = async (email: string, req: Request): Promise<boolean> => {
     if (req.user !== undefined) {
