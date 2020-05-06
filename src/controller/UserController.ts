@@ -270,8 +270,8 @@ export const updateUser = async (
             sendConfirmationEmail(req.user, userUpdates.verificationToken, config.getRouterAddress(req), clientId);
         }
         const payload = await User.refreshAuthToken({ _id: req.user._id }, config.privateKey);
-        const { refreshToken } = await Session.updateSession(req.user._id, req.cookies.refreshToken);
-        const params: any = { httpOnly: true };
+        const { refreshToken, expiryDate } = await Session.updateSession(req.user._id, req.cookies.refreshToken);
+        const params: any = { httpOnly: true, expires: expiryDate };
         if (config.host) {
             params.domain = '.' + config.getDomainAddress();
         }
@@ -350,8 +350,8 @@ export const login = async (
 
     await Session.removeOutdatedSessions(payload.user._id);
 
-    const { refreshToken } = await Session.createSession(payload.user._id);
-    const params: any = { httpOnly: true };
+    const { refreshToken, expiryDate } = await Session.createSession(payload.user._id);
+    const params: any = { httpOnly: true, expires: expiryDate };
     if (config.host) {
         params.domain = '.' + config.getDomainAddress();
     }
@@ -440,8 +440,8 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
     const now = new Date();
     if (user && session && now.getTime() < session.expiryDate) {
         const payload = await User.refreshAuthToken({ _id: user._id }, config.privateKey);
-        const { refreshToken } = await Session.updateSession(user._id, session.refreshToken);
-        const params: any = { httpOnly: true };
+        const { refreshToken, expiryDate } = await Session.updateSession(user._id, session.refreshToken);
+        const params: any = { httpOnly: true, expires: expiryDate };
         if (config.host) {
             params.domain = '.' + config.getDomainAddress();
         }
