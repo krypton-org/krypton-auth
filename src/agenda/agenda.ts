@@ -8,7 +8,16 @@ import config from '../config';
 import email from '../jobs/email';
 
 const collection = 'emailJobs';
-const connectionOpts = { db: { address: config.dbAddress, collection } };
+const connectionOpts = {
+    db: {
+        address: config.dbAddress, collection, options: {
+            useUnifiedTopology: true,
+            autoReconnect: true,
+            reconnectTries: 50,
+            reconnectInterval: 1000
+        }
+    }
+};
 const agenda: Agenda = new Agenda(connectionOpts);
 email(agenda);
 

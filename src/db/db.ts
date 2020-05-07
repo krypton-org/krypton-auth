@@ -38,6 +38,9 @@ async function init(cb?: () => any): Promise<void | never> {
             useFindAndModify: true,
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            autoReconnect: true,
+            reconnectTries: Number.MAX_SAFE_INTEGER,
+            reconnectInterval: 1000,
         });
     } catch (err) {
         config.dbConnectionFailed(err);
