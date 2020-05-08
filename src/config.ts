@@ -335,7 +335,7 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
         Object.keys(new DefaultProperties()).map(
             function (prop) {
                 if (properties[prop]) {
-                    if (typeof this[prop] === 'object' && typeof properties[prop] !== 'string') {
+                    if (prop === 'dbConfig') {
                         this[prop] = {
                             ...this[prop],
                             ...properties[prop],
