@@ -204,9 +204,6 @@ export class DefaultProperties implements Properties {
         useFindAndModify: false,
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        autoReconnect: true,
-        reconnectTries: Number.MAX_SAFE_INTEGER,
-        reconnectInterval: 1000
     }
     public eventEmitter = null;
     public extendedSchema = {};
