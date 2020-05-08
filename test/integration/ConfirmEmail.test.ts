@@ -53,10 +53,10 @@ test("Confirm email", async (done) => {
     
     
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({email: user.email}, {verified: true});
+    const userRetrieved = await UserModel.getUser({email: user.email}, {email_verified: true});
     res = await request.get("/user/email/confirmation?token="+userRetrieved.verificationToken);
     expect(res.statusCode).toBe(200);
-    expect(res.text.includes("You are now verified")).toBeTruthy();
+    expect(res.text.includes("You are now email_verified")).toBeTruthy();
     done();
 });
 

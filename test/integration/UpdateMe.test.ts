@@ -99,7 +99,7 @@ test('Update usersname - email - password', async (done) => {
               token,
               expiryDate
               user{
-                verified
+                email_verified
                 _id
                 email
               }
@@ -129,7 +129,7 @@ test('Update usersname - email - password', async (done) => {
             expect(typeof userDecrypted._id === "string").toBeTruthy();
             expect(userDecrypted._id.length > 5).toBeTruthy();
             expect(userDecrypted.email).toBe(updates.email);
-            expect(userDecrypted.verified).toBe(false);
+            expect(userDecrypted.email_verified).toBe(false);
             expect(userDecrypted.age).toBe(user1.age);
             expect(userDecrypted.receiveNewsletter).toBe(user1.receiveNewsletter);
             expect(userDecrypted.gender).toBe(user1.gender);
@@ -222,9 +222,9 @@ test('Wrong gender', async (done) => {
     done();
 });
 
-test('Update email of a verified user', async (done) => {
+test('Update email of a email_verified user', async (done) => {
     const UserModel = require('../../src/model/UserModel').default;
-    await UserModel.updateUser({ email: user3.email }, { verified: true });
+    await UserModel.updateUser({ email: user3.email }, { email_verified: true });
     let loginRes = await appTester.login(user3.email, user3.password);
     token3 = loginRes.data.login.token;
     refreshToken3 = loginRes.cookies.refreshToken;
@@ -234,14 +234,14 @@ test('Update email of a verified user', async (done) => {
             updateMe(fields:{email: "${newEmail}"}){
               token
               user{
-                verified
+                email_verified
               }
             }
           }`
     }
 
     let updateRes = await request.postGraphQL(query, token3, refreshToken3);
-    expect(updateRes.data.updateMe.user.verified).toBeFalsy();
+    expect(updateRes.data.updateMe.user.email_verified).toBeFalsy();
 
     done();
 });

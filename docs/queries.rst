@@ -46,7 +46,7 @@ You will be able to access private mutations/queries by including it in the ``Au
         expiryDate
         user {
           _id
-          verified
+          email_verified
         }
       }
     }
@@ -70,7 +70,7 @@ To access your own private data use the ``me`` query.  You have to be logged in 
     query {
       me {
         _id
-        verified
+        email_verified
         email
       }
     }
@@ -94,7 +94,7 @@ To change any of your user fields, use the ``updateMe`` mutation. You have to be
         expiryDate
         user {
           _id
-          verified
+          email_verified
         }
       }
     }
@@ -121,7 +121,7 @@ To change your password, use the ``updateMe`` mutation passing your ``previousPa
         expiryDate
         user {
           _id
-          verified
+          email_verified
         }
       }
     }
