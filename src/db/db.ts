@@ -33,15 +33,7 @@ async function init(cb?: () => any): Promise<void | never> {
 
     // Create the database connection
     try {
-        await mongoose.connect(config.dbAddress, {
-            useCreateIndex: true,
-            useFindAndModify: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            autoReconnect: true,
-            reconnectTries: Number.MAX_SAFE_INTEGER,
-            reconnectInterval: 1000,
-        });
+        await mongoose.connect(config.dbAddress, config.dbConfig);
     } catch (err) {
         config.dbConnectionFailed(err);
     }

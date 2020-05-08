@@ -54,6 +54,12 @@ export interface Properties {
      */
     dbAddress?: string;
     /**
+     * MongoDB config, only if you need to set a special configuration for MongoDB.
+     * The default configuration used by Krypton aims to make the system resilient to database connection problems. Krypton will try to reconnect automatically to MongoDB. You can adapt this behavior by tweaking this property.
+     * Example: ``{reconnectInterval: 500}``.
+     */
+    dbConfig?: { [key: string]: any};
+    /**
      * Event emitter transmitting krypton errors on "error" event and email errors on "email-error" event.
      */
     eventEmitter?: EventEmitter;
@@ -193,6 +199,15 @@ export class DefaultProperties implements Properties {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbAddress = 'mongodb://localhost:27017/users';
+    public dbConfig = {
+        useCreateIndex: true,
+        useFindAndModify: false,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        autoReconnect: true,
+        reconnectTries: Number.MAX_SAFE_INTEGER,
+        reconnectInterval: 1000
+    }
     public eventEmitter = null;
     public extendedSchema = {};
     public graphiql = true;
