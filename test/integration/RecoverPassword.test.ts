@@ -97,7 +97,7 @@ test("Change password with recovery token", async (done) => {
     let res = await request.getGraphQL(recoveryEmailQuery);
     expect(res.data.sendPasswordRecoveryEmail).toBeTruthy();
     const UserModel = require('../../src/model/UserModel').default;
-    const userRetrieved = await UserModel.getUser({ email: user.email }, { verified: true });
+    const userRetrieved = await UserModel.getUser({ email: user.email }, { email_verified: true });
     expect(typeof userRetrieved.passwordRecoveryToken === "string").toBeTruthy();
     expect(userRetrieved.passwordRecoveryToken.length > 10).toBeTruthy();
     let newPassword = "newPassword";

@@ -162,7 +162,7 @@ test('Update usersname - email - password', async (done) => {
               expiryDate
               user{
                 username
-                verified
+                email_verified
                 _id
                 email
               }

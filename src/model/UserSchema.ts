@@ -59,7 +59,7 @@ const basicSchema = {
         isPublic: false,
         type: String,
     },
-    verified: {
+    email_verified: {
         default: false,
         isPublic: true,
         isUneditable: true,
@@ -85,7 +85,7 @@ const privateFields: string[] = Object.keys(UserSchema).filter(x => !UserSchema[
 const internalFields: string[] = Object.keys(UserSchema).filter(x => UserSchema[x].isInternal);
 
 /**
- * List of uneditable fields. Users can't change the value of those fields (like if the user is `verified`)
+ * List of uneditable fields. Users can't change the value of those fields (like if the user email is `verified`)
  */
 const uneditableFields: string[] = Object.keys(UserSchema).filter(x => UserSchema[x].isUneditable);
 

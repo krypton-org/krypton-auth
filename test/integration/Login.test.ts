@@ -47,7 +47,7 @@ test('Login by email & query user data', async (done) => {
             user{
                 email
                 _id
-                verified
+                email_verified
                 age
                 receiveNewsletter
                 gender
@@ -64,7 +64,7 @@ test('Login by email & query user data', async (done) => {
     expect(typeof res.data.login.token === "string").toBeTruthy();
     expect(res.data.login.token.length > 10).toBeTruthy();
     expect(res.data.login.user.email).toBe(user.email);
-    expect(res.data.login.user.verified).toBe(false);
+    expect(res.data.login.user.email_verified).toBe(false);
     expect(res.data.login.user.age).toBe(user.age);
     expect(res.data.login.user.receiveNewsletter).toBe(user.receiveNewsletter);
     expect(res.data.login.user.gender).toBe(user.gender);
@@ -92,7 +92,7 @@ test('Login by email & decrypting token to get user data', async (done) => {
             expect(typeof userDecrypted._id === "string").toBeTruthy();
             expect(userDecrypted._id.length > 5).toBeTruthy();
             expect(userDecrypted.email).toBe(user.email);
-            expect(userDecrypted.verified).toBe(false);
+            expect(userDecrypted.email_verified).toBe(false);
             expect(userDecrypted.age).toBe(user.age);
             expect(userDecrypted.receiveNewsletter).toBe(user.receiveNewsletter);
             expect(userDecrypted.gender).toBe(user.gender);

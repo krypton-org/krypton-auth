@@ -109,8 +109,8 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
             throw new UnauthorizedError('This link is no longer valid.');
         }
         const user = await User.getUser({ verificationToken: token });
-        await User.updateUser({ email: user.email }, { verificationToken: null, verified: true });
-        notifications.push({ type: 'success', message: 'You are now verified!' });
+        await User.updateUser({ email: user.email }, { verificationToken: null, email_verified: true });
+        notifications.push({ type: 'success', message: 'You are now email_verified!' });
     } catch (err) {
         notifications.push({ type: 'error', message: 'This link is not valid!' });
     } finally {
@@ -171,7 +171,7 @@ export const resendConfirmationEmail = async (req: Request): Promise<boolean> =>
         throw new UnauthorizedError('Please login!');
     }
     const user = await User.getUser({ _id: req.user._id });
-    if (user.verified) {
+    if (user.email_verified) {
         throw new EmailAlreadyConfirmedError('Your email adress has already been confirmed.');
     } else {
         let clientId;
@@ -253,9 +253,9 @@ export const updateUser = async (
     try {
         let isEmailVerified = true;
 
-        if (req.user.verified && userUpdates.email) {
+        if (req.user.email_verified && userUpdates.email) {
             userUpdates.verificationToken = generateToken(TOKEN_LENGTH);
-            userUpdates.verified = false;
+            userUpdates.email_verified = false;
             isEmailVerified = false;
         }
 
