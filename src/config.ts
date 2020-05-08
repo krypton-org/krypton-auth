@@ -54,6 +54,12 @@ export interface Properties {
      */
     dbAddress?: string;
     /**
+     * MongoDB config, only if you need to set a special configuration for MongoDB.
+     * The default configuration used by Krypton aims to make the system resilient to database connection problems. Krypton will try to reconnect automatically to MongoDB. You can adapt this behavior by tweaking this property.
+     * Example: ``{reconnectInterval: 500}``.
+     */
+    dbConfig?: { [key: string]: any };
+    /**
      * Event emitter transmitting krypton errors on "error" event and email errors on "email-error" event.
      */
     eventEmitter?: EventEmitter;
@@ -193,6 +199,12 @@ export class DefaultProperties implements Properties {
     public algorithm = 'RS256' as Algorithm;
     public authTokenExpiryTime = 15 * 60 * 1000;
     public dbAddress = 'mongodb://localhost:27017/users';
+    public dbConfig = {
+        useCreateIndex: true,
+        useFindAndModify: false,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    }
     public eventEmitter = null;
     public extendedSchema = {};
     public graphiql = true;
@@ -200,7 +212,7 @@ export class DefaultProperties implements Properties {
     public mailFrom = null;
     public nodemailerConfig = null;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
-    public onReady = () => {};
+    public onReady = () => { };
     public privateKey = null;
     public privateKeyFilePath = null;
     public publicKey = null;
@@ -321,9 +333,16 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
 
         // Merge taking place here
         Object.keys(new DefaultProperties()).map(
-            function(prop) {
-                if (properties[prop]){
-                    this[prop] = properties[prop];
+            function (prop) {
+                if (properties[prop]) {
+                    if (prop === 'dbConfig') {
+                        this[prop] = {
+                            ...this[prop],
+                            ...properties[prop],
+                        };
+                    } else {
+                        this[prop] = properties[prop];
+                    }
                 }
             }.bind(this),
         );

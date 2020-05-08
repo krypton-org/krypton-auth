@@ -8,7 +8,17 @@ import config from '../config';
 import email from '../jobs/email';
 
 const collection = 'emailJobs';
-const connectionOpts = { db: { address: config.dbAddress, collection } };
+const dbConfigWithoutUnsupportedOptions = Object.keys(config.dbConfig).reduce(
+    (acc, key) => {
+        if (key !== 'useCreateIndex' && key !== 'useFindAndModify') acc[key] = config.dbConfig[key];
+        return acc;
+    }, {});
+
+const connectionOpts = {
+    db: {
+        address: config.dbAddress, collection, options: dbConfigWithoutUnsupportedOptions
+    }
+};
 const agenda: Agenda = new Agenda(connectionOpts);
 email(agenda);
 
