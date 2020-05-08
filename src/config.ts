@@ -58,7 +58,7 @@ export interface Properties {
      * The default configuration used by Krypton aims to make the system resilient to database connection problems. Krypton will try to reconnect automatically to MongoDB. You can adapt this behavior by tweaking this property.
      * Example: ``{reconnectInterval: 500}``.
      */
-    dbConfig?: { [key: string]: any};
+    dbConfig?: { [key: string]: any };
     /**
      * Event emitter transmitting krypton errors on "error" event and email errors on "email-error" event.
      */
@@ -215,7 +215,7 @@ export class DefaultProperties implements Properties {
     public mailFrom = null;
     public nodemailerConfig = null;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
-    public onReady = () => {};
+    public onReady = () => { };
     public privateKey = null;
     public privateKeyFilePath = null;
     public publicKey = null;
@@ -336,9 +336,16 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
 
         // Merge taking place here
         Object.keys(new DefaultProperties()).map(
-            function(prop) {
-                if (properties[prop]){
-                    this[prop] = properties[prop];
+            function (prop) {
+                if (properties[prop]) {
+                    if (typeof this[prop] === 'object' && typeof properties[prop] !== 'string') {
+                        this[prop] = {
+                            ...this[prop],
+                            ...properties[prop],
+                        };
+                    } else {
+                        this[prop] = properties[prop];
+                    }
                 }
             }.bind(this),
         );
