@@ -35,6 +35,10 @@ const setJWKSConsumerServer = () => {
     thirdPartyApp.get('/', (req, res) => {
         return res.json(req.user);
     })
+    thirdPartyApp.use(function (err, req, res, next) {
+        console.log(err);
+    });
+    
     thirdPartyRequest = supertest(thirdPartyApp);
 }
 
