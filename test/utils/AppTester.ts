@@ -4,13 +4,15 @@ import mongoose from 'mongoose';
 import express from 'express';
 import kryptonAuth from '../../src/index';
 import { parse } from 'cookie';
+import http from 'http';
 
 
 export default class AppTester {
     private request: any;
     private enumSet: Set<string>;
+    private httpServer: http.Server | undefined;
 
-    constructor(options) {
+    constructor(options, mountOnPort?: number) {
         const nodemailerConfig = {
             host: 'smtp.ethereal.email',
             port: 587,
@@ -77,7 +79,14 @@ export default class AppTester {
 
         const app = express();
         app.use(kryptonAuth(options));
-        this.request = request(app);
+        if (mountOnPort){
+            this.httpServer = app.listen(mountOnPort, () => {
+                console.log('Krypton started at http://localhost:' + mountOnPort);
+            });
+            this.request = request(this.httpServer);
+        } else {
+            this.request = request(app);
+        }
 
         this.request.getGraphQL = async function (query, bearerToken, refreshToken): Promise<any> {
             let request = this.get('/')
@@ -153,7 +162,11 @@ export default class AppTester {
         const agenda = require('../../src/agenda/agenda').default;
         await agenda.stop();
         await mongoose.connection.db.dropDatabase();
-        await MongooseConnection.close(done);
+        if (this.httpServer){
+            this.httpServer.close(() =>  MongooseConnection.close(done));
+        } else {
+            await MongooseConnection.close(done);
+        }
     }
 
     public getRequestSender: () => any = () => {
