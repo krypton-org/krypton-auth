@@ -130,12 +130,7 @@ function defaultQuery() {
 # Use this query to register.
 #
 # mutation{
-#   register(fields:{email: "your@mail.com" password:"yourpassword"}){
-#     notifications{
-#       type
-#       message
-#     }
-#   }
+#   register(fields:{email: "your@mail.com" password:"yourpassword"})
 # }
 #
 # Use this query to log-in.
