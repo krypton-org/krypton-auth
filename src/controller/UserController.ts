@@ -110,7 +110,7 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
         }
         const user = await User.getUser({ verificationToken: token });
         await User.updateUser({ email: user.email }, { verificationToken: null, email_verified: true });
-        notifications.push({ type: 'success', message: 'You are now email_verified!' });
+        notifications.push({ type: 'success', message: 'You are now verified!' });
     } catch (err) {
         notifications.push({ type: 'error', message: 'This link is not valid!' });
     } finally {
