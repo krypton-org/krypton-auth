@@ -146,6 +146,8 @@ export default function renderGraphiQL(data: GraphiQLData): string {
             onEditQuery: onEditQuery,
             onEditVariables: onEditVariables,
             onEditOperationName: onEditOperationName,
+            defaultVariableEditorOpen: true,
+            docExplorerOpen: true,
             query: this.state.query,
             variables: ${safeSerialize(variablesString)},
             operationName: ${safeSerialize(operationName)},
