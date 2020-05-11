@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import graphqlHTTP from 'express-graphql';
 import helmet from 'helmet';
+import { pem2jwk } from 'pem-jwk';
 import socketIo from 'socket.io';
 import config from '../config';
 import * as UserController from '../controller/UserController';
@@ -19,7 +20,6 @@ import OperationalError from '../error/ErrorTypes';
 import renderGraphiQL from '../graphiql/renderGraphiQL';
 import graphqlSchema from '../graphql/Schema';
 import UserModel from '../model/UserModel';
-import { pem2jwk } from 'pem-jwk';
 
 const router: Router = express.Router();
 
@@ -46,7 +46,7 @@ const jwk = pem2jwk(config.publicKey);
 
 router.get('/.well-known/jwks.json', (req: Request, res: Response, next: NextFunction) => {
     res.json({
-        keys: [jwk]
+        keys: [jwk],
     });
 });
 router.get('/user/email/confirmation', UserController.confirmEmail);

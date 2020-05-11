@@ -111,7 +111,7 @@ schemaComposer.Query.addFields({
         type: 'Boolean',
     },
     me: {
-        resolve: async (_, { }, { req, res }) => await UserController.getUser(req, res),
+        resolve: async (_, {}, { req, res }) => await UserController.getUser(req, res),
         type: UserTC,
     },
     publicKey: {
@@ -128,7 +128,7 @@ schemaComposer.Query.addFields({
         type: 'Boolean',
     },
     sendVerificationEmail: {
-        resolve: async (_, { }, { req }) => UserController.resendConfirmationEmail(req),
+        resolve: async (_, {}, { req }) => UserController.resendConfirmationEmail(req),
         type: 'Boolean',
     },
 });
@@ -149,13 +149,13 @@ schemaComposer.Mutation.addFields({
         resolve: async (_, { email, password }, { req, res }) => await UserController.login(email, password, req, res),
         type: UserAndTokenTC,
     },
-    refreshToken: {
-        resolve: async (_, { }, { req, res }) => await UserController.refreshTokens(req, res),
-        type: TokenTC,
-    },
     logout: {
-        resolve: async (_, { }, { req }) => await UserController.logout(req),
+        resolve: async (_, {}, { req }) => await UserController.logout(req),
         type: 'Boolean',
+    },
+    refreshToken: {
+        resolve: async (_, {}, { req, res }) => await UserController.refreshTokens(req, res),
+        type: TokenTC,
     },
     register: {
         args: {

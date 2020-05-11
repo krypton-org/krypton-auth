@@ -22,6 +22,13 @@ const basicSchema = {
                 ),
         },
     },
+    email_verified: {
+        default: false,
+        isPublic: true,
+        isUneditable: true,
+        required: true,
+        type: Boolean,
+    },
     password: {
         isInternal: true,
         isPublic: false,
@@ -58,13 +65,6 @@ const basicSchema = {
         isInternal: true,
         isPublic: false,
         type: String,
-    },
-    email_verified: {
-        default: false,
-        isPublic: true,
-        isUneditable: true,
-        required: true,
-        type: Boolean,
     },
 };
 

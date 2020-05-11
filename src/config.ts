@@ -204,7 +204,7 @@ export class DefaultProperties implements Properties {
         useFindAndModify: false,
         useNewUrlParser: true,
         useUnifiedTopology: true,
-    }
+    };
     public eventEmitter = null;
     public extendedSchema = {};
     public graphiql = true;
@@ -212,7 +212,6 @@ export class DefaultProperties implements Properties {
     public mailFrom = null;
     public nodemailerConfig = null;
     public notificationPageTemplate = path.resolve(__dirname, '../lib/templates/pages/Notification.ejs');
-    public onReady = () => { };
     public privateKey = null;
     public privateKeyFilePath = null;
     public publicKey = null;
@@ -221,6 +220,9 @@ export class DefaultProperties implements Properties {
     public resetPasswordEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/ResetPassword.ejs');
     public resetPasswordFormTemplate = path.resolve(__dirname, '../lib/templates/forms/ResetPassword.ejs');
     public verifyEmailTemplate = path.resolve(__dirname, '../lib/templates/emails/VerifyEmail.ejs');
+    public onReady = () => {
+        // Execute some code when Krypton is set-up
+    };
 }
 
 class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
@@ -333,7 +335,7 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
 
         // Merge taking place here
         Object.keys(new DefaultProperties()).map(
-            function (prop) {
+            function(prop) {
                 if (properties[prop]) {
                     if (prop === 'dbConfig') {
                         this[prop] = {
