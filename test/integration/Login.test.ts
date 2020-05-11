@@ -151,6 +151,7 @@ test("Wrong password", async (done) => {
     expect(res.errors[0].type).toBe('UserNotFoundError');
     done();
 });
+
 afterAll(async (done) => {
     await appTester.close(done);
 }, 40000);

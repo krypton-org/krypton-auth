@@ -151,8 +151,11 @@ export default class AppTester {
         let loginQuery = {
             query: `mutation{
             login(email:"${email}" password:"${password}"){
-            token
-            expiryDate
+                token
+                expiryDate
+                user {
+                    _id
+                }
         }}`
         }
         return await this.request.postGraphQL(loginQuery)

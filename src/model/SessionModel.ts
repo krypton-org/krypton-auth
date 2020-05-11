@@ -26,7 +26,7 @@ export interface ISessionModel extends Model<any, {}> {
     createSession(userId: string): Promise<{ refreshToken: string; expiryDate: Date }>;
 
     /**
-     * Remove the refresh token for the given user ID
+     * Remove the session for the given user ID
      * @param  {string} userId
      * @param  {string} refreshToken
      * @returns {Promise<void>}
@@ -34,11 +34,17 @@ export interface ISessionModel extends Model<any, {}> {
     removeSession(userId: string, refreshToken: string): Promise<any>;
 
     /**
-     * Remove the outdated refresh tokens for the given user ID
+     * Remove the outdated sessions for the given user ID
      * @param  {string} userId
      * @returns {Promise<void>}
      */
     removeOutdatedSessions(userId: string): Promise<any>;
+
+    /**
+     * Remove the all the outdated sessions
+     * @returns {Promise<void>}
+     */
+    removeAllOutdatedSessions(): Promise<any>;
 
     /**
      * Update the refresh token by generating a new one with a new expiryDate
@@ -114,6 +120,11 @@ SessionSchema.statics.removeSession = async function(userId: string, refreshToke
 /** @see {@link ISessionModel#removeOutdatedSessions} */
 SessionSchema.statics.removeOutdatedSessions = async function(userId: string): Promise<any> {
     return await this.deleteMany({ userId, expiryDate: { $lt: new Date() } });
+};
+
+/** @see {@link ISessionModel#removeOutdatedSessions} */
+SessionSchema.statics.removeAllOutdatedSessions = async function(): Promise<any> {
+    return await this.deleteMany({ expiryDate: { $lt: new Date() } });
 };
 
 /** @see {@link ISessionModel#removeSession} */
