@@ -6,6 +6,7 @@
 import Agenda from 'agenda';
 import config from '../config';
 import email from '../jobs/email';
+import removeOutdatedSessions, {JOB_NAME as removeOutdatedSessionsJobName} from '../jobs/RemoveOutdatedSessions';
 
 const collection = 'emailJobs';
 const dbConfigWithoutUnsupportedOptions = Object.keys(config.dbConfig).reduce(
@@ -21,9 +22,11 @@ const connectionOpts = {
 };
 const agenda: Agenda = new Agenda(connectionOpts);
 email(agenda);
+removeOutdatedSessions(agenda);
 
-agenda.start().then(() => {
+agenda.start().then(async () => {
     config.serviceReady({ isAgendaReady: true });
+    await agenda.every('1 day', removeOutdatedSessionsJobName);
 });
 
 export default agenda;
