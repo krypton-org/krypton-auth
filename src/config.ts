@@ -4,7 +4,6 @@
  */
 
 import { EventEmitter } from 'events';
-import { Request } from 'express';
 import fs from 'fs';
 import { Algorithm } from 'jsonwebtoken';
 import path from 'path';
@@ -283,7 +282,7 @@ class ServiceConfiguration extends DefaultProperties implements ReadyStatus {
      * @param  {Request} req
      * @returns The the complete router of the service
      */
-    public getRouterAddress = (req: Request): string => {
+    public getRouterAddress = (req: any): string => {
         return config.hostURLObject
             ? config.hostURLObject.href + req.baseUrl
             : req.protocol + '://' + req.get('host') + req.baseUrl;
