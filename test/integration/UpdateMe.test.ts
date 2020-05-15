@@ -150,7 +150,7 @@ test('Wrong previous password', async (done) => {
           }`
     }
     let res = await request.postGraphQL(query, token2, refreshToken2);
-    expect(res.errors[0].message.includes("Your previous password is wrong!")).toBeTruthy();
+    expect(res.errors[0].message.includes("Your previous password is wrong.")).toBeTruthy();
     expect(res.errors[0].type).toBe('WrongPasswordError');
 
     let loginQuery = {

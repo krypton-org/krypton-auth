@@ -78,7 +78,7 @@ export const getUser = async (req: Request, res: Response): Promise<{ user: any 
     try {
         return await User.findById(req.user._id);
     } catch (err) {
-        throw new UnauthorizedError('User not found, please log in!');
+        throw new UnauthorizedError('User not found, please log in.');
     }
 };
 
@@ -110,9 +110,9 @@ export const confirmEmail = async (req: Request, res: Response, next: NextFuncti
         }
         const user = await User.getUser({ verificationToken: token });
         await User.updateUser({ email: user.email }, { verificationToken: null, email_verified: true });
-        notifications.push({ type: 'success', message: 'You are now verified!' });
+        notifications.push({ type: 'success', message: 'You are now verified.' });
     } catch (err) {
-        notifications.push({ type: 'error', message: 'This link is not valid!' });
+        notifications.push({ type: 'error', message: 'This link is not valid.' });
     } finally {
         ejs.renderFile(config.notificationPageTemplate, { notifications }, { notifications }, (err, html) => {
             if (err) {
@@ -137,11 +137,11 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
     user.verificationToken = generateToken(TOKEN_LENGTH);
 
     if (!user.password) {
-        throw new UserValidationError('Please provide a password!');
+        throw new UserValidationError('Please provide a password.');
     }
 
     if (user.password.length < 8) {
-        throw new UserValidationError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters.');
     }
     try {
         await User.createUser(user);
@@ -153,7 +153,7 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
         return true;
     } catch (err) {
         if (err.message.includes('email') && err.message.includes('duplicate key')) {
-            throw new EmailAlreadyExistsError('Email already exists');
+            throw new EmailAlreadyExistsError('Email already exists.');
         }
         throw new UserValidationError(err.message.replace('user validation failed: email: Path ', ''));
     }
@@ -168,7 +168,7 @@ export const createUser = async (user: any, req: Request): Promise<boolean> => {
  */
 export const resendConfirmationEmail = async (req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
     const user = await User.getUser({ _id: req.user._id });
     if (user.email_verified) {
@@ -197,11 +197,11 @@ export const recoverPassword = async (
 ): Promise<{ notifications: Notification[] }> => {
     const notifications: Notification[] = [];
     if (password.length < 8) {
-        throw new UserValidationError('The password must contain at least 8 characters!');
+        throw new UserValidationError('The password must contain at least 8 characters.');
     }
     const userExists = await User.userExists({ passwordRecoveryToken });
     if (!userExists) {
-        throw new UnauthorizedError('Unvalid token!');
+        throw new UnauthorizedError('Unvalid token.');
     }
     const user = await User.getUser({ passwordRecoveryToken });
     const resetDate = new Date(user.passwordRecoveryRequestDate);
@@ -215,7 +215,7 @@ export const recoverPassword = async (
         { _id: user.id },
         { password, passwordRecoveryToken: undefined, passwordRecoveryRequestDate: undefined },
     );
-    notifications.push({ type: 'success', message: 'Your password is updated!' });
+    notifications.push({ type: 'success', message: 'Your password is updated.' });
     return { notifications };
 };
 /**
@@ -238,15 +238,15 @@ export const updateUser = async (
 ): Promise<{ expiryDate: Date; token: string; user: any }> => {
     if (!isUserLoggedIn(req) || !(await Session.isValid(req.user._id, req.cookies.refreshToken))) {
         res.status(401);
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
     if (userUpdates.password && userUpdates.password !== userUpdates.previousPassword) {
         const isValid = await User.isPasswordValid({ email: req.user.email }, userUpdates.previousPassword);
         if (!isValid) {
-            throw new WrongPasswordError('Your previous password is wrong!');
+            throw new WrongPasswordError('Your previous password is wrong.');
         }
         if (userUpdates.password.length < 8) {
-            throw new UserValidationError('The password must contain at least 8 characters!');
+            throw new UserValidationError('The password must contain at least 8 characters.');
         }
         delete userUpdates.previousPassword;
     }
@@ -279,7 +279,7 @@ export const updateUser = async (
         return payload;
     } catch (err) {
         if (err.message.includes('email') && err.message.includes('duplicate key')) {
-            throw new EmailAlreadyExistsError('Email already exists');
+            throw new EmailAlreadyExistsError('Email already exists.');
         }
         throw new UserValidationError(err.message.replace('user validation failed: email: ', ''));
     }
@@ -295,11 +295,11 @@ export const updateUser = async (
  */
 export const deleteUser = async (password: string, req: Request): Promise<boolean> => {
     if (!isUserLoggedIn(req)) {
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
     const isValid = await User.isPasswordValid({ _id: req.user._id }, password);
     if (!isValid) {
-        throw new WrongPasswordError('You entered a wrong password');
+        throw new WrongPasswordError('You entered a wrong password.');
     }
     await User.removeUser({ _id: req.user._id });
     return true;
@@ -315,7 +315,7 @@ export const logout = async (req: Request): Promise<boolean> => {
     if (user && session) {
         await Session.removeSession(req.user._id, req.cookies.refreshToken);
     } else {
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
     return true;
 };
@@ -341,7 +341,7 @@ export const login = async (
     if (emailExists) {
         payload = await User.sign({ email }, password, config.privateKey);
     } else {
-        throw new UserNotFoundError('Wrong credentials!');
+        throw new UserNotFoundError('Wrong credentials.');
     }
 
     if (req.cookies.refreshToken) {
@@ -369,7 +369,7 @@ export const login = async (
  */
 export const sendPasswordRecoveryEmail = async (email: string, req: Request): Promise<boolean> => {
     if (req.user !== undefined) {
-        throw new AlreadyLoggedInError('Oups, you are already logged in!');
+        throw new AlreadyLoggedInError('Oups, you are already logged in.');
     }
 
     const exists = await User.userExists({ email });
@@ -410,7 +410,7 @@ export const sendPasswordRecoveryEmail = async (email: string, req: Request): Pr
 export const resetPasswordForm = (req: Request, res: Response, next: NextFunction): void => {
     const notifications: Notification[] = [];
     if (req.user) {
-        notifications.push({ type: 'error', message: 'Oups, you are already logged in!' });
+        notifications.push({ type: 'error', message: 'Oups, you are already logged in.' });
         res.json({ notifications });
         return;
     }
@@ -448,6 +448,6 @@ export const refreshTokens = async (req: Request, res: Response): Promise<{ toke
         res.cookie('refreshToken', refreshToken, params);
         return payload;
     } else {
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
 };

@@ -62,9 +62,9 @@ beforeAll((done) => {
                 validate: {
                     message: props => {
                         if (props.value.length < 4) {
-                            return 'The username must contains more than 4 characters!';
+                            return 'The username must contains more than 4 characters.';
                         } else {
-                            return 'A username may only contain letters, numbers, dashes, dots and underscores !';
+                            return 'A username may only contain letters, numbers, dashes, dots and underscores .';
                         }
                     },
                     validator: v => /^[a-zA-Z0-9\-_.]{4,}$/.test(v),
@@ -118,7 +118,7 @@ test('Username to small', async (done) => {
             }`
     }
     const res = await request.postGraphQL(query);
-    expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
+    expect(res.errors[0].message.includes("The username must contains more than 4 characters.")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
@@ -194,7 +194,7 @@ test('Username too short', async (done) => {
     }
 
     let res = await request.postGraphQL(query, token, refreshToken);
-    expect(res.errors[0].message.includes("The username must contains more than 4 characters!")).toBeTruthy();
+    expect(res.errors[0].message.includes("The username must contains more than 4 characters.")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
