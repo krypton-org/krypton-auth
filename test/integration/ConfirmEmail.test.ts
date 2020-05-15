@@ -63,7 +63,7 @@ test("Confirm email", async (done) => {
 test("wrong verify token", async (done) => {
     const res = await request.get("/user/email/confirmation?token=" + "WRONGTOKEN");
     expect(res.statusCode).toBe(200);
-    expect(res.text.includes("This link is not valid!")).toBeTruthy();
+    expect(res.text.includes("This link is not valid.")).toBeTruthy();
     done();
 });
 

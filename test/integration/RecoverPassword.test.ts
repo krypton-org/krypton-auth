@@ -146,7 +146,7 @@ test("Wrong token", async (done) => {
     }
 
     res = await request.postGraphQL(updatePasswordQuery);
-    expect(res.errors[0].message.includes("Unvalid token!")).toBeTruthy();
+    expect(res.errors[0].message.includes("Unvalid token.")).toBeTruthy();
     expect(res.errors[0].type).toBe('UnauthorizedError');
 
     res = await appTester.login(user2.email, newPassword);
@@ -229,7 +229,7 @@ test("Can't access reset password form when logged in", async (done) => {
     const res = await request.get("/form/reset/password?token=" + "ATOKEN")
     .set("Authorization", "Bearer " + token).send();
     expect(res.statusCode).toBe(200);
-    expect(res.text.includes("Oups, you are already logged in!")).toBeTruthy();
+    expect(res.text.includes("Oups, you are already logged in.")).toBeTruthy();
     done();
 });
 

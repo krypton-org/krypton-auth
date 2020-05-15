@@ -72,7 +72,7 @@ test('Password to small', async (done) => {
             }`
     }
     const res = await request.postGraphQL(query);
-    expect(res.errors[0].message).toBe("The password must contain at least 8 characters!");
+    expect(res.errors[0].message).toBe("The password must contain at least 8 characters.");
     expect(res.errors[0].type).toBe("UserValidationError");
     done();
 });
@@ -92,7 +92,7 @@ test('Email invalid', async (done) => {
             }`
     }
     const res = await request.postGraphQL(query);
-    expect(res.errors[0].message.includes("This email address is not valid!")).toBeTruthy();
+    expect(res.errors[0].message.includes("This email address is not valid.")).toBeTruthy();
     expect(res.errors[0].type).toBe('UserValidationError');
     done();
 });
@@ -151,7 +151,7 @@ test('Email already exists', async (done) => {
             }`
     }
     res = await request.postGraphQL(query2);
-    expect(res.errors[0].message).toBe("Email already exists");
+    expect(res.errors[0].message).toBe("Email already exists.");
     expect(res.errors[0].type).toBe('EmailAlreadyExistsError');
 
     done();

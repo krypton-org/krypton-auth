@@ -5,7 +5,7 @@ import supertest from 'supertest';
 
 test('Catch operationnal errors', async (done) => {
     const app = express();
-    const msg = "An error occured!"
+    const msg = "An error occured."
     app.get('/', (req, res, next) => { throw new OperationalError(msg) });
     app.use(ErrorHandler);
     const request = supertest(app);

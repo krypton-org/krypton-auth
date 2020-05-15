@@ -132,7 +132,7 @@ User.statics.userExists = function(filter: any): Promise<boolean> {
 User.statics.getUser = function(filter: any): Promise<any> {
     return this.findOne(filter).then(user => {
         if (user == null) {
-            throw new UnauthorizedError('User not found!');
+            throw new UnauthorizedError('User not found.');
         }
         return user;
     });
@@ -145,7 +145,7 @@ User.statics.getUserNonInternalFields = function(filter: any): Promise<any> {
         .lean()
         .then(user => {
             if (user == null) {
-                throw new UnauthorizedError('User not found!');
+                throw new UnauthorizedError('User not found.');
             }
             return user;
         });
@@ -196,7 +196,7 @@ User.statics.sign = async function(
 ): Promise<{ expiryDate: Date; token: string; user: any }> {
     const isPasswordValid = await this.isPasswordValid(filter, password);
     if (!isPasswordValid) {
-        throw new UserNotFoundError('Wrong credentials!');
+        throw new UserNotFoundError('Wrong credentials.');
     }
     const user = await this.getUserNonInternalFields(filter);
     const expiryDate = new Date();
@@ -222,7 +222,7 @@ User.statics.verify = function(token: string, publicKey: string): Promise<object
     return new Promise((resolve, reject) => {
         jwt.verify(token, publicKey, { algorithms: [config.algorithm] }, async (err, userDecrypted) => {
             if (err) {
-                reject(new UnauthorizedError('User not found, please log in!'));
+                reject(new UnauthorizedError('User not found, please log in.'));
             } else {
                 resolve(userDecrypted);
             }

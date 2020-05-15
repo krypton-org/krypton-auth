@@ -15,7 +15,7 @@ const basicSchema = {
         type: String,
         unique: true,
         validate: {
-            message: () => 'This email address is not valid!',
+            message: () => 'This email address is not valid.',
             validator: v =>
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
                     v,

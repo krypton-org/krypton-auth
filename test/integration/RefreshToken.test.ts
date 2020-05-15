@@ -90,7 +90,7 @@ test("Refresh token expired - relog-in", async (done) => {
     expect(new Date(resLogin.data.login.expiryDate) >= upLimit).toBeTruthy();
     await wait(refreshTokenExpiryTime)
     let resRefresh = await request.postGraphQL(buildRefreshTokenQuery(), token1, resLogin.cookies.refreshToken);
-    expect(resRefresh.errors[0].message).toBe("Please login!");
+    expect(resRefresh.errors[0].message).toBe("Please login.");
     done();
 }, 40000);
 
@@ -101,7 +101,7 @@ test("Can't refresh auth token without refresh token", async (done) => {
     let token1 = resLogin.data.login.token;
     expect(new Date(resLogin.data.login.expiryDate) >= upLimit).toBeTruthy();
     let resRefresh = await request.postGraphQL(buildRefreshTokenQuery(), token1);
-    expect(resRefresh.errors[0].message).toBe("Please login!");
+    expect(resRefresh.errors[0].message).toBe("Please login.");
     done();
 }, 40000);
 
@@ -116,7 +116,7 @@ test("Can't update user without refresh token", async (done) => {
           }`
     }
     let resUpdate = await request.postGraphQL(query, token3);
-    expect(resUpdate.errors[0].message.includes("Please login!")).toBeTruthy();
+    expect(resUpdate.errors[0].message.includes("Please login.")).toBeTruthy();
     done();
 });
 
@@ -132,7 +132,7 @@ test("Can't update user with expired auth token", async (done) => {
     }
     await wait(authTokenExpiryTime)
     let resUpdate = await request.postGraphQL(query, token3, resLogin.cookies.refreshToken);
-    expect(resUpdate.errors[0].message.includes("Please login!")).toBeTruthy();
+    expect(resUpdate.errors[0].message.includes("Please login.")).toBeTruthy();
     done();
 }, 40000);
 

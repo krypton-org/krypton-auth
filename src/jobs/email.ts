@@ -26,7 +26,7 @@ export default function(agenda: Agenda): void {
                             'To open the preview click <a style="color: #007bff; text-decoration: none; background-color: transparent;" href="' +
                             nodemailer.getTestMessageUrl(info) +
                             '" target="_blank"/>here</a>.',
-                        title: 'Mock email sent!',
+                        title: 'Mock email sent.',
                         type: 'info',
                     });
                 }

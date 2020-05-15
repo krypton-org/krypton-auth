@@ -34,7 +34,7 @@ export default class AppTester {
                         maxlength: 256,
                         validate: {
                             validator: v => v.length >= 2,
-                            message: () => "A minimum of 2 letters are required for your first name!",
+                            message: () => "A minimum of 2 letters are required for your first name.",
                         },
                         isPublic: false
                     },
@@ -44,7 +44,7 @@ export default class AppTester {
                         maxlength: 256,
                         validate: {
                             validator: v => v.length >= 2,
-                            message: () => "A minimum of 2 letters are required for your last name!",
+                            message: () => "A minimum of 2 letters are required for your last name.",
                         },
                         isPublic: false
                     },

@@ -164,7 +164,7 @@ SessionSchema.statics.getUserAndSessionFromRefreshToken = async function(
     ) {
         return { user: aggregate[0].user[0], session: aggregate[0] };
     } else {
-        throw new UnauthorizedError('Please login!');
+        throw new UnauthorizedError('Please login.');
     }
 };
 
