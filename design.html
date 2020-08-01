@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design &#8212; Krypton Authentication  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Security" href="security.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+
+
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=krypton-org&repo=krypton-auth&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+<p>
+    <a class="badge" href="https://coveralls.io/github/krypton-org/krypton-auth">
+    <img
+        alt="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+        src="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://github.com/krypton-org/krypton-auth/actions">
+    <img
+        alt="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+        src="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-heroku">
+    <img
+        alt="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+        src="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+    />
+</a>
+</p>
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queries.html">Queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Design</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="security.html" title="previous chapter">Security</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="design">
+<h1>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h1>
+<p>This authentication system works with a pair of Private and Public Keys:
+1. When a user logs-in, Krypton Authentication generates a token from the Private Key (with JSON Web Tokens). This token will encode the user data.
+2. Then, the user is able to make authenticated requests to other servers by including the token into the request headers. Those servers can decode the token with the Public Key and access the user data. If the decoding works, it means that only the Private Key could encode the token and it guarantees the user’s identity.</p>
+<p>Below the corresponding sequence diagram:</p>
+<img alt="Krypton Authentication - Sequence diagram" class="align-center" src="https://nusid.net/img/sequence_diagram-graphql_auth_service.svg" /><p>This library aims to be replicated behind a load balancer. It is completely stateless (no session stored). All your replicas would have to be sharing the same pair of Private and Public Keys.</p>
+<p>Below a possible system design you could use:</p>
+<img alt="Krypton Authentication - System Design diagram" class="align-center" src="https://nusid.net/img/system_design_diagram-graphql_auth_service.svg" /></div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div> 
+
+
+    <div class="footer">
+      &copy;2020, The Krypton Project.
+      
+      |
+      <a href="_sources/design.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+
+<!-- GraphiQL -->
+
+<link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.css">
+<script crossorigin src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
+<script crossorigin src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
+<script crossorigin src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.min.js"></script>
+<script crossorigin src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+<script type="text/javascript" src="_static/queries.js"></script>
+<script type="text/javascript">
+    var fetchURL = "https://nusid.net/krypton-auth/";
+    var socketURL = "https://nusid.net/";
+    setupGraphiQLHelpers(fetchURL, socketURL);
+</script>
+
+
+  </body>
+</html>

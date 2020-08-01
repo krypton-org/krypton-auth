@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration &#8212; Krypton Authentication  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deployment" href="deployment.html" />
+    <link rel="prev" title="Queries" href="queries.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+
+
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=krypton-org&repo=krypton-auth&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+<p>
+    <a class="badge" href="https://coveralls.io/github/krypton-org/krypton-auth">
+    <img
+        alt="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+        src="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://github.com/krypton-org/krypton-auth/actions">
+    <img
+        alt="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+        src="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-heroku">
+    <img
+        alt="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+        src="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+    />
+</a>
+</p>
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queries.html">Queries</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#properties">Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#error-handling">Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extended-schema">Extended Schema</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="queries.html" title="previous chapter">Queries</a></li>
+      <li>Next: <a href="deployment.html" title="next chapter">Deployment</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<p>Properties are set when the service is instantiated, for example:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">kryptonAuth</span><span class="p">({</span> <span class="nx">mailFrom</span><span class="o">:</span> <span class="s1">&#39;&quot;Fred Foo 👻&quot; &lt;foo@example.com&gt;&#39;</span> <span class="p">}));</span>
+</pre></div>
+</div>
+<dl class="js class">
+<dt id="Properties">
+<em class="property">class </em><code class="sig-name descname">Properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Properties" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>interface</em>, <em>exported from</em> <code class="xref js js-mod docutils literal notranslate"><span class="pre">config</span></code></p>
+<p>Properties for configuring Krypton Authentication.</p>
+<dl class="js attribute">
+<dt id="Properties.algorithm">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">algorithm</code><a class="headerlink" href="#Properties.algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> Algorithm</p>
+<p>JSON Web Token signing algorithm. The default value is <code class="docutils literal notranslate"><span class="pre">RS256</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.authTokenExpiryTime">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">authTokenExpiryTime</code><a class="headerlink" href="#Properties.authTokenExpiryTime" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> number</p>
+<p>Time until the authentication token expires in milliseconds.
+The default value is <code class="docutils literal notranslate"><span class="pre">15</span> <span class="pre">*</span> <span class="pre">60</span> <span class="pre">*</span> <span class="pre">1000</span></code> (15 minutes).
+Call the <code class="docutils literal notranslate"><span class="pre">refreshToken</span></code> mutation to renew it.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.dbAddress">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">dbAddress</code><a class="headerlink" href="#Properties.dbAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>MongoDB server address.
+Example: <code class="docutils literal notranslate"><span class="pre">mongodb://user:password&#64;host.com:27017/DBname</span></code>.
+The default value is <code class="docutils literal notranslate"><span class="pre">mongodb://localhost:27017/users</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.dbConfig">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">dbConfig</code><a class="headerlink" href="#Properties.dbConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> &lt;TODO&gt;</p>
+<p>MongoDB config, only if you need to set a special configuration for MongoDB.
+The default configuration used by Krypton aims to make the system resilient to database connection problems. Krypton will try to reconnect automatically to MongoDB. You can adapt this behavior by tweaking this property.
+Example: <code class="docutils literal notranslate"><span class="pre">{reconnectInterval:</span> <span class="pre">500}</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.eventEmitter">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">eventEmitter</code><a class="headerlink" href="#Properties.eventEmitter" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> EventEmitter</p>
+<p>Event emitter transmitting krypton errors on “error” event and email errors on “email-error” event.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.extendedSchema">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">extendedSchema</code><a class="headerlink" href="#Properties.extendedSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> object</p>
+<p>Custom user model, see <a class="reference internal" href="#extended-schema"><span class="std std-ref">Extended Schema</span></a>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.graphiql">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">graphiql</code><a class="headerlink" href="#Properties.graphiql" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> boolean</p>
+<p>Enable or disable GraphiQL IDE. The default value is <cite>true</cite>.
+In the page header, you will find an input field to include your auth token and be able to make authenticated requests.</p>
+<p><strong>Note:</strong> Include your auth token directly, no need to precede it with <code class="docutils literal notranslate"><span class="pre">Bearer</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.host">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">host</code><a class="headerlink" href="#Properties.host" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>Public URL of the service.</p>
+<p><strong>Very important for use in production:</strong> when users receive emails to reset their password or to confirm their account, the links will be pointing to the <code class="docutils literal notranslate"><span class="pre">host</span></code> of the service. The default value is <code class="docutils literal notranslate"><span class="pre">null</span></code>. When <code class="docutils literal notranslate"><span class="pre">null</span></code>, Krypton Authentication uses the address located in <code class="docutils literal notranslate"><span class="pre">req.headers.host</span></code> that can correspond to the machine <code class="docutils literal notranslate"><span class="pre">localhost</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.mailFrom">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">mailFrom</code><a class="headerlink" href="#Properties.mailFrom" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string|Address</p>
+<p>Sender address displayed in emails sent to users. The default value is <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">kryptonAuth</span><span class="p">({</span> <span class="nx">mailFrom</span><span class="o">:</span> <span class="s1">&#39;&quot;Fred Foo 👻&quot; &lt;foo@example.com&gt;&#39;</span> <span class="p">}));</span>
+<span class="c1">// or</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">kryptonAuth</span><span class="p">({</span>
+    <span class="nx">mailFrom</span><span class="o">:</span> <span class="p">{</span>
+         <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Fred Foo 👻&quot;</span><span class="p">;</span>
+         <span class="nx">address</span><span class="o">:</span> <span class="s2">&quot;foo@example.com&quot;</span><span class="p">;</span>
+     <span class="p">}</span>
+<span class="p">}));</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.nodemailerConfig">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">nodemailerConfig</code><a class="headerlink" href="#Properties.nodemailerConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> any</p>
+<p>A <a class="reference external" href="https://nodemailer.com/smtp/#examples">Nodemailer configuration</a> used to send administration emails to users. The default value is <code class="docutils literal notranslate"><span class="pre">undefined</span></code>.</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">nodemailerConfig</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="nx">host</span><span class="o">:</span> <span class="s2">&quot;smtp.example.email&quot;</span><span class="p">,</span>
+     <span class="nx">port</span><span class="o">:</span> <span class="mi">587</span><span class="p">,</span>
+     <span class="nx">secure</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// true for 465, false for other ports</span>
+     <span class="nx">auth</span><span class="o">:</span> <span class="p">{</span>
+         <span class="nx">user</span><span class="o">:</span> <span class="nx">credentials</span><span class="p">.</span><span class="nx">user</span><span class="p">,</span>
+         <span class="nx">pass</span><span class="o">:</span> <span class="nx">credentials</span><span class="p">.</span><span class="nx">pass</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;/auth&#39;</span><span class="p">,</span> <span class="nx">kryptonAuth</span><span class="p">({</span> <span class="nx">nodemailerConfig</span> <span class="p">}));</span>
+</pre></div>
+</div>
+<p>If left <code class="docutils literal notranslate"><span class="pre">undefined</span></code> a Nodemailer test account is set automatically. It will print URL links on the command line to let you preview the emails that would have normally been sent.</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span>Message sent: &lt;365ea109-f645-e3a1-5e08-48e4c8a37bcb@JohannC&gt;
+Preview URL: https://ethereal.email/message/Xklk07cTigz7mlaKXkllHsRk0gyz7kuxAAAAAWLgnFDcJwUFl8MZ-h1shKs
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.notificationPageTemplate">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">notificationPageTemplate</code><a class="headerlink" href="#Properties.notificationPageTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The filepath to the <a class="reference external" href="https://ejs.co/">EJS</a> template file of notification page.
+This library include a simple one located in <a class="reference external" href="https://github.com/JohannC/krypton-auth/blob/master/lib/templates/pages/Notification.ejs">./nodes_module/krypton-auth/lib/templates/pages/Notification.ejs</a>.
+You can create another, just gives the file path to the <a class="reference external" href="https://ejs.co/">EJS</a> file you wish to send. Here are the locals you can use inside the template:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">notifications</span></code>: <code class="docutils literal notranslate"><span class="pre">Array</span></code> of <code class="docutils literal notranslate"><span class="pre">Object</span></code> notification. Each notification object contains two properties:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>: <code class="docutils literal notranslate"><span class="pre">String</span> <span class="pre">Enum</span></code> either equal to <code class="docutils literal notranslate"><span class="pre">success</span></code> - <code class="docutils literal notranslate"><span class="pre">warning</span></code> - <code class="docutils literal notranslate"><span class="pre">error</span></code> - <code class="docutils literal notranslate"><span class="pre">info</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message</span></code>: <code class="docutils literal notranslate"><span class="pre">String</span></code> property containing the notificaiton message</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.onReady">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">onReady</code><a class="headerlink" href="#Properties.onReady" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> &lt;TODO&gt;</p>
+<p>The callback that will be executed when service is launched and ready. The default value is: <code class="docutils literal notranslate"><span class="pre">()</span> <span class="pre">=&gt;</span> <span class="pre">console.log(&quot;Krypton</span> <span class="pre">Authentication</span> <span class="pre">is</span> <span class="pre">ready.&quot;);</span></code>.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.privateKey">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">privateKey</code><a class="headerlink" href="#Properties.privateKey" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The private key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under <code class="docutils literal notranslate"><span class="pre">your-app/private-key.txt</span></code> all along with the public key. You can retrieve the pair of keys created for re-use afterward.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.privateKeyFilePath">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">privateKeyFilePath</code><a class="headerlink" href="#Properties.privateKeyFilePath" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The file path to the private key of the service. If both privateKey and privateKeyFilePath are undefined, it will create one under <code class="docutils literal notranslate"><span class="pre">your-app/private-key.txt</span></code> all along with the public key. You can retrieve the pair of keys created for re-use afterward.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.publicKey">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">publicKey</code><a class="headerlink" href="#Properties.publicKey" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The public key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under <code class="docutils literal notranslate"><span class="pre">your-app/public-key.txt</span></code> all along with the private key. You can retrieve the pair of keys created for re-use afterward.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.publicKeyFilePath">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">publicKeyFilePath</code><a class="headerlink" href="#Properties.publicKeyFilePath" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The file path to the public key of the service. If both publicKey and publicKeyFilePath are undefined, it will create one under <code class="docutils literal notranslate"><span class="pre">your-app/public-key.txt</span></code> all along with the private key. You can retrieve the pair of keys created for re-use afterward.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.refreshTokenExpiryTime">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">refreshTokenExpiryTime</code><a class="headerlink" href="#Properties.refreshTokenExpiryTime" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> number</p>
+<p>The time until the refresh token expires in milliseconds. If a user is inactive during this period he will have to login in order to get a new refresh token. The default value is <code class="docutils literal notranslate"><span class="pre">7</span> <span class="pre">*</span> <span class="pre">24</span> <span class="pre">*</span> <span class="pre">60</span> <span class="pre">*</span> <span class="pre">60</span> <span class="pre">*</span> <span class="pre">1000</span></code> (7 days).</p>
+<p><strong>Note:</strong> before the refresh token has expired, you can call the <a class="reference internal" href="queries.html#refresh-authentication-tokens"><span class="std std-ref">refreshToken</span></a> mutation. Both the auth token and the refresh token will be renewed and your user won’t face any service interruption.</p>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.resetPasswordEmailTemplate">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">resetPasswordEmailTemplate</code><a class="headerlink" href="#Properties.resetPasswordEmailTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The file path to the <a class="reference external" href="https://ejs.co/">EJS</a> template file of the email to reset forgotten password.
+This library include a simple one located in <a class="reference external" href="https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/ResetPassword.ejs">./nodes_module/krypton-auth/lib/templates/emails/ResetPassword.ejs</a>.
+You can create another, just gives the file path to the <a class="reference external" href="https://ejs.co/">EJS</a> file you wish to send. Here are the locals you can use inside the template:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user</span></code> - The current user: <code class="docutils literal notranslate"><span class="pre">&lt;p&gt;Hi</span> <span class="pre">&lt;%=</span> <span class="pre">user.fistName</span> <span class="pre">%&gt;&lt;/p&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code> - The link to the reset form: <code class="docutils literal notranslate"><span class="pre">Click</span> <span class="pre">here:</span> <span class="pre">&lt;a</span> <span class="pre">href=&quot;&lt;%=</span> <span class="pre">link</span> <span class="pre">%&gt;&quot;&gt;&lt;%=</span> <span class="pre">link</span> <span class="pre">%&gt;</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.resetPasswordFormTemplate">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">resetPasswordFormTemplate</code><a class="headerlink" href="#Properties.resetPasswordFormTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The file path to the <a class="reference external" href="https://ejs.co/">EJS</a> template file of the reset password form.
+This library include a simple one located in <a class="reference external" href="https://github.com/JohannC/krypton-auth/blob/master/lib/templates/forms/ResetPassword.ejs">./nodes_module/krypton-auth/lib/templates/forms/ResetPassword.ejs</a>.
+You can create another, just gives the file path to the <a class="reference external" href="https://ejs.co/">EJS</a> file you wish to send.
+Here are the locals you can use inside the template:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code>: The link of the API: <code class="docutils literal notranslate"><span class="pre">xhr.open(&quot;POST&quot;,</span> <span class="pre">'&lt;%=</span> <span class="pre">link</span> <span class="pre">%&gt;')</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The reset password token to include in the GraphQL <a class="reference internal" href="queries.html#reset-password"><span class="std std-ref">resetMyPassword</span></a> mutation (example below)</p></li>
+</ul>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">responseType</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span><span class="p">;</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s1">&#39;&lt;%= link %&gt;&#39;</span><span class="p">);</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/json&quot;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">mutation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">query</span><span class="o">:</span> <span class="sb">`mutation{resetMyPassword(password:&quot;</span><span class="si">${</span><span class="nx">formData</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span><span class="si">}</span><span class="sb">&quot; passwordRecoveryToken:&lt;%= token %&gt;){</span>
+<span class="sb">        notifications{</span>
+<span class="sb">            type</span>
+<span class="sb">            message</span>
+<span class="sb">        }</span>
+<span class="sb">     }}`</span>
+  <span class="p">}</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">mutation</span><span class="p">));</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="js attribute">
+<dt id="Properties.verifyEmailTemplate">
+<code class="sig-prename descclassname">Properties.</code><code class="sig-name descname">verifyEmailTemplate</code><a class="headerlink" href="#Properties.verifyEmailTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>type:</strong> string</p>
+<p>The filepath to the <a class="reference external" href="https://ejs.co/">EJS</a> template file of the email to verify user account.
+This library include a simple one located in <a class="reference external" href="https://github.com/JohannC/krypton-auth/blob/master/lib/templates/emails/VerifyEmail.ejs">./nodes_module/krypton-auth/lib/templates/emails/VerifyEmail.ejs</a>.
+You can create another, just gives the file path to the <a class="reference external" href="https://ejs.co/">EJS</a> file you wish to send.
+Here are the locals you can use inside the template:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user</span></code> - The current user: <code class="docutils literal notranslate"><span class="pre">&lt;p&gt;Hi</span> <span class="pre">&lt;%=</span> <span class="pre">user.firstName</span> <span class="pre">%&gt;&lt;/p&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code> - The verification link: <code class="docutils literal notranslate"><span class="pre">Click</span> <span class="pre">here:</span> <span class="pre">&lt;a</span> <span class="pre">href=&quot;&lt;%=</span> <span class="pre">link</span> <span class="pre">%&gt;&quot;&gt;&lt;%=</span> <span class="pre">link</span> <span class="pre">%&gt;</span></code></p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="error-handling">
+<h2>Error Handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>Krypton Authentication provides an <code class="docutils literal notranslate"><span class="pre">eventBus</span></code> to notify eventual errors. The <code class="docutils literal notranslate"><span class="pre">email-error</span></code> event is related to unsent emails. The <code class="docutils literal notranslate"><span class="pre">error</span></code> event is related to any other kind of errors.</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">kryptonAuth</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;@krypton-org/krypton-auth&#39;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">EventEmitter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+<span class="kr">const</span> <span class="nx">eventEmitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="p">();</span>
+<span class="nx">eventEmitter</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;email-error&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">email</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Email not sent: &quot;</span><span class="o">+</span><span class="nx">email</span><span class="p">)</span>
+<span class="p">});</span>
+
+<span class="nx">eventEmitter</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;An error occured: &quot;</span><span class="o">+</span><span class="nx">err</span><span class="p">)</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="s1">&#39;/auth&#39;</span><span class="p">,</span> <span class="nx">kryptonAuth</span><span class="p">({</span> <span class="nx">eventEmitter</span> <span class="p">}));</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="extended-schema">
+<span id="id1"></span><h2>Extended Schema<a class="headerlink" href="#extended-schema" title="Permalink to this headline">¶</a></h2>
+<p>The true power of Krypton Authentication is the ability to customize the user model to your own needs.</p>
+<p>To achieve that you simply need to pass the different <a class="reference external" href="https://mongoosejs.com/docs/guide.html">Mongoose Schema</a> fields you want to add.
+Under the hood, those extra fields will be converted into GraphQL types thanks to <a class="reference external" href="https://github.com/graphql-compose/graphql-compose-mongoose">graphql-compose-mongoose</a> and added to the different queries and mutations automatically.</p>
+<p><a class="reference external" href="https://mongoosejs.com/docs/guide.html">Mongoose Schema</a> is very powerful, you can define the field type, default value, <a class="reference external" href="https://mongoosejs.com/docs/validation.html#custom-validators">custom validators</a> &amp; error messages to display, if it is <a class="reference external" href="https://mongoosejs.com/docs/validation.html#required-validators-on-nested-objects">required</a>, if it should be <a class="reference external" href="https://mongoosejs.com/docs/validation.html#the-unique-option-is-not-a-validator">unique</a>. Please refer to its <a class="reference external" href="https://mongoosejs.com/docs/guide.html">documentation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In each schema field, you can define the <code class="docutils literal notranslate"><span class="pre">isPrivate</span></code> attribute. It is a <code class="docutils literal notranslate"><span class="pre">Boolean</span></code> attribute telling whether or not this field can be accessible by public <code class="docutils literal notranslate"><span class="pre">queries</span></code> like <a class="reference internal" href="queries.html#fetch-public-user-data"><span class="std std-ref">userById</span></a>, <a class="reference internal" href="queries.html#fetch-public-user-data"><span class="std std-ref">userByOne</span></a>, etc.</p>
+</div>
+<p>For example, you could pass the following <code class="docutils literal notranslate"><span class="pre">extendedSchema</span></code>:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="kr">const</span> <span class="nx">extendedSchema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">firstName</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nb">String</span><span class="p">,</span>
+        <span class="nx">required</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nx">maxlength</span><span class="o">:</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="nx">validate</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">validator</span><span class="o">:</span> <span class="nx">v</span> <span class="p">=&gt;</span> <span class="nx">v</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="nx">message</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="s2">&quot;A minimum of 2 letters are required for your first name!&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="nx">isPublic</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">},</span>
+    <span class="nx">lastName</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nb">String</span><span class="p">,</span>
+        <span class="nx">required</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nx">maxlength</span><span class="o">:</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="nx">validate</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">validator</span><span class="o">:</span> <span class="nx">v</span> <span class="p">=&gt;</span> <span class="nx">v</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="nx">message</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="s2">&quot;A minimum of 2 letters are required for your last name!&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="nx">isPublic</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">},</span>
+    <span class="nx">gender</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nb">String</span><span class="p">,</span>
+        <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="kr">enum</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;Mrs&quot;</span><span class="p">,</span> <span class="s2">&quot;Other&quot;</span><span class="p">],</span>
+        <span class="nx">isPublic</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">},</span>
+    <span class="nx">age</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nb">Number</span><span class="p">,</span>
+        <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nx">isPublic</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nx">min</span><span class="o">:</span> <span class="mi">0</span>
+    <span class="p">},</span>
+    <span class="nx">receiveNewsletter</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="nb">Boolean</span><span class="p">,</span>
+        <span class="nx">required</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="k">default</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nx">isPublic</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">kryptonAuth</span><span class="p">({</span> <span class="nx">extendedSchema</span> <span class="p">}));</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div> 
+
+
+    <div class="footer">
+      &copy;2020, The Krypton Project.
+      
+      |
+      <a href="_sources/configuration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+
+<!-- GraphiQL -->
+
+<link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.css">
+<script crossorigin src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
+<script crossorigin src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
+<script crossorigin src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.min.js"></script>
+<script crossorigin src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+<script type="text/javascript" src="_static/queries.js"></script>
+<script type="text/javascript">
+    var fetchURL = "https://nusid.net/krypton-auth/";
+    var socketURL = "https://nusid.net/";
+    setupGraphiQLHelpers(fetchURL, socketURL);
+</script>
+
+
+  </body>
+</html>

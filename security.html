@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security &#8212; Krypton Authentication  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Design" href="design.html" />
+    <link rel="prev" title="Deployment" href="deployment.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+
+
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.svg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=krypton-org&repo=krypton-auth&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+<p>
+    <a class="badge" href="https://coveralls.io/github/krypton-org/krypton-auth">
+    <img
+        alt="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+        src="https://coveralls.io/repos/github/krypton-org/krypton-auth/badge.svg?branch=master"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://github.com/krypton-org/krypton-auth/actions">
+    <img
+        alt="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+        src="https://img.shields.io/github/workflow/status/krypton-org/krypton-auth/Node CI?label=tests"
+    />
+</a>
+</p>
+
+<p>
+    <a class="badge" href="https://heroku.com/deploy?template=https://github.com/krypton-org/krypton-heroku">
+    <img
+        alt="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+        src="https://img.shields.io/badge/heroku-deploy-blueviolet?logo=heroku"
+    />
+</a>
+</p>
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queries.html">Queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="deployment.html" title="previous chapter">Deployment</a></li>
+      <li>Next: <a href="design.html" title="next chapter">Design</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="security">
+<h1>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h1>
+<p>Krypton Authentication follows the security guidelines of this article: <a class="reference external" href="https://blog.hasura.io/best-practices-of-using-jwt-with-graphql/">The Ultimate Guide to handling JWTs on frontend clients</a>.</p>
+<p>By logging-in a user will receive a short-lived authentication token and a long-lived refresh token. The authentication token should not be saved in the localstorage (prone to <a class="reference external" href="https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)">XSS</a>), but in a variable. The refresh token is set automatically as an HttpOnly cookie (safe from <a class="reference external" href="https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)">XSS</a>).</p>
+<p>By default, the authentication token is valid for 15 minutes. Afterwards you will have to make a call to the <a class="reference internal" href="queries.html#refresh-authentication-tokens"><span class="std std-ref">refreshToken</span></a> mutation to have a new one. This mutation will use the refresh token set in the HttpOnly cookie to authenticate the user and give back his new authentication token. This refresh token is by default valid for 7 days and allows you to have a persistent session. Note that the refresh token is also refreshed on every call to the <a class="reference internal" href="queries.html#refresh-authentication-tokens"><span class="std std-ref">refreshToken</span></a> mutation so that an active user never gets disconnected.</p>
+<img alt="Krypton Authentication - System Design diagram" class="align-center" src="_images/sequence_diagram-security.svg" /><p>This process is safe from <a class="reference external" href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)">CSRF</a> attacks, because even though a form submit attack can make a call to the <a class="reference internal" href="queries.html#refresh-authentication-tokens"><span class="std std-ref">refreshToken</span></a> mutation, the attacker cannot get the new JWT token value that is returned.</p>
+<p>The only risk left is that by an XSS attack an authentication token gets stolen. The attacker could then make requests with the identity of the hacked user during a period of time up to 15 minutes. That is why to change any user information like the password or email with the <a class="reference internal" href="queries.html#update-user"><span class="std std-ref">updateMe</span></a> mutation, the system will check the authentication token and the refresh token. It prevents the attacker from taking over the targeted user account by modifying those fields.</p>
+<p>Anyway, you should learn on how to protect your application from XSS attacks to ensure maximum security to your users. Here is a <a class="reference external" href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">cheat sheet</a> made by <a class="reference external" href="http://owasp.org">OWASP</a>. Note that GrahQL-Auth-Service is escaping any HTML special character like <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> in the data provided by users (except for passwords which are hashed and never returned to the client).</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div> 
+
+
+    <div class="footer">
+      &copy;2020, The Krypton Project.
+      
+      |
+      <a href="_sources/security.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+
+<!-- GraphiQL -->
+
+<link rel="stylesheet" href="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.css">
+<script crossorigin src="https://unpkg.com/promise-polyfill@8.1.3/dist/polyfill.min.js"></script>
+<script crossorigin src="https://unpkg.com/unfetch@4.1.0/dist/unfetch.umd.js"></script>
+<script crossorigin src="https://unpkg.com/react@16.12.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/graphiql-auth-token@1.2.1/umd/graphiql-auth-token.min.js"></script>
+<script crossorigin src="https://unpkg.com/socket.io-client@2.3.0/dist/socket.io.slim.js"></script>
+<script type="text/javascript" src="_static/queries.js"></script>
+<script type="text/javascript">
+    var fetchURL = "https://nusid.net/krypton-auth/";
+    var socketURL = "https://nusid.net/";
+    setupGraphiQLHelpers(fetchURL, socketURL);
+</script>
+
+
+  </body>
+</html>
